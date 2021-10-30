@@ -50,6 +50,10 @@ extension Node {
         return String(cString: str)
     }
 
+    public var symbol: Int {
+        return Int(ts_node_symbol(internalNode))
+    }
+    
     public var byteRange: Range<UInt32> {
         let start = ts_node_start_byte(internalNode)
         let end = ts_node_end_byte(internalNode)
@@ -98,7 +102,7 @@ extension Node {
         let upper = byteRange.upperBound
 
         let n = ts_node_descendant_for_byte_range(internalNode, lower, upper)
-
+        
         return Node(internalNode: n)
     }
 }
@@ -130,7 +134,7 @@ extension Node {
     
     public var treeCursor: TreeCursor {
         let cursor = ts_tree_cursor_new(internalNode)
-        
+
         return TreeCursor(internalCursor: cursor)
     }
 }
