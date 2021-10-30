@@ -127,5 +127,10 @@ extension Node {
 
         return child(at: childCount - 1)
     }
-
+    
+    public var treeCursor: TreeCursor {
+        let cursor = ts_tree_cursor_new(internalNode)
+        
+        return TreeCursor(internalCursor: cursor)
+    }
 }

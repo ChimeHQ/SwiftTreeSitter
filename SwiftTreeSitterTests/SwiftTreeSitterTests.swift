@@ -22,4 +22,11 @@ class SwiftTreeSitterTests: XCTestCase {
         XCTAssertEqual(root.child(at: 0)?.nodeType, "var_declaration")
         XCTAssertEqual(root.child(at: 1)?.nodeType, "\n")
     }
+    
+    func testFields() throws {
+        let lang = Language.go
+        
+        XCTAssertEqual(lang.fieldCount, 33)
+        XCTAssertEqual(lang.fieldName(for: 13), "function")
+    }
 }
