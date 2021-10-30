@@ -1,0 +1,24 @@
+sudo mkdir -p /usr/local/lib/pkgconfig
+sudo mkdir -p /usr/local/include
+
+pushd tree-sitter
+CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" LDFLAGS="-mmacosx-version-min=10.13" make
+sudo make install PREFIX=/usr/local
+sudo rm /usr/local/lib/libtree-sitter*.dylib
+popd
+
+or 
+
+sudo cp /opt/local/lib/libtree-sitter.a /usr/local/lib/
+sudo cp -R /opt/local/include/tree_sitter /usr/local/include/
+
+sudo cp tree-sitter-changes/tree-sitter.pc /usr/local/lib/pkgconfig/tree-sitter.pc
+
+pushd tree-sitter-go
+npm install
+ar rcs libtree-sitter-go.a build/Release/obj.target/tree_sitter_go_binding/src/*
+sudo cp libtree-sitter-go.a /usr/local/lib/
+popd
+
+sudo cp tree-sitter-changes/tree-sitter-go.pc /usr/local/lib/pkgconfig/
+sudo cp tree-sitter-changes/go.h /usr/local/include/tree_sitter/

@@ -1,0 +1,12 @@
+module tree_sitter [extern_c] {
+    module runtime {
+        header "lib/include/tree_sitter/api.h"
+        link "tree-sitter"
+        export *
+    }
+
+    module parser {
+        header "lib/include/tree_sitter/parser.h"
+        export *
+    }
+}

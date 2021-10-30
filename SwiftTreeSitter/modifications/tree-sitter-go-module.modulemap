@@ -1,0 +1,5 @@
+module tree_sitter_go [extern_c] {
+    header "go.h"
+    link "tree_sitter_go"
+    export *
+}

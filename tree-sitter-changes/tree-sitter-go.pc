@@ -1,0 +1,6 @@
+Name: tree-sitter-go
+Description: Go grammar for tree-sitter
+URL: https://github.com/tree-sitter/tree-sitter-go
+Version: 0.16.1
+Libs: -L/usr/local/lib -ltree-sitter-go
+Cflags: -Iusr/local/include
