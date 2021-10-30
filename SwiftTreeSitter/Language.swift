@@ -15,6 +15,8 @@ public enum Language {
 }
 
 extension Language {
+    public typealias FieldId = TSFieldId
+    
     public static var version: Int {
         return Int(TREE_SITTER_LANGUAGE_VERSION)
     }
@@ -31,8 +33,31 @@ extension Language {
     }
 
     public var ABIVersion: Int {
-        guard let lang = internalLanguage else { return  0 }
+        guard let lang = internalLanguage else { return 0 }
 
         return Int(ts_language_version(lang))
+    }
+    
+    public var fieldCount: Int {
+        guard let lang = internalLanguage else { return 0 }
+        
+        return Int(ts_language_field_count(lang))
+    }
+    
+    public func fieldName(for id: FieldId) -> String? {
+        guard let lang = internalLanguage else { return nil }
+        guard let str = ts_language_field_name_for_id(lang, id) else { return nil }
+        
+        return String(cString: str)
+    }
+    
+    public func fieldId(for name: String) -> FieldId? {
+        guard let lang = internalLanguage else { return nil }
+        
+        let count = UInt32(name.utf8.count)
+        
+        return name.withCString { cStr in
+            return ts_language_field_id_for_name(lang, cStr, count)
+        }
     }
 }
