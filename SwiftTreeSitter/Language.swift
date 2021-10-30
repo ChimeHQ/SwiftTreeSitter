@@ -60,4 +60,12 @@ extension Language {
         
         return Int(value)
     }
+
+    public func symbolName(for id: Int) -> String? {
+        guard let str = ts_language_symbol_name(internalLanguage, TSSymbol(id)) else {
+            return nil
+        }
+
+        return String(cString: str)
+    }
 }
