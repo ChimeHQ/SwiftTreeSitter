@@ -55,3 +55,30 @@ extension Tree {
         return ranges
     }
 }
+
+extension Tree {
+    public func enumerateNodes(in byteRange: Range<UInt32>, block: (Node) throws -> Void) rethrows {
+        guard let root = rootNode else { return }
+
+        guard let node = root.descendant(in: byteRange) else { return }
+
+        let cursor = node.treeCursor
+
+        if cursor.goToFirstChild(for: byteRange.lowerBound) == false {
+            return
+        }
+
+        try cursor.enumerateCurrentAndDescendents(block: block)
+
+        while cursor.gotoNextSibling() {
+            guard let node = cursor.currentNode else {
+                assertionFailure("no current node when gotoNextSibling succeeded")
+                break
+            }
+
+            guard node.byteRange.overlaps(byteRange) else { break }
+
+            try cursor.enumerateCurrentAndDescendents(block: block)
+        }
+    }
+}

@@ -41,7 +41,13 @@ extension Language {
         
         return Int(ts_language_field_count(lang))
     }
-    
+
+    public var symbolCount: Int {
+        guard let lang = internalLanguage else { return 0 }
+
+        return Int(ts_language_symbol_count(lang))
+    }
+
     public func fieldName(for id: Int) -> String? {
         guard let lang = internalLanguage else { return nil }
         guard let str = ts_language_field_name_for_id(lang, TSFieldId(id)) else { return nil }

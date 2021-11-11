@@ -48,3 +48,25 @@ extension TreeCursor {
         return Int(ts_tree_cursor_current_field_id(&internalCursor))
     }
 }
+
+extension TreeCursor {
+    public func enumerateCurrentAndDescendents(block: (Node) throws -> Void) rethrows {
+        if let node = currentNode {
+            try block(node)
+        }
+
+        if goToFirstChild() == false {
+            return
+        }
+
+        if let node = currentNode {
+            try block(node)
+        }
+
+        while gotoNextSibling() {
+            try enumerateCurrentAndDescendents(block: block)
+        }
+
+        assert(gotoParent())
+    }
+}
