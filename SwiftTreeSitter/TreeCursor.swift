@@ -25,6 +25,10 @@ extension TreeCursor {
     public func goToFirstChild() -> Bool {
         return ts_tree_cursor_goto_first_child(&internalCursor)
     }
+
+    public func goToFirstChild(for startByte: UInt32) -> Bool {
+        return ts_tree_cursor_goto_first_child_for_byte(&internalCursor, startByte) != -1
+    }
 }
 
 extension TreeCursor {
