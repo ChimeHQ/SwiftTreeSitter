@@ -76,7 +76,10 @@ extension Tree {
                 break
             }
 
-            guard node.byteRange.overlaps(byteRange) else { break }
+            // once we are past the interesting range, stop
+            if node.byteRange.lowerBound > byteRange.upperBound {
+                break
+            }
 
             try cursor.enumerateCurrentAndDescendents(block: block)
         }
