@@ -1,17 +1,10 @@
-//
-//  Parser.swift
-//  SwiftTreeSitter
-//
-//  Created by Matt Massicotte on 2018-12-17.
-//  Copyright © 2018 Chime Systems. All rights reserved.
-//
-
 import Foundation
 import tree_sitter
 
 enum ParserError: Error {
-    case LanguageIncompatible
-    case LanguageFailure
+    case languageIncompatible
+    case languageFailure
+    case languageInvalid
 }
 
 public class Parser {
@@ -28,15 +21,21 @@ public class Parser {
 
 extension Parser {
     public func setLanguage(_ language: Language) throws {
-        let success: Bool
+        guard let lang = language.internalLanguage else {
+            throw ParserError.languageInvalid
+        }
 
         switch language {
         case .go:
-            success = ts_parser_set_language(internalParser, language.internalLanguage)
+            try setLanguage(lang)
         }
+    }
+
+    public func setLanguage(_ language: UnsafePointer<TSLanguage>) throws {
+        let success = ts_parser_set_language(internalParser, language)
 
         if success == false {
-            throw ParserError.LanguageFailure
+            throw ParserError.languageFailure
         }
     }
 }
