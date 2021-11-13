@@ -62,6 +62,8 @@ extension Tree {
 
         guard let node = root.descendant(in: byteRange) else { return }
 
+        try block(node)
+
         let cursor = node.treeCursor
 
         if cursor.goToFirstChild(for: byteRange.lowerBound) == false {
