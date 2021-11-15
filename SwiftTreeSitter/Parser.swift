@@ -44,15 +44,11 @@ extension Parser {
     public typealias ReadBlock = (Int, Point) -> Data?
 
     public func parse(_ string: String) -> Tree? {
-        guard let data = string.data(using: .utf16) else {
-            return nil
-        }
+        guard let data = string.utf16DataWithoutBOM() else { return nil }
 
-        let bomRemovedData = data.suffix(from: 2)
+        let dataLength = data.count
 
-        let dataLength = bomRemovedData.count
-
-        let optionalTreePtr = bomRemovedData.withUnsafeBytes({ (byteBuffer) -> OpaquePointer? in
+        let optionalTreePtr = data.withUnsafeBytes({ (byteBuffer) -> OpaquePointer? in
             guard let ptr = byteBuffer.baseAddress?.bindMemory(to: Int8.self, capacity: dataLength) else {
                 return nil
             }
@@ -75,5 +71,13 @@ extension Parser {
         }
 
         return Tree(internalTree: newTree)
+    }
+
+    public func parse(tree: Tree?, string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Tree? {
+        let usableLimit = limit ?? string.utf16.count
+
+        return parse(tree: tree, encoding: .utf16) { (start, _) -> Data? in
+            return string.utf16Data(at: start, limit: usableLimit, chunkSize: chunkSize)
+        }
     }
 }
