@@ -1,17 +1,12 @@
-//
-//  Language.swift
-//  SwiftTreeSitter
-//
-//  Created by Matt Massicotte on 2018-12-18.
-//  Copyright © 2018 Chime Systems. All rights reserved.
-//
-
 import Foundation
 import tree_sitter
-import tree_sitter_go
 
-public enum Language {
-    case go
+public struct Language {
+    public var tsLanguage: UnsafePointer<TSLanguage>
+
+    public init(language: UnsafePointer<TSLanguage>) {
+        self.tsLanguage = language
+    }
 }
 
 extension Language {
@@ -23,52 +18,36 @@ extension Language {
         return Int(TREE_SITTER_MIN_COMPATIBLE_LANGUAGE_VERSION)
     }
 
-    var internalLanguage: UnsafePointer<TSLanguage>? {
-        switch self {
-        case .go:
-            return UnsafePointer(tree_sitter_go())
-        }
-    }
-
     public var ABIVersion: Int {
-        guard let lang = internalLanguage else { return 0 }
-
-        return Int(ts_language_version(lang))
+        return Int(ts_language_version(tsLanguage))
     }
     
     public var fieldCount: Int {
-        guard let lang = internalLanguage else { return 0 }
-        
-        return Int(ts_language_field_count(lang))
+        return Int(ts_language_field_count(tsLanguage))
     }
 
     public var symbolCount: Int {
-        guard let lang = internalLanguage else { return 0 }
-
-        return Int(ts_language_symbol_count(lang))
+        return Int(ts_language_symbol_count(tsLanguage))
     }
 
     public func fieldName(for id: Int) -> String? {
-        guard let lang = internalLanguage else { return nil }
-        guard let str = ts_language_field_name_for_id(lang, TSFieldId(id)) else { return nil }
+        guard let str = ts_language_field_name_for_id(tsLanguage, TSFieldId(id)) else { return nil }
         
         return String(cString: str)
     }
     
     public func fieldId(for name: String) -> Int? {
-        guard let lang = internalLanguage else { return nil }
-        
         let count = UInt32(name.utf8.count)
         
         let value = name.withCString { cStr in
-            return ts_language_field_id_for_name(lang, cStr, count)
+            return ts_language_field_id_for_name(tsLanguage, cStr, count)
         }
         
         return Int(value)
     }
 
     public func symbolName(for id: Int) -> String? {
-        guard let str = ts_language_symbol_name(internalLanguage, TSSymbol(id)) else {
+        guard let str = ts_language_symbol_name(tsLanguage, TSSymbol(id)) else {
             return nil
         }
 

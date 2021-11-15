@@ -21,14 +21,7 @@ public class Parser {
 
 extension Parser {
     public func setLanguage(_ language: Language) throws {
-        guard let lang = language.internalLanguage else {
-            throw ParserError.languageInvalid
-        }
-
-        switch language {
-        case .go:
-            try setLanguage(lang)
-        }
+        try setLanguage(language.tsLanguage)
     }
 
     public func setLanguage(_ language: UnsafePointer<TSLanguage>) throws {

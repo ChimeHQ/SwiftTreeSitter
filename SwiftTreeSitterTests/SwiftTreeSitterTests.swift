@@ -1,19 +1,12 @@
-//
-//  SwiftTreeSitterTests.swift
-//  SwiftTreeSitterTests
-//
-//  Created by Matt Massicotte on 2018-12-17.
-//  Copyright © 2018 Chime Systems. All rights reserved.
-//
-
 import XCTest
+import tree_sitter_go
 @testable import SwiftTreeSitter
 
 class SwiftTreeSitterTests: XCTestCase {
     func testSimpleParse() throws {
         let parser = Parser()
 
-        try parser.setLanguage(.go)
+        try parser.setLanguage(tree_sitter_go())
 
         let tree = try XCTUnwrap(parser.parse("var foo int"))
         let root = try XCTUnwrap(tree.rootNode)
@@ -24,7 +17,7 @@ class SwiftTreeSitterTests: XCTestCase {
     }
     
     func testFields() throws {
-        let lang = Language.go
+        let lang = Language(language: tree_sitter_go())
         
         XCTAssertEqual(lang.fieldCount, 33)
         XCTAssertEqual(lang.fieldName(for: 13), "function")
