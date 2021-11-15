@@ -19,6 +19,14 @@ public class Tree {
     deinit {
         ts_tree_delete(internalTree)
     }
+
+    public func copy() -> Tree? {
+        guard let copiedTree = ts_tree_copy(self.internalTree) else {
+            return nil
+        }
+
+        return Tree(internalTree: copiedTree)
+    }
 }
 
 extension Tree {
