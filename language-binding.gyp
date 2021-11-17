@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "tree_sitter_go_binding",
+      "target_name": "tree_sitter_language_binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"
@@ -12,12 +12,12 @@
       ],
       'xcode_settings': {
           'OTHER_CFLAGS': [
+            "-arch x86_64",
             "-arch arm64",
-            "-arch x86_64"
+            "-mmacosx-version-min=10.13",
+            "-isysroot /Applications/Xcode-beta.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk"
           ],
           "OTHER_LDFLAGS":[
-            "-arch arm64",
-            "-arch x86_64",
             "-mmacosx-version-min=10.13"
           ]
       },

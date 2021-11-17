@@ -1,6 +1,0 @@
-Name: tree-sitter
-Description: An incremental parsing system for programming tools
-URL: https://tree-sitter.github.io/
-Version: 0.18.0
-Libs: -L/usr/local/lib -ltree-sitter
-Cflags: -Iusr/local/include
