@@ -12,11 +12,11 @@ import tree_sitter
 class Input {
     typealias Buffer = UnsafeMutableBufferPointer<Int8>
 
-    private let encoding: String.Encoding
+    private let encoding: TSInputEncoding
     fileprivate let readBlock: Parser.ReadBlock
     private var internalBuffer: Buffer?
 
-    init(encoding: String.Encoding, readBlock: @escaping Parser.ReadBlock) {
+    init(encoding: TSInputEncoding, readBlock: @escaping Parser.ReadBlock) {
         self.encoding = encoding
         self.readBlock = readBlock
     }
@@ -43,13 +43,9 @@ class Input {
     }
 
     var internalInput: TSInput? {
-        guard let tsEncoding = encoding.internalEncoding else {
-            return nil
-        }
-
         let unmanaged = Unmanaged.passUnretained(self)
 
-        return TSInput(payload: unmanaged.toOpaque(), read: readFunction, encoding: tsEncoding)
+        return TSInput(payload: unmanaged.toOpaque(), read: readFunction, encoding: encoding)
     }
 }
 

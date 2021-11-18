@@ -14,7 +14,9 @@ extension String.Encoding {
         switch self {
         case .utf8:
             return TSInputEncodingUTF8
-        case .utf16:
+        case .utf16LittleEndian:
+            return TSInputEncodingUTF16
+        case .utf16BigEndian:
             return TSInputEncodingUTF16
         default:
             return nil

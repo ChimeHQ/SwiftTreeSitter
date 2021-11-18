@@ -1,13 +1,16 @@
 import Foundation
 
-public extension StringProtocol {
-    func utf16DataWithoutBOM() -> Data? {
-        return data(using: .utf16)?.suffix(from: 2)
-    }
-}
+extension String {
+    static var nativeUTF16Encoding: String.Encoding {
+        let dataA = "abc".data(using: .utf16LittleEndian)
+        let dataB = "abc".data(using: .utf16)?.suffix(from: 2)
 
-public extension String {
-    func utf16Data(at byteOffset: Int, limit: Int, chunkSize: Int = 2048) -> Data? {
+        return dataA == dataB ? .utf16LittleEndian : .utf16BigEndian
+    }
+
+    func data(at byteOffset: Int, limit: Int, using encoding: String.Encoding, chunkSize: Int) -> Data? {
+        precondition(encoding.internalEncoding != nil)
+        
         let location = byteOffset / 2
 
         let end = min(location + (chunkSize / 2), limit)
@@ -25,6 +28,6 @@ public extension String {
         let substring = self[stringRange]
 
         // have to remove the bom from the string
-        return substring.utf16DataWithoutBOM()
+        return substring.data(using: encoding)
     }
 }
