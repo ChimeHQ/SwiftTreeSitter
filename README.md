@@ -1,6 +1,6 @@
 # SwiftTreeSitter
 
-Swift wrappers for the [tree-sitter](https://tree-sitter.github.io/) incremental parsing system. Remember that tree-sitter has both runtime and per-language dependencies. They all have to be installed and build seperately.
+Swift wrappers for the [tree-sitter](https://tree-sitter.github.io/) incremental parsing system. Remember that tree-sitter has both runtime and per-language dependencies. They all have to be installed and build separately.
 
 ## Integration
 
@@ -16,7 +16,7 @@ dependencies: [
 
 SwiftTreeSitter needs the tree-sitter runtime libraries and headers. Your build configuration will, unfortunately, depend on how you want to package and distribute your final target. This is made even more complex because SPM currently does not allow you to select between a .dylib and .a **when both are in the same directory**. Static linking can simplify distribution, but SwiftTreeSitter should be compatible with both.
 
-Ultimately, it could be that you cannot use this package without modification. I'd really prefer to make it more seamless, but I experimented with many different appraoches, and this was the only one that offered sufficient flexibility. If you have other ideas, please get in touch.
+Ultimately, it could be that you cannot use this package without modification. I'd really prefer to make it more seamless, but I experimented with many different approaches, and this was the only one that offered sufficient flexibility. If you have other ideas, please get in touch.
 
 Note: These instructions assume a macOS target. Also, I've only tested tree-sitter down to 10.13. I suspect it will work with lower targets, but have not tried.
 
@@ -41,6 +41,8 @@ This **deletes** the dylib, so SPM links statically. I really wish this under th
 ## Building Language Libraries
 
 In addition to the runtime, tree-sitter you'll probably also want at least one language library. These are more complex to build than the runtime, because each lib requires a small amount of patching. It's a real pain.
+
+There's [hope](https://github.com/tree-sitter/tree-sitter-go/pull/56) that language libs will soon have an identical build process to the runtime! While still manual, it is at least more straightforward.
 
 ### check out the source
 
@@ -73,7 +75,7 @@ You can use the [template](language.h), replacing `TREE_SITTER_LANGUAGE_H_`, `tr
 
 #### make a .pc
 
-This is useful when using SPM, but could be skipped if you are building/linking with another mechansim.
+This is useful when using SPM, but could be skipped if you are building/linking with another mechanism.
 
 There's a [template](tree-sitter-LANGUAGE.pc) file for that as well. Remember to fill in `VERSION` and `language` as needed.
 
