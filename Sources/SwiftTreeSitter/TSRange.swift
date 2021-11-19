@@ -1,11 +1,3 @@
-//
-//  TSRange.swift
-//  SwiftTreeSitter
-//
-//  Created by Matt Massicotte on 2020-03-02.
-//  Copyright © 2020 Example. All rights reserved.
-//
-
 import Foundation
 import tree_sitter
 
