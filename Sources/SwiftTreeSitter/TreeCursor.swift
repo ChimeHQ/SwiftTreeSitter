@@ -59,10 +59,8 @@ extension TreeCursor {
             return
         }
 
-        if let node = currentNode {
-            try block(node)
-        }
-
+        try enumerateCurrentAndDescendents(block: block)
+        
         while gotoNextSibling() {
             try enumerateCurrentAndDescendents(block: block)
         }
