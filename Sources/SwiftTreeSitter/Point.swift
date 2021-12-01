@@ -45,6 +45,8 @@ extension Point: CustomStringConvertible {
         return "{\(row), \(column)}"
     }
 }
+extension Point: Hashable {
+}
 
 extension Point {
     public static let zero = Point(row: 0, column: 0)

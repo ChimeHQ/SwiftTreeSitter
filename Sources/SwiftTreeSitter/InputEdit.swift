@@ -35,3 +35,6 @@ public struct InputEdit {
                            new_end_point: newEndPoint.internalPoint)
     }
 }
+
+extension InputEdit: Hashable {
+}
