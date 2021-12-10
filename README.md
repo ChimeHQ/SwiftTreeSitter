@@ -24,7 +24,7 @@ Note: These instructions assume a macOS target. Also, I've only tested tree-sitt
 
 Check out and build tree-sitter from source. 
 
-    CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" LDFLAGS="-mmacosx-version-min=10.13" make
+    CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" CXXFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" LDFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" make
 
 ### install
 
@@ -34,52 +34,15 @@ Install it into `/usr/local`. This is where the Swift.package expects it to be.
 
 ### remove the dylib
 
-This **deletes** the dylib, so SPM links statically. I really wish this under the control of consumer of the package, but as far as I can tell, SPM does not support that.
+This **deletes** the dylib, so SPM links statically. I really wish this was under the control of consumer of the package, but as far as I can tell, SPM does not support that.
 
     sudo rm /usr/local/lib/libtree-sitter*.dylib
 
 ## Building Language Libraries
 
-In addition to the runtime, tree-sitter you'll probably also want at least one language library. These are more complex to build than the runtime, because each lib requires a small amount of patching. It's a real pain.
+In addition to the runtime, you'll probably also want at least one language library. These are more complex to build than the runtime. In fact, I've struggled with them so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
 
-There's [hope](https://github.com/tree-sitter/tree-sitter-go/pull/56) that language libs will soon have an identical build process to the runtime! While still manual, it is at least more straightforward.
-
-### check out the source
-
-#### modify binding.gyp
-
-An `xcode_settings` section needs to be added to `binding.gyp`. The `-isysroot` parameter could be unnecessary, depending on how your developer tools are installed/configured, and which SDK you want to build against.
-
-And, again, I would imagine these libraries support macOS versions lower than 10.13, but I have not tried.
-
-You should be able to use the [template](language-binding.gyp), replacing `tree_sitter_language_binding` with the language binding name.
-
-### build
-
-You need npm to build a language binding. Earlier versions of tree-sitter required a specific NPM version, but more recent versions are less picky. A standard NPM install should work.
-
-    npm install
-
-#### package and install
-
-    ar rcs libtree-sitter-LANGUAGE.a build/Release/obj.target/tree_sitter_LANGUAGE_binding/src/*
-    sudo cp libtree-sitter-LANGUAGE.a /usr/local/lib/
-
-#### make a .h
-
-To build against a language library, you'll need an .h file.
-
-You can use the [template](language.h), replacing `TREE_SITTER_LANGUAGE_H_`, `tree_sitter_LANGUAGE`, and the file name as appropriate.
-
-    sudo cp LANGUAGE.h /usr/local/include/tree_sitter/
-
-#### make a .pc
-
-This is useful when using SPM, but could be skipped if you are building/linking with another mechanism.
-
-There's a [template](tree-sitter-LANGUAGE.pc) file for that as well. Remember to fill in `VERSION` and `language` as needed.
-
-    sudo cp tree-sitter-changes/tree-sitter-LANGUAGE.pc /usr/local/lib/pkgconfig/
+And, if the parser does have a Makefile, then the process is identical to the runtime above.
 
 ## Suggestions or Feedback
 

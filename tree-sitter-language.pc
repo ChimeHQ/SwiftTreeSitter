@@ -1,6 +1,0 @@
-Name: tree-sitter-language
-Description: Language grammar for tree-sitter
-URL: https://github.com/tree-sitter/tree-sitter-language
-Version: VERSION
-Libs: -L/usr/local/lib -ltree-sitter-language
-Cflags: -Iusr/local/include
