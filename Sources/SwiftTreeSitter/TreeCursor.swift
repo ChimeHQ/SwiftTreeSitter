@@ -65,6 +65,8 @@ extension TreeCursor {
             try enumerateCurrentAndDescendents(block: block)
         }
 
-        assert(gotoParent())
+        let success = gotoParent()
+
+        assert(success)
     }
 }
