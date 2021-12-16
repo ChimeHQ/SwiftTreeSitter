@@ -16,6 +16,14 @@ public enum QueryError: Error {
             self = .none
         case TSQueryErrorSyntax:
             self = .syntax(offset)
+        case TSQueryErrorNodeType:
+            self = .nodeType(offset)
+        case TSQueryErrorField:
+            self = .field(offset)
+        case TSQueryErrorCapture:
+            self = .capture(offset)
+        case TSQueryErrorStructure:
+            self = .structure(offset)
         default:
             self = .unknown(offset)
         }
