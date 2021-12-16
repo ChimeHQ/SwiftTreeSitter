@@ -154,4 +154,18 @@ public class QueryCursor {
                           patternIndex: Int(match.pattern_index),
                           captures: captures)
     }
+
+    public func nextCapture() -> QueryCapture? {
+        var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
+        var index: UInt32 = 0
+
+        if ts_query_cursor_next_capture(internalCursor, &match, &index) == false {
+            return nil
+        }
+
+        let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
+                                                                count: Int(match.capture_count))
+
+        return QueryCapture(tsCapture: captureBuffer[Int(index)])
+    }
 }
