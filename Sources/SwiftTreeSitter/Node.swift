@@ -88,6 +88,30 @@ extension Node {
         return Node(internalNode: n)
     }
 
+    public var nextSibling: Node? {
+        let n = ts_node_next_sibling(internalNode)
+
+        return Node(internalNode: n)
+    }
+
+    public var previousSibling: Node? {
+        let n = ts_node_prev_sibling(internalNode)
+
+        return Node(internalNode: n)
+    }
+
+    public var nextNamedSibling: Node? {
+        let n = ts_node_next_named_sibling(internalNode)
+
+        return Node(internalNode: n)
+    }
+
+    public var previousNamedSibling: Node? {
+        let n = ts_node_prev_named_sibling(internalNode)
+
+        return Node(internalNode: n)
+    }
+
     public func descendant(in pointRange: Range<Point>) -> Node? {
         let lower = pointRange.lowerBound
         let upper = pointRange.upperBound
