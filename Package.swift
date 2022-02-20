@@ -12,5 +12,6 @@ let package = Package(
     targets: [
       .systemLibrary(name: "tree_sitter", pkgConfig: "tree-sitter"),
       .target(name: "SwiftTreeSitter", dependencies: ["tree_sitter"]),
+      .testTarget(name: "SwiftTreeSitterTests", dependencies: ["SwiftTreeSitter"]),
     ]
 )

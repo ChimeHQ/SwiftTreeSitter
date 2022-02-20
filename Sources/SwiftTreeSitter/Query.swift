@@ -30,8 +30,16 @@ public enum QueryError: Error {
     }
 }
 
+public enum QueryPredicateError: Error {
+    case valueNotFound
+    case unrecognizedStepType
+    case queryInvalid
+    case textContentUnavailable
+}
+
 public class Query {
     let internalQuery: OpaquePointer
+    let predicateList: [[Predicate]]
 
     public init(language: Language, data: Data) throws {
         let dataLength = data.count
@@ -49,11 +57,12 @@ public class Query {
                                 &queryError)
         }
 
-        guard let result = result else {
+        guard let queryPtr = result else {
             throw QueryError(offset: errorOffset, internalError: queryError)
         }
 
-        self.internalQuery = result
+        self.internalQuery = queryPtr
+        self.predicateList = try PredicateParser().predicates(in: queryPtr)
     }
 
     deinit {
@@ -72,8 +81,8 @@ public class Query {
         return Int(ts_query_string_count(internalQuery))
     }
 
-    public func execute(node: Node) -> QueryCursor {
-        let cursor = QueryCursor()
+    public func execute(node: Node, textProvider: PredicateTextProvider? = nil) -> QueryCursor {
+        let cursor = QueryCursor(textProvider: textProvider)
 
         cursor.execute(query: self, node: node)
 
@@ -88,6 +97,32 @@ public class Query {
         }
 
         return String(cString: cStr)
+    }
+
+    public func stringName(for id: Int) -> String? {
+        var length: UInt32 = 0
+
+        guard let cStr = ts_query_string_value_for_id(internalQuery, UInt32(id), &length) else {
+            return nil
+        }
+
+        return String(cString: cStr)
+    }
+
+    func captures(matching names: [String], in match: QueryMatch) -> [QueryCapture] {
+        return match.captures.filter { capture in
+            guard let name = captureName(for: capture.index) else {
+                return false
+            }
+
+            return names.contains(name)
+        }
+    }
+    
+    public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
+        let predicates = predicateList[match.patternIndex]
+
+        return try predicates.allSatisfy({ try $0.evaluate(with: match, in: self, textProvider: textProvider) })
     }
 }
 
@@ -113,9 +148,14 @@ public struct QueryMatch {
 
 public class QueryCursor {
     let internalCursor: OpaquePointer
+    public private(set) var activeQuery: Query?
+    let textProvider: PredicateTextProvider
 
-    public init() {
+    public init(textProvider: PredicateTextProvider? = nil) {
         self.internalCursor = ts_query_cursor_new()
+        self.textProvider = textProvider ?? { _, _ in
+            return .failure(QueryPredicateError.textContentUnavailable)
+        }
     }
 
     deinit {
@@ -123,6 +163,8 @@ public class QueryCursor {
     }
 
     public func execute(query: Query, node: Node) {
+        self.activeQuery = query
+
         ts_query_cursor_exec(internalCursor, query.internalQuery, node.internalNode)
     }
 
@@ -146,7 +188,7 @@ public class QueryCursor {
         ts_query_cursor_set_point_range(internalCursor, start, end)
     }
 
-    public func nextMatch() -> QueryMatch? {
+    public func nextMatchIgnoringPredicates() -> QueryMatch? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
 
         if ts_query_cursor_next_match(internalCursor, &match) == false {
@@ -163,6 +205,16 @@ public class QueryCursor {
                           captures: captures)
     }
 
+    public func nextMatch() throws -> QueryMatch? {
+        while let match = nextMatchIgnoringPredicates() {
+            if try matchSatisifiesPredicates(match, textProvider: textProvider) {
+                return match
+            }
+        }
+
+        return nil
+    }
+
     public func nextCapture() -> QueryCapture? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
         var index: UInt32 = 0
@@ -175,5 +227,13 @@ public class QueryCursor {
                                                                 count: Int(match.capture_count))
 
         return QueryCapture(tsCapture: captureBuffer[Int(index)])
+    }
+
+    public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
+        guard let query = activeQuery else {
+            throw QueryPredicateError.queryInvalid
+        }
+
+        return try query.matchSatisifiesPredicates(match, textProvider: textProvider)
     }
 }

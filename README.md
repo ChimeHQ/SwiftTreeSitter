@@ -12,6 +12,16 @@ dependencies: [
 ]
 ```
 
+## Predicate Support
+
+| Predicate | Readable | Supported |
+| ----------|:--------:|:---------:|
+| `eq?` | yes | yes |
+| `match?`  | yes | yes |
+| `is-not?`  | `local` only | no |
+
+Query predicates are complex to support and have performance implications. Notably, `is-not? local` is **just** supported enough to be correctly read, but is not applied. Please open up an issue if you need additional support here.
+
 ## Building Dependencies
 
 SwiftTreeSitter needs the tree-sitter runtime libraries and headers. Your build configuration will, unfortunately, depend on how you want to package and distribute your final target. This is made even more complex because SPM currently does not allow you to select between a .dylib and .a **when both are in the same directory**. Static linking can simplify distribution, but SwiftTreeSitter should be compatible with both.
