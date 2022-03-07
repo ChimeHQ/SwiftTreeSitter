@@ -3,11 +3,11 @@
     "pins": [
       {
         "package": "tree-sitter-xcframework",
-        "repositoryURL": "https://github.com/krzyzanowskim/tree-sitter-xcframework",
+        "repositoryURL": "git@github.com:krzyzanowskim/tree-sitter-xcframework.git",
         "state": {
           "branch": null,
-          "revision": "8c2780c8ded0ff00872801943aef9370e623d6dc",
-          "version": "0.206.1"
+          "revision": "3761ca40f9316a53ea6f7416ae2ff5f06693d5ee",
+          "version": "0.206.2"
         }
       }
     ]
