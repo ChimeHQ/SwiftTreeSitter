@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/krzyzanowskim/tree-sitter-xcframework",
         "state": {
           "branch": null,
-          "revision": "0354f10d8cab1145216d4d55361aeac2d485a9a3",
-          "version": "0.20.6"
+          "revision": "8c2780c8ded0ff00872801943aef9370e623d6dc",
+          "version": "0.206.1"
         }
       }
     ]
