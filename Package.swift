@@ -9,7 +9,7 @@ let package = Package(
         .library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
     ],
     dependencies: [
-      .package(url: "https://github.com/krzyzanowskim/tree-sitter-xcframework", from: "0.20.6")
+      .package(url: "https://github.com/krzyzanowskim/tree-sitter-xcframework", from: "0.206.2")
     ],
     targets: [
       .target(name: "SwiftTreeSitter", dependencies: ["tree_sitter"]),
