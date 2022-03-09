@@ -54,3 +54,11 @@ extension Language {
         return String(cString: str)
     }
 }
+
+public extension Language {
+    func query(contentsOf url: URL) throws -> Query {
+        let data = try Data(contentsOf: url)
+
+        return try Query(language: self, data: data)
+    }
+}
