@@ -28,16 +28,16 @@ enum Predicate: Hashable {
     case match(NSRegularExpression, [String])
     case isNot(String)
 
-    func evaluate(with match: QueryMatch, in query: Query, textProvider: PredicateTextProvider) throws -> Bool {
+    func evaluate(with match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
         switch self {
         case .none:
             return true
         case .eq(let strings, let captureNames):
-            let captures = query.captures(matching: captureNames, in: match)
+            let captures = match.captures(matching: captureNames)
 
             return try evaluateEq(strings: strings, captures: captures, textProvider: textProvider)
         case .match(let regex, let captureNames):
-            let captures = query.captures(matching: captureNames, in: match)
+            let captures = match.captures(matching: captureNames)
 
             return try evaluateMatch(regex: regex, captures: captures, textProvider: textProvider)
         case .isNot(_):

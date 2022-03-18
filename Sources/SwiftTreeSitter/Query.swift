@@ -108,19 +108,11 @@ public class Query {
 
         return String(cString: cStr)
     }
-
-    func captures(matching names: [String], in match: QueryMatch) -> [QueryCapture] {
-        return match.captures.filter { capture in
-            guard let name = capture.name else { return false }
-
-            return names.contains(name)
-        }
-    }
     
     public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
         let predicates = predicateList[match.patternIndex]
 
-        return try predicates.allSatisfy({ try $0.evaluate(with: match, in: self, textProvider: textProvider) })
+        return try predicates.allSatisfy({ try $0.evaluate(with: match, textProvider: textProvider) })
     }
 }
 
@@ -144,6 +136,18 @@ public struct QueryMatch {
     public var id: Int
     public var patternIndex: Int
     public var captures: [QueryCapture]
+
+    public func captures(named name: String) -> [QueryCapture] {
+        return captures.filter({ $0.name == name })
+    }
+
+    public func captures(matching names: [String]) -> [QueryCapture] {
+        return captures.filter({ capture in
+            guard let name = capture.name else { return false }
+
+            return names.contains(name)
+        })
+    }
 }
 
 public class QueryCursor {
