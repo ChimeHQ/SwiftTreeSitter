@@ -111,9 +111,7 @@ public class Query {
 
     func captures(matching names: [String], in match: QueryMatch) -> [QueryCapture] {
         return match.captures.filter { capture in
-            guard let name = captureName(for: capture.index) else {
-                return false
-            }
+            guard let name = capture.name else { return false }
 
             return names.contains(name)
         }
@@ -129,14 +127,16 @@ public class Query {
 public struct QueryCapture {
     public var node: Node
     public var index: Int
+    public var name: String?
 
-    init?(tsCapture: TSQueryCapture) {
+    init?(tsCapture: TSQueryCapture, name: String?) {
         guard let node = Node(internalNode: tsCapture.node) else {
             return nil
         }
 
         self.node = node
         self.index = Int(tsCapture.index)
+        self.name = name
     }
 }
 
@@ -188,6 +188,12 @@ public class QueryCursor {
         ts_query_cursor_set_point_range(internalCursor, start, end)
     }
 
+    func makeCapture(from capture: TSQueryCapture) -> QueryCapture? {
+        let name = activeQuery?.captureName(for: Int(capture.index))
+
+        return QueryCapture(tsCapture: capture, name: name)
+    }
+
     public func nextMatchIgnoringPredicates() -> QueryMatch? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
 
@@ -198,7 +204,7 @@ public class QueryCursor {
         let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
                                                                 count: Int(match.capture_count))
 
-        let captures = captureBuffer.compactMap({ QueryCapture(tsCapture: $0) })
+        let captures = captureBuffer.compactMap({ makeCapture(from: $0) })
 
         return QueryMatch(id: Int(match.id),
                           patternIndex: Int(match.pattern_index),
@@ -226,7 +232,9 @@ public class QueryCursor {
         let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
                                                                 count: Int(match.capture_count))
 
-        return QueryCapture(tsCapture: captureBuffer[Int(index)])
+        let capture = captureBuffer[Int(index)]
+
+        return makeCapture(from: capture)
     }
 
     public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
