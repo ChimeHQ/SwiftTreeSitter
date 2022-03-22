@@ -70,10 +70,16 @@ extension Parser {
     }
 
     public func parse(tree: Tree?, string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Tree? {
-        let usableLimit = limit ?? string.utf16.count
-        let encoding = self.encoding
+        let readFunction = Parser.readFunction(for: string, limit: limit, chunkSize: chunkSize)
 
-        return parse(tree: tree) { (start, _) -> Data? in
+        return parse(tree: tree, readBlock: readFunction)
+    }
+
+    public static func readFunction(for string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Parser.ReadBlock {
+        let usableLimit = limit ?? string.utf16.count
+        let encoding = String.nativeUTF16Encoding
+
+        return { (start, _) -> Data? in
             return string.data(at: start,
                                limit: usableLimit,
                                using: encoding,
