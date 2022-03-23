@@ -1,6 +1,6 @@
 # SwiftTreeSitter
 
-Swift wrappers for the [tree-sitter](https://tree-sitter.github.io/) incremental parsing system. Remember that tree-sitter has both runtime and per-language dependencies. They all have to be installed and build separately.
+Swift wrappers for the [tree-sitter](https://tree-sitter.github.io/) incremental parsing system.
 
 ## Integration
 
@@ -22,11 +22,9 @@ dependencies: [
 
 Query predicates are complex to support and have performance implications. Notably, `is-not? local` is **just** supported enough to be correctly read, but is not applied. Please open up an issue if you need additional support here.
 
-## Building Dependencies
+## Runtime/Parser Dependencies
 
-SwiftTreeSitter needs the tree-sitter runtime libraries and headers. Your build configuration will, unfortunately, depend on how you want to package and distribute your final target. This is made even more complex because SPM currently does not allow you to select between a .dylib and .a **when both are in the same directory**. Static linking can simplify distribution, but SwiftTreeSitter should be compatible with both.
-
-Ultimately, it could be that you cannot use this package without modification. I'd really prefer to make it more seamless, but I experimented with many different approaches, and this was the only one that offered sufficient flexibility. If you have other ideas, please get in touch.
+Remember that tree-sitter has both runtime and per-language dependencies. SwiftTreeSitter now depends on [tree-sitter-xcframework](https://github.com/krzyzanowskim/tree-sitter-xcframework), which provides pre-built binaries for the runtime and **some** parsers. If you need support for parsers not included in that project, the best best is to try to add them! But, that is not necessary - you can build and link parsers manually.
 
 Note: These instructions assume a macOS target. Also, I've only tested tree-sitter down to 10.13. I suspect it will work with lower targets, but have not tried.
 
