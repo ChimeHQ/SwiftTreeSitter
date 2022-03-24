@@ -24,7 +24,9 @@ Query predicates are complex to support and have performance implications. Notab
 
 ## Runtime/Parser Dependencies
 
-Remember that tree-sitter has both runtime and per-language dependencies. SwiftTreeSitter now depends on [tree-sitter-xcframework](https://github.com/krzyzanowskim/tree-sitter-xcframework), which provides pre-built binaries for the runtime and **some** parsers. If you need support for parsers not included in that project, the best best is to try to add them! But, that is not necessary - you can build and link parsers manually.
+Remember that tree-sitter has both runtime and per-language dependencies. SwiftTreeSitter now depends on [tree-sitter-xcframework](https://github.com/krzyzanowskim/tree-sitter-xcframework), which provides pre-built binaries for the runtime and **some** parsers. If you need support for parsers not included in that project, the best best is to try to add them!
+
+But, that is not necessary - you can build and link parsers manually.
 
 Note: These instructions assume a macOS target. Also, I've only tested tree-sitter down to 10.13. I suspect it will work with lower targets, but have not tried.
 
@@ -36,15 +38,9 @@ Check out and build tree-sitter from source.
 
 ### install
 
-Install it into `/usr/local`. This is where the Swift.package expects it to be.
+Install it into `/usr/local`.
 
     sudo make install PREFIX=/usr/local
-
-### remove the dylib
-
-This **deletes** the dylib, so SPM links statically. I really wish this was under the control of consumer of the package, but as far as I can tell, SPM does not support that.
-
-    sudo rm /usr/local/lib/libtree-sitter*.dylib
 
 ## Building Language Libraries
 
