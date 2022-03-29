@@ -40,6 +40,7 @@ public enum QueryPredicateError: Error {
 public class Query {
     let internalQuery: OpaquePointer
     let predicateList: [[Predicate]]
+    public let hasPredicates: Bool
 
     public init(language: Language, data: Data) throws {
         let dataLength = data.count
@@ -63,6 +64,8 @@ public class Query {
 
         self.internalQuery = queryPtr
         self.predicateList = try PredicateParser().predicates(in: queryPtr)
+
+        self.hasPredicates = predicateList.contains(where: { $0.contains(where: { $0 != .none }) })
     }
 
     deinit {

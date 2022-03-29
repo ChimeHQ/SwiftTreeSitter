@@ -1,7 +1,7 @@
 import XCTest
 @testable import SwiftTreeSitter
 
-class PredicateTests: XCTestCase {
+final class PredicateTests: XCTestCase {
     func testParseEqTwoArgs() throws {
         let steps: [QueryPredicateStep] = [
             .string("eq?"),
