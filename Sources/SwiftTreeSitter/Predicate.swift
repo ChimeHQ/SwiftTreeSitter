@@ -20,8 +20,6 @@ extension QueryPredicateStep: CustomStringConvertible {
     }
 }
 
-public typealias PredicateTextProvider = (Range<UInt32>, Range<Point>) -> Result<String, Error>
-
 public enum Predicate: Hashable {
     case eq([String], captureNames: [String])
     case match(NSRegularExpression, captureNames: [String])
