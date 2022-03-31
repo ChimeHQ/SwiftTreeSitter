@@ -20,13 +20,15 @@ dependencies: [
 
 ## Predicate/Directive Support
 
-`QueryMatch` provides an API for getting at query predicates and directives. However, actually applying their effects isn't really something that this library can do. That requires tight integration with both the underlying text content and the system using the query. Unfortunately, if you need to run queries that contain predicates, evaluating and applying them is up to you.
+`QueryMatch` provides an API for getting at query predicates and directives. You are free to use/evaluate them yourself. However, there is also a `ResolvingQueryCursor`, which wraps a standard `QueryCursor`, but allows for resolution of predicates. It also provides some facilities for preloading all `QueryMatch` objects from the underlying `QueryCursor`, which can help with performance in some situations.
 
 The following predicates are parsed and transformed into structured `Predicate` cases. All others are turned into the `generic` case.
 
-- `eq?`
-- `match?`
-- `is-not? local`
+- `eq?`: fully supported
+- `match?`: fully supported
+- `is-not?`: parsed, but not implemented
+
+Please open up an issue if you need additional support here.
 
 ## Runtime/Parser Dependencies
 

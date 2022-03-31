@@ -86,10 +86,10 @@ public class Query {
         return Int(ts_query_string_count(internalQuery))
     }
 
-    public func execute(node: Node) -> QueryCursor {
+    public func execute(node: Node, in tree: Tree? = nil) -> QueryCursor {
         let cursor = QueryCursor()
 
-        cursor.execute(query: self, node: node)
+        cursor.execute(query: self, node: node, in: tree)
 
         return cursor
     }
@@ -159,6 +159,7 @@ public struct QueryMatch {
 public class QueryCursor {
     let internalCursor: OpaquePointer
     public private(set) var activeQuery: Query?
+    private var tree: Tree?
 
     public init() {
         self.internalCursor = ts_query_cursor_new()
@@ -168,8 +169,17 @@ public class QueryCursor {
         ts_query_cursor_delete(internalCursor)
     }
 
-    public func execute(query: Query, node: Node) {
+    /// Run a query
+    ///
+    /// Note that the node **and** the Tree is is part of
+    /// must remain valid as long as the query is being used.
+    ///
+    /// - Parameter query: they query object to execute
+    /// - Parameter node: they query object to execute
+    /// - Parameter tree: keep an optional reference to the tree
+    public func execute(query: Query, node: Node, in tree: Tree? = nil) {
         self.activeQuery = query
+        self.tree = tree
 
         ts_query_cursor_exec(internalCursor, query.internalQuery, node.internalNode)
     }
@@ -185,6 +195,10 @@ public class QueryCursor {
 
     public func setByteRange(range: Range<UInt32>) {
         ts_query_cursor_set_byte_range(internalCursor, range.lowerBound, range.upperBound)
+    }
+
+    public func setRange(_ range: NSRange) {
+        setByteRange(range: range.byteRange)
     }
 
     public func setPointRange(range: Range<Point>) {

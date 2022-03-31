@@ -53,7 +53,11 @@ extension Node {
     public var symbol: Int {
         return Int(ts_node_symbol(internalNode))
     }
-    
+
+    public var range: NSRange {
+        return byteRange.range
+    }
+
     public var byteRange: Range<UInt32> {
         let start = ts_node_start_byte(internalNode)
         let end = ts_node_end_byte(internalNode)
