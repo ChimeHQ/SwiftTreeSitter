@@ -22,23 +22,39 @@ extension QueryPredicateStep: CustomStringConvertible {
 
 public typealias PredicateTextProvider = (Range<UInt32>, Range<Point>) -> Result<String, Error>
 
-enum Predicate: Hashable {
-    case none
-    case eq([String], [String])
-    case match(NSRegularExpression, [String])
+public enum Predicate: Hashable {
+    case eq([String], captureNames: [String])
+    case match(NSRegularExpression, captureNames: [String])
     case isNot(String)
 
-    func evaluate(with match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
+    public var captureNames: [String] {
         switch self {
-        case .none:
-            return true
-        case .eq(let strings, let captureNames):
-            let captures = match.captures(matching: captureNames)
+        case .eq(_, let names):
+            return names
+        case .match(_, let names):
+            return names
+        case .isNot:
+            return []
+        }
+    }
 
+    public func captures(in match: QueryMatch) -> [QueryCapture] {
+        let names = captureNames
+
+        return match.captures.filter({ capture in
+            guard let name = capture.name else { return false }
+
+            return names.contains(name)
+        })
+    }
+
+    func evaluate(with match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
+        let captures = captures(in: match)
+
+        switch self {
+        case .eq(let strings, _):
             return try evaluateEq(strings: strings, captures: captures, textProvider: textProvider)
-        case .match(let regex, let captureNames):
-            let captures = match.captures(matching: captureNames)
-
+        case .match(let regex, _):
             return try evaluateMatch(regex: regex, captures: captures, textProvider: textProvider)
         case .isNot(_):
             return true
@@ -139,7 +155,7 @@ struct PredicateParser {
 
         switch name {
         case "eq?":
-            return .eq(strings, captures)
+            return .eq(strings, captureNames: captures)
         case "match?":
             if strings.count != 1 {
                 throw PredicateParserError.unsupportedMatchArguments
@@ -147,7 +163,7 @@ struct PredicateParser {
 
             let expression = try NSRegularExpression(pattern: strings.first!, options: [])
 
-            return .match(expression, captures)
+            return .match(expression, captureNames: captures)
         case "is-not?":
             if strings != ["local"] {
                 throw PredicateParserError.unsupportedIsNotArguments(strings)
@@ -164,7 +180,7 @@ extension PredicateParser {
     func predicates(in query: OpaquePointer) throws -> [[Predicate]] {
         let patternCount = Int(ts_query_pattern_count(query))
 
-        var predicates = [[Predicate]](repeating: [.none], count: patternCount)
+        var predicates = [[Predicate]](repeating: [], count: patternCount)
 
         for i in 0..<patternCount {
             let steps = try predicateSteps(for: i, in: query)

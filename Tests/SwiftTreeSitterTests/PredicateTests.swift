@@ -13,7 +13,7 @@ final class PredicateTests: XCTestCase {
         let predicates = try PredicateParser().parse(steps)
 
         let expectedPredicates = [
-            Predicate.eq(["thing"], ["@a"]),
+            Predicate.eq(["thing"], captureNames: ["@a"]),
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)
@@ -32,7 +32,7 @@ final class PredicateTests: XCTestCase {
         let predicates = try PredicateParser().parse(steps)
 
         let expectedPredicates = [
-            Predicate.eq([], ["@a", "@b", "@c", "@d"]),
+            Predicate.eq([], captureNames: ["@a", "@b", "@c", "@d"]),
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)
@@ -53,8 +53,8 @@ final class PredicateTests: XCTestCase {
         let predicates = try PredicateParser().parse(steps)
 
         let expectedPredicates = [
-            Predicate.eq(["thing"], ["@a"]),
-            Predicate.eq(["thing"], ["@b"]),
+            Predicate.eq(["thing"], captureNames: ["@a"]),
+            Predicate.eq(["thing"], captureNames: ["@b"]),
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)
@@ -71,7 +71,7 @@ final class PredicateTests: XCTestCase {
         let predicates = try PredicateParser().parse(steps)
 
         let expectedPredicates = [
-            Predicate.match(try NSRegularExpression(pattern: "^(a|b|c)$", options: []), ["@a"])
+            Predicate.match(try NSRegularExpression(pattern: "^(a|b|c)$", options: []), captureNames: ["@a"])
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)

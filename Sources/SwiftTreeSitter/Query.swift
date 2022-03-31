@@ -40,8 +40,12 @@ public enum QueryPredicateError: Error {
 public class Query {
     let internalQuery: OpaquePointer
     let predicateList: [[Predicate]]
-    public let hasPredicates: Bool
 
+    /// Construct a query object from scm data
+    ///
+    /// This operation has do to a lot of work, especially if any
+    /// patterns contain predicates. You should expect it will
+    /// be expensive.
     public init(language: Language, data: Data) throws {
         let dataLength = data.count
         var errorOffset: UInt32 = 0
@@ -64,8 +68,6 @@ public class Query {
 
         self.internalQuery = queryPtr
         self.predicateList = try PredicateParser().predicates(in: queryPtr)
-
-        self.hasPredicates = predicateList.contains(where: { $0.contains(where: { $0 != .none }) })
     }
 
     deinit {
@@ -84,8 +86,8 @@ public class Query {
         return Int(ts_query_string_count(internalQuery))
     }
 
-    public func execute(node: Node, textProvider: PredicateTextProvider? = nil) -> QueryCursor {
-        let cursor = QueryCursor(textProvider: textProvider)
+    public func execute(node: Node) -> QueryCursor {
+        let cursor = QueryCursor()
 
         cursor.execute(query: self, node: node)
 
@@ -111,11 +113,19 @@ public class Query {
 
         return String(cString: cStr)
     }
-    
-    public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
-        let predicates = predicateList[match.patternIndex]
 
-        return try predicates.allSatisfy({ try $0.evaluate(with: match, textProvider: textProvider) })
+    public func predicates(for patternIndex: Int) -> [Predicate] {
+        return predicateList[patternIndex]
+    }
+
+    public var hasPredicates: Bool {
+        for i in 0..<patternCount {
+            if predicates(for: i).isEmpty == false {
+                return true
+            }
+        }
+
+        return false
     }
 }
 
@@ -139,30 +149,19 @@ public struct QueryMatch {
     public var id: Int
     public var patternIndex: Int
     public var captures: [QueryCapture]
+    public let predicates: [Predicate]
 
     public func captures(named name: String) -> [QueryCapture] {
         return captures.filter({ $0.name == name })
-    }
-
-    public func captures(matching names: [String]) -> [QueryCapture] {
-        return captures.filter({ capture in
-            guard let name = capture.name else { return false }
-
-            return names.contains(name)
-        })
     }
 }
 
 public class QueryCursor {
     let internalCursor: OpaquePointer
     public private(set) var activeQuery: Query?
-    let textProvider: PredicateTextProvider
 
-    public init(textProvider: PredicateTextProvider? = nil) {
+    public init() {
         self.internalCursor = ts_query_cursor_new()
-        self.textProvider = textProvider ?? { _, _ in
-            return .failure(QueryPredicateError.textContentUnavailable)
-        }
     }
 
     deinit {
@@ -201,7 +200,7 @@ public class QueryCursor {
         return QueryCapture(tsCapture: capture, name: name)
     }
 
-    public func nextMatchIgnoringPredicates() -> QueryMatch? {
+    public func nextMatch() -> QueryMatch? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
 
         if ts_query_cursor_next_match(internalCursor, &match) == false {
@@ -211,21 +210,15 @@ public class QueryCursor {
         let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
                                                                 count: Int(match.capture_count))
 
+        let patternIndex = Int(match.pattern_index)
+        let predicates = activeQuery?.predicates(for: patternIndex) ?? []
+
         let captures = captureBuffer.compactMap({ makeCapture(from: $0) })
 
         return QueryMatch(id: Int(match.id),
                           patternIndex: Int(match.pattern_index),
-                          captures: captures)
-    }
-
-    public func nextMatch() throws -> QueryMatch? {
-        while let match = nextMatchIgnoringPredicates() {
-            if try matchSatisifiesPredicates(match, textProvider: textProvider) {
-                return match
-            }
-        }
-
-        return nil
+                          captures: captures,
+                          predicates: predicates)
     }
 
     public func nextCapture() -> QueryCapture? {
@@ -242,13 +235,5 @@ public class QueryCursor {
         let capture = captureBuffer[Int(index)]
 
         return makeCapture(from: capture)
-    }
-
-    public func matchSatisifiesPredicates(_ match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
-        guard let query = activeQuery else {
-            throw QueryPredicateError.queryInvalid
-        }
-
-        return try query.matchSatisifiesPredicates(match, textProvider: textProvider)
     }
 }
