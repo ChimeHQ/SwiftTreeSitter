@@ -24,9 +24,9 @@ dependencies: [
 
 The following predicates are parsed and transformed into structured `Predicate` cases. All others are turned into the `generic` case.
 
-    - `eq?`
-    - `match?`
-    - `is-not? local`
+- `eq?`
+- `match?`
+- `is-not? local`
 
 ## Runtime/Parser Dependencies
 
