@@ -18,15 +18,15 @@ dependencies: [
 ]
 ```
 
-## Predicate Support
+## Predicate/Directive Support
 
-| Predicate | Readable | Supported |
-| ----------|:--------:|:---------:|
-| `eq?` | yes | yes |
-| `match?`  | yes | yes |
-| `is-not?`  | `local` only | no |
+`QueryMatch` provides an API for getting at query predicates and directives. However, actually applying their effects isn't really something that this library can do. That requires tight integration with both the underlying text content and the system using the query. Unfortunately, if you need to run queries that contain predicates, evaluating and applying them is up to you.
 
-Query predicates are complex to support and have performance implications. Notably, `is-not? local` is **just** supported enough to be correctly read, but is not applied. Please open up an issue if you need additional support here.
+The following predicates are parsed and transformed into structured `Predicate` cases. All others are turned into the `generic` case.
+
+    - `eq?`
+    - `match?`
+    - `is-not? local`
 
 ## Runtime/Parser Dependencies
 

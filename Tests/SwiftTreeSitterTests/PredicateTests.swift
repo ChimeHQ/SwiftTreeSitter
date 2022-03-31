@@ -92,4 +92,22 @@ final class PredicateTests: XCTestCase {
 
         XCTAssertEqual(predicates, expectedPredicates)
     }
+
+    func testParseUnknown() throws {
+        let steps: [QueryPredicateStep] = [
+            .string("foo?"),
+            .string("a"),
+            .capture("@b"),
+            .capture("@c"),
+            .done
+        ]
+
+        let predicates = try PredicateParser().parse(steps)
+
+        let expectedPredicates = [
+            Predicate.generic("foo?", strings: ["a"], captureNames: ["@b", "@c"])
+        ]
+
+        XCTAssertEqual(predicates, expectedPredicates)
+    }
 }

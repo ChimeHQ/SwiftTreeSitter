@@ -26,6 +26,7 @@ public enum Predicate: Hashable {
     case eq([String], captureNames: [String])
     case match(NSRegularExpression, captureNames: [String])
     case isNot(String)
+    case generic(String, strings: [String], captureNames: [String])
 
     public var captureNames: [String] {
         switch self {
@@ -35,6 +36,8 @@ public enum Predicate: Hashable {
             return names
         case .isNot:
             return []
+        case .generic(_, _, let names):
+            return names
         }
     }
 
@@ -47,61 +50,12 @@ public enum Predicate: Hashable {
             return names.contains(name)
         })
     }
-
-    func evaluate(with match: QueryMatch, textProvider: PredicateTextProvider) throws -> Bool {
-        let captures = captures(in: match)
-
-        switch self {
-        case .eq(let strings, _):
-            return try evaluateEq(strings: strings, captures: captures, textProvider: textProvider)
-        case .match(let regex, _):
-            return try evaluateMatch(regex: regex, captures: captures, textProvider: textProvider)
-        case .isNot(_):
-            return true
-        }
-    }
-
-    private func evaluateEq(strings: [String], captures: [QueryCapture], textProvider: PredicateTextProvider) throws -> Bool {
-        // find the length needed to match a string
-        let neededLength = strings.map({ $0.utf16.count }).map { $0 * 2 }.first
-
-        // compute the string contents for the captures
-        let captureStrings = try captures.map { capture -> String in
-            // this is an optimization to avoid querying for the string value
-            // if we don't at least match the needed length
-            if let length = neededLength, length != capture.node.byteRange.count {
-                return ""
-            }
-
-            let result = textProvider(capture.node.byteRange, capture.node.pointRange)
-
-            return try result.get()
-        }
-
-        // finally, make sure all of those things are the same
-        let allStrings = strings + captureStrings
-
-        return allStrings.dropFirst().allSatisfy({ $0 == strings.first })
-    }
-
-    private func evaluateMatch(regex: NSRegularExpression, captures: [QueryCapture], textProvider: PredicateTextProvider) throws -> Bool {
-        // we must get the capture text contents
-        let contents = try captures.map({ try textProvider($0.node.byteRange, $0.node.pointRange).get() })
-
-        return contents.allSatisfy { content in
-            let range = NSRange(location: 0, length: content.utf16.count)
-
-            return regex.numberOfMatches(in: content, options: [], range: range) > 0
-        }
-    }
 }
 
 enum PredicateParserError: Error {
     case stepNameExpected
     case doneExpected
     case argumentsContainDone
-    case unsupportedPredicate(String)
-    case unsupportedMatchArguments
     case unsupportedIsNotArguments([String])
 }
 
@@ -158,7 +112,7 @@ struct PredicateParser {
             return .eq(strings, captureNames: captures)
         case "match?":
             if strings.count != 1 {
-                throw PredicateParserError.unsupportedMatchArguments
+                return .generic(name, strings: strings, captureNames: captures)
             }
 
             let expression = try NSRegularExpression(pattern: strings.first!, options: [])
@@ -166,12 +120,12 @@ struct PredicateParser {
             return .match(expression, captureNames: captures)
         case "is-not?":
             if strings != ["local"] {
-                throw PredicateParserError.unsupportedIsNotArguments(strings)
+                return .generic(name, strings: strings, captureNames: captures)
             }
 
             return .isNot(strings.first!)
         default:
-            throw PredicateParserError.unsupportedPredicate(name)
+            return .generic(name, strings: strings, captureNames: captures)
         }
     }
 }
