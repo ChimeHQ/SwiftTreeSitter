@@ -26,6 +26,15 @@ public struct InputEdit {
         self.newEndPoint = newEndPoint
     }
 
+    public init(startByte: Int, oldEndByte: Int, newEndByte: Int, startPoint: Point, oldEndPoint: Point, newEndPoint: Point) {
+        self.startByte = UInt32(startByte)
+        self.oldEndByte = UInt32(oldEndByte)
+        self.newEndByte = UInt32(newEndByte)
+        self.startPoint = startPoint
+        self.oldEndPoint = oldEndPoint
+        self.newEndPoint = newEndPoint
+    }
+
     var internalInputEdit: TSInputEdit {
         return TSInputEdit(start_byte: startByte,
                            old_end_byte: oldEndByte,

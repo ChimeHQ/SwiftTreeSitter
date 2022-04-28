@@ -18,6 +18,11 @@ public struct Point {
         self.column = column
     }
 
+    public init(row: Int, column: Int) {
+        self.row = UInt32(row)
+        self.column = UInt32(column)
+    }
+
     init(internalPoint: TSPoint) {
         self.row = internalPoint.row
         self.column = internalPoint.column
