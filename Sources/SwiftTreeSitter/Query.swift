@@ -145,6 +145,14 @@ public struct QueryCapture {
     }
 }
 
+extension QueryCapture: CustomDebugStringConvertible {
+    public var debugDescription: String {
+        let name = name ?? ""
+
+        return "<capture \(index) \"\(name)\": \(node.debugDescription)>"
+    }
+}
+
 public struct QueryMatch {
     public var id: Int
     public var patternIndex: Int

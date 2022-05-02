@@ -21,11 +21,11 @@ public struct Node {
     }
 }
 
-extension Node: CustomStringConvertible {
-    public var description: String {
+extension Node: CustomDebugStringConvertible {
+    public var debugDescription: String {
         let typeName = nodeType ?? "unnamed"
 
-        return "<\(typeName) range: \(byteRange) childCount: \(childCount)>"
+        return "<\(typeName) range: \(range) childCount: \(childCount)>"
     }
 }
 
