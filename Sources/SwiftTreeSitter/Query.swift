@@ -143,6 +143,10 @@ public struct QueryCapture {
         self.index = Int(tsCapture.index)
         self.name = name
     }
+
+    public var range: NSRange {
+        return node.range
+    }
 }
 
 extension QueryCapture: CustomDebugStringConvertible {
