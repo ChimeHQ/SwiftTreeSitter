@@ -2,12 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "tree-sitter-xcframework",
-        "repositoryURL": "https://github.com/krzyzanowskim/tree-sitter-xcframework",
+        "package": "tree-sitter",
+        "repositoryURL": "https://github.com/mattmassicotte/tree-sitter",
         "state": {
-          "branch": null,
-          "revision": "e24b77438e2d40f796875101e45a5b5f93aaac25",
-          "version": "0.206.7"
+          "branch": "feature/swift-package",
+          "revision": "8da471d78238e24035a7a74c06f3d778c5c8f0e7",
+          "version": null
         }
       }
     ]
