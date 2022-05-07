@@ -33,6 +33,7 @@ In addition to the runtime, you'll probably also want at least one language libr
 Parsers available via SPM:
 
 - [Go](https://github.com/mattmassicotte/tree-sitter-go/tree/feature/swift)
+- [GoMod](https://github.com/mattmassicotte/tree-sitter-gomod/tree/feature/swift)
 - [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)
 
 While SPM is nice, it isn't a requirement. You can also build them yourself directly. In fact, I've struggled with this so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
