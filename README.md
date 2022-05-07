@@ -18,6 +18,24 @@ dependencies: [
 ]
 ```
 
+## Runtime/Parser Dependencies
+
+Remember that tree-sitter has both runtime and per-language dependencies.
+
+This library has gone through a variety of iterations on how these dependencies should be integrated. The [tree-sitter-xcframework](https://github.com/krzyzanowskim/tree-sitter-xcframework) was created to help package everything up in a way that was totally transparent.
+
+However, it turns out that it is possible to use SPM to build the runtime and (with a little more work) the parsers too. SwiftTreeSitter currently depends on a branch I created that adds SPM. But as soon as [this PR](https://github.com/tree-sitter/tree-sitter/pull/1736) is merged, it can be switched to the official repo directly as a standard package.
+
+## Language Parsers
+
+In addition to the runtime, you'll probably also want at least one language library. They can also be built with SPM, though they are more complex. If you need help adding SPM support to a parser that doesn't have it yet, let me know and I'll help!
+
+Parsers available via SPM:
+
+- [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)
+
+While SPM is nice, it isn't a requirement. You can also build them yourself directly. In fact, I've struggled with this so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
+
 ## Predicate/Directive Support
 
 `QueryMatch` provides an API for getting at query predicates and directives. You are free to use/evaluate them yourself. However, there is also a `ResolvingQueryCursor`, which wraps a standard `QueryCursor`, but allows for resolution of predicates. It also provides some facilities for preloading all `QueryMatch` objects from the underlying `QueryCursor`, which can help with performance in some situations.
@@ -29,32 +47,6 @@ The following predicates are parsed and transformed into structured `Predicate` 
 - `is-not?`: parsed, but not implemented
 
 Please open up an issue if you need additional support here.
-
-## Runtime/Parser Dependencies
-
-Remember that tree-sitter has both runtime and per-language dependencies. SwiftTreeSitter now depends on [tree-sitter-xcframework](https://github.com/krzyzanowskim/tree-sitter-xcframework), which provides pre-built binaries for the runtime and **some** parsers. If you need support for parsers not included in that project, the best best is to try to add them!
-
-But, that is not necessary - you can build and link parsers manually.
-
-Note: These instructions assume a macOS target. Also, I've only tested tree-sitter down to 10.13. I suspect it will work with lower targets, but have not tried.
-
-### build
-
-Check out and build tree-sitter from source. 
-
-    CFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" CXXFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" LDFLAGS="-arch arm64 -arch x86_64 -mmacosx-version-min=10.13" make
-
-### install
-
-Install it into `/usr/local`.
-
-    sudo make install PREFIX=/usr/local
-
-## Building Language Libraries
-
-In addition to the runtime, you'll probably also want at least one language library. These are more complex to build than the runtime. In fact, I've struggled with them so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
-
-And, if the parser does have a Makefile, then the process is identical to the runtime above.
 
 ## Suggestions or Feedback
 
