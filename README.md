@@ -34,6 +34,7 @@ Parsers available via SPM:
 
 - [Go](https://github.com/mattmassicotte/tree-sitter-go/tree/feature/swift)
 - [GoMod](https://github.com/mattmassicotte/tree-sitter-gomod/tree/feature/swift)
+- [JSON](https://github.com/mattmassicotte/tree-sitter-gomod/tree/feature/spm)
 - [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)
 - [Swift](https://github.com/mattmassicotte/tree-sitter-swift/tree/feature/spm)
 
