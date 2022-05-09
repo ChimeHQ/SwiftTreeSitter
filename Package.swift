@@ -4,7 +4,6 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftTreeSitter",
-    platforms: [.macOS(.v10_13), .iOS(.v11)],
     products: [
         .library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
     ],
