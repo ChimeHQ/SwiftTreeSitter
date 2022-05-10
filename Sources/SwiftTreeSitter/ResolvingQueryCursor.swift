@@ -107,10 +107,14 @@ extension ResolvingQueryCursor {
             return evaluateTextPredicate(match: match, captureNames: names, textProvider: textProvider) { text in
                 let range = NSRange(0..<text.utf16.count)
 
-                return exp.rangeOfFirstMatch(in: text, options: [], range: range).location != NSNotFound
+                return exp.rangeOfFirstMatch(in: text, options: [], range: range) == range
+            }
+        case .anyOf(let set, let name):
+            return evaluateTextPredicate(match: match, captureNames: [name], textProvider: textProvider) { text in
+                return set.contains(text)
             }
         case .isNot:
-            return true
+            return false
         case .generic:
             return false
         }

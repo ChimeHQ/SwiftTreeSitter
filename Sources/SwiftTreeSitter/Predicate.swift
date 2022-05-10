@@ -24,6 +24,7 @@ public enum Predicate: Hashable {
     case eq([String], captureNames: [String])
     case match(NSRegularExpression, captureNames: [String])
     case isNot(String)
+    case anyOf(Set<String>, captureName: String)
     case generic(String, strings: [String], captureNames: [String])
 
     public var captureNames: [String] {
@@ -34,6 +35,8 @@ public enum Predicate: Hashable {
             return names
         case .isNot:
             return []
+        case .anyOf(_, let names):
+            return [names]
         case .generic(_, _, let names):
             return names
         }
@@ -116,6 +119,13 @@ struct PredicateParser {
             let expression = try NSRegularExpression(pattern: strings.first!, options: [])
 
             return .match(expression, captureNames: captures)
+        case "any-of?":
+            guard let capture = captures.first else {
+                return .generic(name, strings: strings, captureNames: captures)
+            }
+
+            return .anyOf(Set(strings), captureName: capture)
+
         case "is-not?":
             if strings != ["local"] {
                 return .generic(name, strings: strings, captureNames: captures)

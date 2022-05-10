@@ -93,6 +93,25 @@ final class PredicateTests: XCTestCase {
         XCTAssertEqual(predicates, expectedPredicates)
     }
 
+    func testParseAnyOf() throws {
+        let steps: [QueryPredicateStep] = [
+            .string("any-of?"),
+            .capture("@a"),
+            .string("foo"),
+            .string("bar"),
+            .string("baz"),
+            .done
+        ]
+
+        let predicates = try PredicateParser().parse(steps)
+
+        let expectedPredicates = [
+            Predicate.anyOf(Set(["foo", "bar", "baz"]), captureName: "@a"),
+        ]
+
+        XCTAssertEqual(predicates, expectedPredicates)
+    }
+
     func testParseUnknown() throws {
         let steps: [QueryPredicateStep] = [
             .string("foo?"),

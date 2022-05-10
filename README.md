@@ -48,6 +48,7 @@ The following predicates are parsed and transformed into structured `Predicate` 
 
 - `eq?`: fully supported
 - `match?`: fully supported
+- `any-of?`: fully supported
 - `is-not?`: parsed, but not implemented
 
 Please open up an issue if you need additional support here.
