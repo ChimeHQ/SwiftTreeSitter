@@ -60,6 +60,23 @@ final class PredicateTests: XCTestCase {
         XCTAssertEqual(predicates, expectedPredicates)
     }
 
+    func testParseNotEq() throws {
+        let steps: [QueryPredicateStep] = [
+            .string("not-eq?"),
+            .capture("@a"),
+            .string("thing"),
+            .done
+        ]
+
+        let predicates = try PredicateParser().parse(steps)
+
+        let expectedPredicates = [
+            Predicate.notEq(["thing"], captureNames: ["@a"]),
+        ]
+
+        XCTAssertEqual(predicates, expectedPredicates)
+    }
+
     func testParseMatch() throws {
         let steps: [QueryPredicateStep] = [
             .string("match?"),
@@ -72,6 +89,23 @@ final class PredicateTests: XCTestCase {
 
         let expectedPredicates = [
             Predicate.match(try NSRegularExpression(pattern: "^(a|b|c)$", options: []), captureNames: ["@a"])
+        ]
+
+        XCTAssertEqual(predicates, expectedPredicates)
+    }
+
+    func testParseNotMatch() throws {
+        let steps: [QueryPredicateStep] = [
+            .string("not-match?"),
+            .capture("@a"),
+            .string("^(a|b|c)$"),
+            .done
+        ]
+
+        let predicates = try PredicateParser().parse(steps)
+
+        let expectedPredicates = [
+            Predicate.notMatch(try NSRegularExpression(pattern: "^(a|b|c)$", options: []), captureNames: ["@a"])
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)
@@ -107,6 +141,25 @@ final class PredicateTests: XCTestCase {
 
         let expectedPredicates = [
             Predicate.anyOf(Set(["foo", "bar", "baz"]), captureName: "@a"),
+        ]
+
+        XCTAssertEqual(predicates, expectedPredicates)
+    }
+
+    func testParseNotAnyOf() throws {
+        let steps: [QueryPredicateStep] = [
+            .string("not-any-of?"),
+            .capture("@a"),
+            .string("foo"),
+            .string("bar"),
+            .string("baz"),
+            .done
+        ]
+
+        let predicates = try PredicateParser().parse(steps)
+
+        let expectedPredicates = [
+            Predicate.notAnyOf(Set(["foo", "bar", "baz"]), captureName: "@a"),
         ]
 
         XCTAssertEqual(predicates, expectedPredicates)

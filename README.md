@@ -47,8 +47,11 @@ While SPM is nice, it isn't a requirement. You can also build them yourself dire
 The following predicates are parsed and transformed into structured `Predicate` cases. All others are turned into the `generic` case.
 
 - `eq?`: fully supported
+- `not-eq?`: fully supported
 - `match?`: fully supported
+- `not-match?`: fully supported
 - `any-of?`: fully supported
+- `not-any-of?`: fully supported
 - `is-not?`: parsed, but not implemented
 
 Please open up an issue if you need additional support here.

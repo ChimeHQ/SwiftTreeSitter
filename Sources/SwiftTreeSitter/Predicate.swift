@@ -22,20 +22,29 @@ extension QueryPredicateStep: CustomStringConvertible {
 
 public enum Predicate: Hashable {
     case eq([String], captureNames: [String])
+    case notEq([String], captureNames: [String])
     case match(NSRegularExpression, captureNames: [String])
+    case notMatch(NSRegularExpression, captureNames: [String])
     case isNot(String)
     case anyOf(Set<String>, captureName: String)
+    case notAnyOf(Set<String>, captureName: String)
     case generic(String, strings: [String], captureNames: [String])
 
     public var captureNames: [String] {
         switch self {
         case .eq(_, let names):
             return names
+        case .notEq(_, let names):
+            return names
         case .match(_, let names):
+            return names
+        case .notMatch(_, let names):
             return names
         case .isNot:
             return []
         case .anyOf(_, let names):
+            return [names]
+        case .notAnyOf(_, let names):
             return [names]
         case .generic(_, _, let names):
             return names
@@ -111,21 +120,36 @@ struct PredicateParser {
         switch name {
         case "eq?":
             return .eq(strings, captureNames: captures)
+        case "not-eq?":
+            return .notEq(strings, captureNames: captures)
         case "match?":
-            if strings.count != 1 {
+            guard let pattern = strings.first else {
                 return .generic(name, strings: strings, captureNames: captures)
             }
 
-            let expression = try NSRegularExpression(pattern: strings.first!, options: [])
+            let expression = try NSRegularExpression(pattern: pattern, options: [])
 
             return .match(expression, captureNames: captures)
+        case "not-match?":
+            guard let pattern = strings.first else {
+                return .generic(name, strings: strings, captureNames: captures)
+            }
+
+            let expression = try NSRegularExpression(pattern: pattern, options: [])
+
+            return .notMatch(expression, captureNames: captures)
         case "any-of?":
             guard let capture = captures.first else {
                 return .generic(name, strings: strings, captureNames: captures)
             }
 
             return .anyOf(Set(strings), captureName: capture)
+        case "not-any-of?":
+            guard let capture = captures.first else {
+                return .generic(name, strings: strings, captureNames: captures)
+            }
 
+            return .notAnyOf(Set(strings), captureName: capture)
         case "is-not?":
             if strings != ["local"] {
                 return .generic(name, strings: strings, captureNames: captures)
