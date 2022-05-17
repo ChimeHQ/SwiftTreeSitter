@@ -33,7 +33,7 @@ In addition to the runtime, you'll probably also want at least one language libr
 Parsers available via SPM:
 
 - [Go](https://github.com/mattmassicotte/tree-sitter-go/tree/feature/swift)
-- [GoMod](https://github.com/mattmassicotte/tree-sitter-go-mod/tree/feature/swift)
+- [GoMod](https://github.com/camdencheek/tree-sitter-go-mod)
 - [JSON](https://github.com/mattmassicotte/tree-sitter-json/tree/feature/spm)
 - [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)
 - [Swift](https://github.com/mattmassicotte/tree-sitter-swift/tree/feature/spm)
