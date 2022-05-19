@@ -8,9 +8,12 @@ let package = Package(
         .library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/mattmassicotte/tree-sitter", .branch("feature/swift-package"))
     ],
     targets: [
+        .target(name: "tree-sitter",
+                path: "tree-sitter/lib",
+                sources: ["src/lib.c"],
+                publicHeadersPath: "include"),
         .target(name: "SwiftTreeSitter", dependencies: ["tree-sitter"]),
         .testTarget(name: "SwiftTreeSitterTests", dependencies: ["SwiftTreeSitter"]),
     ]
