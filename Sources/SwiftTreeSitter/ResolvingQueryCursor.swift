@@ -28,7 +28,7 @@ public final class ResolvingQueryCursor {
             return
         }
 
-        while let match = cursor.nextMatch() {
+        while let match = cursor.next() {
             matches.append(match)
         }
 
@@ -76,7 +76,7 @@ extension ResolvingQueryCursor: Sequence, IteratorProtocol {
     private func nextMatch() -> QueryMatch? {
         // use the cursor directly if we haven't prefetched
         if matches.isEmpty {
-            return cursor.nextMatch()
+            return cursor.next()
         }
 
         if index >= matches.endIndex {

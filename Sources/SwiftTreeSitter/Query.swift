@@ -226,7 +226,30 @@ public class QueryCursor {
         return QueryCapture(tsCapture: capture, name: name)
     }
 
+    @available(*, deprecated, renamed: "next")
     public func nextMatch() -> QueryMatch? {
+        return next()
+    }
+
+    public func nextCapture() -> QueryCapture? {
+        var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
+        var index: UInt32 = 0
+
+        if ts_query_cursor_next_capture(internalCursor, &match, &index) == false {
+            return nil
+        }
+
+        let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
+                                                                count: Int(match.capture_count))
+
+        let capture = captureBuffer[Int(index)]
+
+        return makeCapture(from: capture)
+    }
+}
+
+extension QueryCursor: Sequence, IteratorProtocol {
+    public func next() -> QueryMatch? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
 
         if ts_query_cursor_next_match(internalCursor, &match) == false {
@@ -245,21 +268,5 @@ public class QueryCursor {
                           patternIndex: Int(match.pattern_index),
                           captures: captures,
                           predicates: predicates)
-    }
-
-    public func nextCapture() -> QueryCapture? {
-        var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
-        var index: UInt32 = 0
-
-        if ts_query_cursor_next_capture(internalCursor, &match, &index) == false {
-            return nil
-        }
-
-        let captureBuffer = UnsafeBufferPointer<TSQueryCapture>(start: match.captures,
-                                                                count: Int(match.capture_count))
-
-        let capture = captureBuffer[Int(index)]
-
-        return makeCapture(from: capture)
     }
 }
