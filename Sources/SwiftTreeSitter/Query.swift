@@ -130,22 +130,28 @@ public class Query {
 }
 
 public struct QueryCapture {
-    public var node: Node
-    public var index: Int
-    public var name: String?
+    public let node: Node
+    public let index: Int
+    public let nameComponents: [String]
+    public let patternIndex: Int
 
-    init?(tsCapture: TSQueryCapture, name: String?) {
+    init?(tsCapture: TSQueryCapture, name: String?, patternIndex: Int) {
         guard let node = Node(internalNode: tsCapture.node) else {
             return nil
         }
 
         self.node = node
         self.index = Int(tsCapture.index)
-        self.name = name
+        self.nameComponents = name?.components(separatedBy: ".") ?? []
+        self.patternIndex = patternIndex
     }
 
     public var range: NSRange {
         return node.range
+    }
+
+    public var name: String? {
+        return nameComponents.joined(separator: ".")
     }
 }
 
@@ -154,6 +160,20 @@ extension QueryCapture: CustomDebugStringConvertible {
         let name = name ?? ""
 
         return "<capture \(index) \"\(name)\": \(node.debugDescription)>"
+    }
+}
+
+extension QueryCapture: Comparable {
+    public static func < (lhs: QueryCapture, rhs: QueryCapture) -> Bool {
+        if lhs.range.lowerBound != rhs.range.lowerBound {
+            return lhs.range.lowerBound < rhs.range.lowerBound
+        }
+
+        if lhs.nameComponents.count != rhs.nameComponents.count {
+            return lhs.nameComponents.count < rhs.nameComponents.count
+        }
+
+        return lhs.patternIndex < rhs.patternIndex
     }
 }
 
@@ -220,10 +240,10 @@ public class QueryCursor {
         ts_query_cursor_set_point_range(internalCursor, start, end)
     }
 
-    func makeCapture(from capture: TSQueryCapture) -> QueryCapture? {
+    func makeCapture(from capture: TSQueryCapture, patternIndex: Int) -> QueryCapture? {
         let name = activeQuery?.captureName(for: Int(capture.index))
 
-        return QueryCapture(tsCapture: capture, name: name)
+        return QueryCapture(tsCapture: capture, name: name, patternIndex: patternIndex)
     }
 
     @available(*, deprecated, renamed: "next")
@@ -244,7 +264,7 @@ public class QueryCursor {
 
         let capture = captureBuffer[Int(index)]
 
-        return makeCapture(from: capture)
+        return makeCapture(from: capture, patternIndex: Int(match.pattern_index))
     }
 }
 
@@ -262,7 +282,7 @@ extension QueryCursor: Sequence, IteratorProtocol {
         let patternIndex = Int(match.pattern_index)
         let predicates = activeQuery?.predicates(for: patternIndex) ?? []
 
-        let captures = captureBuffer.compactMap({ makeCapture(from: $0) })
+        let captures = captureBuffer.compactMap({ makeCapture(from: $0, patternIndex: patternIndex) })
 
         return QueryMatch(id: Int(match.id),
                           patternIndex: Int(match.pattern_index),

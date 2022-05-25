@@ -29,6 +29,12 @@ extension Node: CustomDebugStringConvertible {
     }
 }
 
+extension Node: Equatable {
+    public static func == (lhs: Node, rhs: Node) -> Bool {
+        return ts_node_eq(lhs.internalNode, rhs.internalNode)
+    }
+}
+
 extension Node {
     public var sExpressionString: String? {
         guard let str = ts_node_string(internalNode) else {
