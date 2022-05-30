@@ -108,7 +108,8 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 Parsers available via SPM:
 
 - [C](https://github.com/tree-sitter/tree-sitter-c)
-- [Go](https://github.com/mattmassicotte/tree-sitter-go/tree/feature/swift)
+- [C#](https://github.com/tree-sitter/tree-sitter-c-sharp)
+- [Go](https://github.com/tree-sitter/tree-sitter-go)
 - [GoMod](https://github.com/camdencheek/tree-sitter-go-mod)
 - [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm)
 - [Java](https://github.com/tree-sitter/tree-sitter-java)
