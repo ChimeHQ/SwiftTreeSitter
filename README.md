@@ -105,21 +105,25 @@ while let match = queryCursor.nextMatch() {
 
 Tree-sitter language parsers are separate projects, and you'll probably need at least one. They can also be built with SPM, though they are more complex. If you would like SPM support for parser that doesn't have it yet, let me know and I'll help!
 
-Parsers available via SPM:
+**Parsers available via SPM:** (\* not merged into official repo yet)
 
+- [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm)\*
 - [C](https://github.com/tree-sitter/tree-sitter-c)
+- [C++](https://github.com/tree-sitter/tree-sitter-cpp)
 - [C#](https://github.com/tree-sitter/tree-sitter-c-sharp)
+- [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm)\*
 - [Go](https://github.com/tree-sitter/tree-sitter-go)
 - [GoMod](https://github.com/camdencheek/tree-sitter-go-mod)
-- [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm)
+- [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm)\*
 - [Java](https://github.com/tree-sitter/tree-sitter-java)
 - [Javascript](https://github.com/tree-sitter/tree-sitter-javascript)
-- [JSON](https://github.com/mattmassicotte/tree-sitter-json/tree/feature/spm)
+- [JSON](https://github.com/mattmassicotte/tree-sitter-json/tree/feature/spm)\*
 - [PHP](https://github.com/tree-sitter/tree-sitter-php)
-- [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)
+- [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm)\*
+- [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)\*
 - [Rust](https://github.com/tree-sitter/tree-sitter-rust)
-- [Swift](https://github.com/mattmassicotte/tree-sitter-swift/tree/feature/spm)
-- [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm)
+- [Swift](https://github.com/mattmassicotte/tree-sitter-swift/tree/feature/spm)\*
+- [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm)\*
 
 While SPM is nice, it isn't a requirement. You can use git submodules. You can even build them yourself. In fact, I've struggled with this so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
 
