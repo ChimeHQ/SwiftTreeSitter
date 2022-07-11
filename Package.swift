@@ -13,7 +13,8 @@ let package = Package(
         .target(name: "tree-sitter",
                 path: "tree-sitter/lib",
                 sources: ["src/lib.c"],
-                publicHeadersPath: "include"),
+                publicHeadersPath: "include",
+                cSettings: [.headerSearchPath("src/")]),
         .target(name: "SwiftTreeSitter", dependencies: ["tree-sitter"]),
         .testTarget(name: "SwiftTreeSitterTests", dependencies: ["SwiftTreeSitter"]),
     ]

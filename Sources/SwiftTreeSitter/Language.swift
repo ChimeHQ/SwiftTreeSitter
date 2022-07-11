@@ -55,6 +55,7 @@ extension Language {
     }
 }
 
+#if !os(WASI)
 public extension Language {
     func query(contentsOf url: URL) throws -> Query {
         let data = try Data(contentsOf: url)
@@ -62,3 +63,4 @@ public extension Language {
         return try Query(language: self, data: data)
     }
 }
+#endif
