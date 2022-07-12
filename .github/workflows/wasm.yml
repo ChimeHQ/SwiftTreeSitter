@@ -1,0 +1,24 @@
+name: WebAssembly CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+  test:
+    name: BezierKit WASM support
+    runs-on: ubuntu-latest
+    container: ghcr.io/swiftwasm/carton:0.16.0
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Test WebAssembly
+        run: carton test
