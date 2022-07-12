@@ -94,7 +94,7 @@ let tree = parseText() // <- omitting for clarity
 
 let queryCursor = query.execute(node: tree.rootNode!, in: tree)
 
-// the performance of nextMatch is highly dependent on  the nature of the queries,
+// the performance of nextMatch is highly dependent on the nature of the queries,
 // language grammar, and size of input
 while let match = queryCursor.nextMatch() {
     print("match: ", match)
