@@ -172,3 +172,10 @@ extension Node {
         return TreeCursor(internalCursor: cursor)
     }
 }
+
+extension Node {
+    public func getNodeChild(withField field: String) -> Node? {
+        let tsNode = ts_node_child_by_field_name(internalNode, field.cString(using: .utf8), UInt32(field.count))
+        return .init(internalNode: tsNode)
+    }
+}
