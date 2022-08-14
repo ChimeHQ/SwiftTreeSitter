@@ -82,12 +82,51 @@ extension Node {
         return TSRange(points: pointRange, bytes: byteRange)
     }
 
+    public var isNull: Bool {
+        return ts_node_is_null(internalNode)
+    }
+
+    public var isExtra: Bool {
+        return ts_node_is_extra(internalNode)
+    }
+
+    public var isNamed: Bool {
+        return ts_node_is_named(internalNode)
+    }
+
+    public var isMissing: Bool {
+        return ts_node_is_missing(internalNode)
+    }
+
+    public var hasChanges: Bool {
+        return ts_node_has_changes(internalNode)
+    }
+
+    public var hasError: Bool {
+        return ts_node_has_error(internalNode)
+    }
+
+    public func childByFieldName(fieldName: String) -> Node? {
+        let n = ts_node_child_by_field_name(internalNode, fieldName, UInt32(fieldName.count))
+        return Node(internalNode: n)
+    }
+    
     public var childCount: Int {
         return Int(ts_node_child_count(internalNode))
     }
 
+    public var namedChildCount: Int {
+        return Int(ts_node_named_child_count(internalNode))
+    }
+
     public func child(at index: Int) -> Node? {
         let n = ts_node_child(internalNode, UInt32(index))
+
+        return Node(internalNode: n)
+    }
+
+    public func namedChild(at index: Int) -> Node? {
+        let n = ts_node_named_child(internalNode, UInt32(index))
 
         return Node(internalNode: n)
     }
