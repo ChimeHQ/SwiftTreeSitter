@@ -7,13 +7,11 @@ public final class ResolvingQueryCursor {
     private let cursor: QueryCursor
     private var index: Array.Index
     private var textProvider: TextProvider
-    private var cachedText: [NSRange : String]
 
     public init(cursor: QueryCursor) {
         self.cursor = cursor
         self.matches = []
         self.index = matches.startIndex
-        self.cachedText = [:]
         self.textProvider = { _, _ in return nil }
     }
 
@@ -37,17 +35,18 @@ public final class ResolvingQueryCursor {
 
     public func prepare(with textProvider: @escaping TextProvider) {
         self.index = matches.startIndex
-        self.cachedText.removeAll()
+
+        var cachedText = [NSRange : String]()
 
         // create a caching provider
         self.textProvider = { (range, pointRange) in
-            if let value = self.cachedText[range] {
+            if let value = cachedText[range] {
                 return value
             }
 
             let value = textProvider(range, pointRange)
 
-            self.cachedText[range] = value
+            cachedText[range] = value
 
             return value
         }
