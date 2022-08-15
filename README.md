@@ -123,7 +123,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 - [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm)\*
 - [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)\*
 - [Rust](https://github.com/tree-sitter/tree-sitter-rust)
-- [Swift](https://github.com/mattmassicotte/tree-sitter-swift/tree/feature/spm)\*
+- [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files)
 - [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm)\*
 
 While SPM is nice, it isn't a requirement. You can use git submodules. You can even build them yourself. In fact, I've struggled with this so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
