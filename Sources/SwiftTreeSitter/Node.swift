@@ -107,7 +107,8 @@ extension Node {
     }
 
     public func child(byFieldName fieldName: String) -> Node? {
-        let n = ts_node_child_by_field_name(internalNode, fieldName, UInt32(fieldName.count))
+        let count = UInt32(fieldName.utf8.count)
+        let n = ts_node_child_by_field_name(internalNode, fieldName, count)
         return Node(internalNode: n)
     }
     
