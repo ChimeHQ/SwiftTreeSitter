@@ -106,7 +106,7 @@ extension Node {
         return ts_node_has_error(internalNode)
     }
 
-    public func childByFieldName(fieldName: String) -> Node? {
+    public func child(byFieldName fieldName: String) -> Node? {
         let n = ts_node_child_by_field_name(internalNode, fieldName, UInt32(fieldName.count))
         return Node(internalNode: n)
     }
