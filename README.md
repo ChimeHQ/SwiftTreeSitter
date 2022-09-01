@@ -119,6 +119,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 - [Javascript](https://github.com/tree-sitter/tree-sitter-javascript)
 - [JSON](https://github.com/mattmassicotte/tree-sitter-json/tree/feature/spm)\*
 - [Lua](https://github.com/Azganoth/tree-sitter-lua)
+- [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown-2/tree/feature/spm)\*
 - [PHP](https://github.com/tree-sitter/tree-sitter-php)
 - [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm)\*
 - [Ruby](https://github.com/mattmassicotte/tree-sitter-ruby/tree/feature/swift)\*
