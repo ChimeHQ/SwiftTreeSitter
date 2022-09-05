@@ -24,6 +24,13 @@ public struct TSRange {
 
         self.points = start..<safeEnd
     }
+
+	var internalRange: tree_sitter.TSRange {
+		return .init(start_point: points.lowerBound.internalPoint,
+					 end_point: points.upperBound.internalPoint,
+					 start_byte: bytes.lowerBound,
+					 end_byte: bytes.upperBound)
+	}
 }
 
 extension TSRange: Equatable {

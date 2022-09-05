@@ -34,6 +34,34 @@ extension Parser {
             throw ParserError.languageFailure
         }
     }
+
+	/// The ranges this parser will operate on.
+	///
+	/// This defaults to the entire document. This is useful
+	/// for working with embedded languages.
+	public var includedRanges: [TSRange] {
+		get {
+			var count: UInt32 = 0
+			let tsRangePointer = ts_parser_included_ranges(internalParser, &count)
+
+			let tsRangeBuffer = UnsafeBufferPointer<tree_sitter.TSRange>(start: tsRangePointer, count: Int(count))
+
+			return tsRangeBuffer.map({ TSRange(internalRange: $0) })
+		}
+		set {
+			let ranges = newValue.map({ $0.internalRange })
+
+			ranges.withUnsafeBytes { bufferPtr in
+				let count = newValue.count
+
+				guard let ptr = bufferPtr.baseAddress?.bindMemory(to: tree_sitter.TSRange.self, capacity: count) else {
+					preconditionFailure("unable to convert pointer")
+				}
+
+				ts_parser_set_included_ranges(internalParser, ptr, UInt32(count))
+			}
+		}
+	}
 }
 
 extension Parser {

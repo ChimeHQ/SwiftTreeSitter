@@ -57,7 +57,8 @@ public class Query {
             }
 
             return ts_query_new(language.tsLanguage,
-                                ptr, UInt32(dataLength),
+                                ptr,
+								UInt32(dataLength),
                                 &errorOffset,
                                 &queryError)
         }
