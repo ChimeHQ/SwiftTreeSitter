@@ -128,6 +128,8 @@ extension ResolvingQueryCursor {
             }
         case .isNot:
             return false
+		case .set:
+			return true
         case .generic:
             return false
         }
