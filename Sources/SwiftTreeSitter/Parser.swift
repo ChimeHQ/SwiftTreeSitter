@@ -62,6 +62,20 @@ extension Parser {
 			}
 		}
 	}
+
+	/// The maximum time interval the parser can run before halting.
+	public var timeout: TimeInterval {
+		get {
+			let us = ts_parser_timeout_micros(internalParser)
+
+			return TimeInterval(us) / 1000.0 / 1000.0
+		}
+		set {
+			let us = UInt64(newValue * 1000.0 * 1000.0)
+
+			ts_parser_set_timeout_micros(internalParser, us)
+		}
+	}
 }
 
 extension Parser {

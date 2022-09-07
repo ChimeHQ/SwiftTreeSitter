@@ -11,4 +11,12 @@ final class ParserTests: XCTestCase {
 
 		XCTAssertEqual(parser.includedRanges, [range])
 	}
+
+	func testSetTimeout() {
+		let parser = Parser()
+
+		parser.timeout = 1.0
+
+		XCTAssertEqual(parser.timeout, 1.0)
+	}
 }
