@@ -1,6 +1,15 @@
 import Foundation
 
+/// An enhanced QueryCursor that can resolve predicates.
+///
+/// By default tree-sitter leaves the evaluation of predicates up
+/// to user libraries. `ResolvingQueryCursor` has a very similar API
+/// to the standard `QueryCursor`, but can also resolve predicates.
+///
+/// This class also comes with some features that help to run queries in
+/// the background safely and efficiently.
 public final class ResolvingQueryCursor {
+	/// A function that can produce text content.
     public typealias TextProvider = (NSRange, Range<Point>) -> String?
 
     private var matches: [QueryMatch]
@@ -19,7 +28,7 @@ public final class ResolvingQueryCursor {
     ///
     /// Iterating over matches can be very expensive for certain
     /// queries/inputs. This is helpful if you want to gather all
-    /// matches in the background before evalucating them later on.
+    /// matches in the background before evaluating them later on.
     public func prefetchMatches() {
         guard matches.isEmpty else {
             assertionFailure("Should not prefetch more than once")
