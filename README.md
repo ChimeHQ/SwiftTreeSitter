@@ -13,95 +13,10 @@ SwiftTreeSitter is fairly low-level. If you are looking a higher-level system fo
 
 ## Integration
 
-### Swift Package Manager
-
 ```swift
 dependencies: [
     .package(url: "https://github.com/ChimeHQ/SwiftTreeSitter")
 ]
-```
-
-## Usage
-
-Basic parsing:
-
-```swift
-// import the tree-sitter bindings
-import SwiftTreeSitter
-
-// import the tree-sitter swift parser (confusing naming, I know)
-import TreeSitterSwift
-
-// create a language
-let language = Language(language: tree_sitter_swift())
-
-// create a parser
-let parser = Parser()
-try parser.setLanguage(language)
-
-let source = """
-func hello() {
-    print("hello from tree-sitter")
-}
-"""
-
-let tree = parser.parse(source)
-
-print("tree: ", tree)
-```
-
-Tree-sitter operates on byte indices and line/character-offset pairs (called a Point). It is, unfortunately, your responsibility to map your text storage and edits into these types. For the most part, 
-
-
-Processing edits:
-
-```swift
-// tree-sitter operates on byte indices and line/character-offset pairs (called a Point). It is, unfortunately,
-// your responsibility to map your text storage and edits into these types
-
-let edit = InputEdit(startByte: editStartByteOffset,
-                                oldEndByte: preEditEndByteOffset,
-                                newEndByte: postEditEndByteOffset,
-                                startPoint: editStartPoint,
-                                oldEndPoint: preEditEndPoint,
-                                newEndPoint: postEditEndPoint)
-
-// apply the edit first
-existingTree.edit(edit)
-
-// then, re-parse the text to build a new tree
-let newTree = parser.parse(existingTree, string: fullText)
-
-// you can now compute a diff to determine what has changed
-let changedRanges = existingTree.changedRanges(newTree)
-```
-
-Using queries:
-
-```swift
-import SwiftTreeSitter
-import TreeSitterSwift
-
-let language = Language(language: tree_sitter_swift())
-
-// find the SPM-packaged queries
-let url = Bundle.main
-              .resourceURL
-              .appendingPathComponent("TreeSitterSwift_TreeSitterSwift.bundle")
-              .appendingPathComponent("queries/highlights.scm")
-
-// this can be very expensive, depending on the language grammar/queries
-let query = try language.query(contentsOf: url!)
-
-let tree = parseText() // <- omitting for clarity
-
-let queryCursor = query.execute(node: tree.rootNode!, in: tree)
-
-// the performance of nextMatch is highly dependent on the nature of the queries,
-// language grammar, and size of input
-while let match = queryCursor.nextMatch() {
-    print("match: ", match)
-}
 ```
 
 ## Language Parsers
@@ -129,38 +44,6 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Rust](https://github.com/tree-sitter/tree-sitter-rust) | ✅ |
 | [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ |
 | [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | |
-
-## Predicate/Directive Support
-
-`QueryMatch` provides an API for getting at query predicates and directives. You are free to use/evaluate them yourself. However, there is also a `ResolvingQueryCursor`, which wraps a standard `QueryCursor`, but allows for resolution of predicates. It also provides some facilities for preloading all `QueryMatch` objects from the underlying `QueryCursor`, which can help with performance in some situations.
-
-The following predicates are parsed and transformed into structured `Predicate` cases. All others are turned into the `generic` case.
-
-- `eq?`: fully supported
-- `not-eq?`: fully supported
-- `match?`: fully supported
-- `not-match?`: fully supported
-- `any-of?`: fully supported
-- `not-any-of?`: fully supported
-- `is-not?`: parsed, but not implemented
-- `set!`: parsed, but not implemented
-
-Please open up an issue if you need additional support here.
-
-```swift
-let resolvingCursor = ResolvingQueryCursor(cursor: queryCursor)
-
-// this function takes an NSRange and Range<Point>, and returns
-// the contents in your source text
-let provider: TextProvider = { range, pointRange in ... }
-
-resolvingCursor.prepare(with: provider)
-
-// ResolvingQueryCursor conforms to Sequence
-for match in resolvingCursor {
-    print("match: ", match)
-}
-```
 
 ## Suggestions or Feedback
 

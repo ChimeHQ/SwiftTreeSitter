@@ -1,0 +1,80 @@
+@Tutorial(time: 10) {
+    @Intro(title: "Parsing") {
+		Set up a language and get parse results.
+    }
+    
+    @Section(title: "Adding Dependencies") {
+        @ContentAndMedia {
+            This example will use both SwiftTreeSitter and the parser for the Swift language itself. SPM will be used, but similar steps can be done from within Xcode.
+        }
+        
+        @Steps {
+            @Step {
+                Create a package.
+                
+                @Code(name: "Package.swift", file: "using-essentials-1-1-package.swift")
+            }
+            
+            @Step {
+                Add the `SwiftTreeSitter` dependency.
+                
+                @Code(name: "Package.swift", file: "using-essentials-1-2-package.swift")
+            }
+            
+            @Step {
+                Add the `TreeSitterSwift` dependency, using the branch with SPM support.
+                
+                We're going to be parsing Swift code here, and the module naming is confusing. The convention for parser modules is `TreeSitter` + `NameOfLanguage`.
+
+                
+                @Code(name: "Package.swift", file: "using-essentials-1-3-package.swift")
+            }
+        }
+    }
+    
+    @Section(title: "Creating a Parser") {
+        @ContentAndMedia {
+            The core component of tree-sitter is the `Parser` object. Let's make one and use it to generate a tree representation of some Swift code.
+        }
+        
+        @Steps {
+            @Step {
+				Import the runtime module.
+                
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-1-example.swift")
+            }
+			
+			@Step {
+				Import the language parser
+								
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-2-example.swift")
+			}
+			
+			@Step {
+				Create a `Language` object.
+								
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-3-example.swift")
+			}
+			
+			@Step {
+				Create a `Parser` object and assign its language grammar.
+								
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-4-example.swift")
+			}
+			
+			@Step {
+				Define a small amount of Swift code as a string.
+				
+				We'll use this as input to the parser.
+								
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-5-example.swift")
+			}
+			
+			@Step {
+				Parse the text and print the result.
+								
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-6-example.swift")
+			}
+        }
+    }
+}

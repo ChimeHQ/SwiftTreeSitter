@@ -4,10 +4,34 @@ import Foundation
 ///
 /// By default tree-sitter leaves the evaluation of predicates up
 /// to user libraries. `ResolvingQueryCursor` has a very similar API
-/// to the standard `QueryCursor`, but can also resolve predicates.
-///
-/// This class also comes with some features that help to run queries in
+/// to the standard `QueryCursor`, but can also resolve predicates. This class
+/// also comes with some features that help to run queries in
 /// the background safely and efficiently.
+///
+/// The following predicates are parsed and transformed into structured
+/// `Predicate` cases. All others are turned into the `generic` case.
+///
+/// - `eq?`
+/// - `not-eq?`
+/// - `match?`
+/// - `not-match?`
+/// - `any-of?`
+/// - `not-any-of?`
+/// - `is-not?` (parsed, but not implemented)
+/// - `set!` (parsed, but not implemented)
+///
+/// Here's an example of how it is used:
+/// ```swift
+/// let resolvingCursor = ResolvingQueryCursor(cursor: queryCursor)
+///
+/// let provider: TextProvider = { range, pointRange in ... }
+///
+/// resolvingCursor.prepare(with: provider)
+///
+/// for match in resolvingCursor {
+///     print("match: ", match)
+/// }
+/// ```
 public final class ResolvingQueryCursor {
 	/// A function that can produce text content.
     public typealias TextProvider = (NSRange, Range<Point>) -> String?

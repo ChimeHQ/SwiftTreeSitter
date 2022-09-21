@@ -1,0 +1,47 @@
+@Tutorial(time: 10) {
+    @Intro(title: "Queries") {
+		Use the tree-sitter query system to inspect the syntax tree.
+    }
+    
+    @Section(title: "Getting Query Definitions") {
+        @ContentAndMedia {
+            text
+        }
+        
+        @Steps {
+            @Step {
+                one  
+                
+                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
+            }
+        }
+    }
+        
+    @Section(title: "Executing Queries") {
+        @ContentAndMedia {
+            text
+        }
+        
+        @Steps {
+            @Step {
+                one  
+                
+                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
+            }
+        }
+    }
+        
+    @Section(title: "Using ResolvingQueryCursor") {
+        @ContentAndMedia {
+            text
+        }
+        
+        @Steps {
+            @Step {
+                one  
+                
+                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
+            }
+        }
+    }
+}

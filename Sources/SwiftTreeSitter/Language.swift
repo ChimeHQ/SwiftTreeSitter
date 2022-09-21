@@ -57,6 +57,7 @@ extension Language {
 
 #if !os(WASI)
 public extension Language {
+    /// Construct a query object from data in a file.
     func query(contentsOf url: URL) throws -> Query {
         let data = try Data(contentsOf: url)
 
