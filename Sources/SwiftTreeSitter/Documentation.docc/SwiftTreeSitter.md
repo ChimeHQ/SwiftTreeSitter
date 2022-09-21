@@ -10,6 +10,7 @@ SwiftTreeSitter attempts to map the [tree-sitter](https://tree-sitter.github.io/
 
 ### Parsing
 
+- <doc:New-Languages>
 - ``Parser``
 - ``Language``
 - ``InputEdit``

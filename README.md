@@ -1,6 +1,7 @@
 [![Build Status][build status badge]][build status]
 [![License][license badge]][license]
 [![Platforms][platforms badge]][platforms]
+[![Documentation][documentation badge]][documentation]
 
 # SwiftTreeSitter
 
@@ -105,7 +106,7 @@ while let match = queryCursor.nextMatch() {
 
 ## Language Parsers
 
-Tree-sitter language parsers are separate projects, and you'll probably need at least one. They can also be built with SPM, though they are more complex. If you would like SPM support for parser that doesn't have it yet, let me know and I'll help!
+Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation].
 
 | Language    | Offical Repo |
 | --- | :---: |
@@ -128,8 +129,6 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Rust](https://github.com/tree-sitter/tree-sitter-rust) | ✅ |
 | [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ |
 | [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | |
-
-While SPM is nice, it isn't a requirement. You can use git submodules. You can even build them yourself. In fact, I've struggled with this so much that I began adapting the runtime's Makefile for the parsers themselves. This is a [work-in-progress](https://github.com/tree-sitter/tree-sitter/issues/1488). But, if the parser you'd like to use doesn't have a Makefile, let me know and I'll help get it set up.
 
 ## Predicate/Directive Support
 
@@ -176,3 +175,4 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 [platforms]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter
 [platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FChimeHQ%2FSwiftTreeSitter%2Fbadge%3Ftype%3Dplatforms
 [documentation]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter/main/documentation
+[documentation badge]: https://img.shields.io/badge/Documentation-DocC-blue
