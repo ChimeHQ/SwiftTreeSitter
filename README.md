@@ -8,6 +8,8 @@ Swift API for the [tree-sitter](https://tree-sitter.github.io/) incremental pars
 
 SwiftTreeSitter is fairly low-level. If you are looking a higher-level system for syntax highlighting and other syntactic operations, you might want to have a look at [Neon](https://github.com/ChimeHQ/Neon).
 
+📖 [Documentation][documentation] is available in DocC format.
+
 ## Integration
 
 ### Swift Package Manager
@@ -173,3 +175,4 @@ Please note that this project is released with a [Contributor Code of Conduct](C
 [license badge]: https://img.shields.io/github/license/ChimeHQ/SwiftTreeSitter
 [platforms]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter
 [platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FChimeHQ%2FSwiftTreeSitter%2Fbadge%3Ftype%3Dplatforms
+[documentation]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter/main/documentation
