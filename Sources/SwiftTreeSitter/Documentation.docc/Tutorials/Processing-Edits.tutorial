@@ -1,17 +1,59 @@
 @Tutorial(time: 10) {
     @Intro(title: "Processing Edits") {
-		Process text changes for incremental parsing.
+		Tree-sitter can be used to process static text. But, its real power is its ability to handle changes.
+		
+		With basic parsing down, let's make a change a look at how incremental re-parsing is done.
     }
     
-    @Section(title: "Using InputEdit") {
+    @Section(title: "Create an InputEdit and Update an Existing Tree") {
         @ContentAndMedia {
-            <#text#>
+            Starting with our previous example, we now have a parsed tree. We can now supply some new text, compute the needed edit values, and re-parse the content. This will allow us to compute what's been changed in the source.
         }
         
         @Steps {
             @Step {
-                step
+				Change handling must start with an existing `Tree` structure. 
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-1-example.swift")
             }
+			
+			@Step {
+				Create some new text.
+				
+				Note the "edit" we've done is changing the content of the string.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-2-example.swift")
+			}
+			
+			@Step {
+				Calculate the `InputEdit` structure that describes the change.
+				
+				This involves computing UTF-16 byte offsets and `Point` values.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-3-example.swift")
+			}
+			
+			@Step {
+				Apply the edit to the existing `tree` object.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-4-example.swift")
+			}
+			
+			@Step {
+				Re-parse the edited tree, supplying the new text.
+				
+				Tree-sitter will use the updated tree and grammar rules to re-read the minimum amount of text required to form a valid syntax tree.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-5-example.swift")
+			}
+			
+			@Step {
+				Calculate the differences.
+				
+				These ranges will tell you which elements of the text were affected by the edit. 
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-3-6-example.swift")
+			}
         }
     }
 }

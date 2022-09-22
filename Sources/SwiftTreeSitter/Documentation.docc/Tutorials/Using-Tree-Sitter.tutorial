@@ -7,8 +7,8 @@
 		Learn how to use parse text, process edits, and perform queries with tree-sitter.
         
         @TutorialReference(tutorial: "doc:Parsing")
-        @Comment {
-            @TutorialReference(tutorial: "doc:Processing-Edits")
+		@TutorialReference(tutorial: "doc:Processing-Edits")
+		@Comment {
             @TutorialReference(tutorial: "doc:Queries")
         }
     }	
