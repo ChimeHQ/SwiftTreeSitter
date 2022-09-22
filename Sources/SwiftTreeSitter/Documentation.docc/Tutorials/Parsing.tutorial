@@ -1,6 +1,6 @@
 @Tutorial(time: 10) {
     @Intro(title: "Parsing") {
-		Set up a language and get parse results.
+		Tree-sitter is all about parsing. Learn how to set up and use a language parser to generate a syntax tree.
     }
     
     @Section(title: "Adding Dependencies") {
@@ -46,13 +46,17 @@
 			
 			@Step {
 				Import the language parser
+				
+				Remember the names are close. This is the parser for the Swift language.
 								
 				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-2-example.swift")
 			}
 			
 			@Step {
 				Create a `Language` object.
-								
+
+				Note the call to `tree_sitter_swift`. That function is defined in the Swift language module. 
+				
 				@Code(name: "TreeSitterExample.swift", file: "using-essentials-2-3-example.swift")
 			}
 			

@@ -1,15 +1,21 @@
 @Tutorials(name: "Using SwiftTreeSitter") {
     @Intro(title: "Using SwiftTreeSitter") {
-        SwiftTreeSitter provides a Swift interface to the tree-sitter incremental parsing system. You can use it to parse language text and get information about the syntatic elements contained.
+        SwiftTreeSitter provides a Swift interface to the tree-sitter incremental parsing system. You can use it to parse language text, reparse it as it changes, and query the syntax tree.
     }
     
-    @Chapter(name: "Essentials") {
+    @Chapter(name: "Tree-Sitter Essentials") {
 		Learn how to use parse text, process edits, and perform queries with tree-sitter.
         
         @TutorialReference(tutorial: "doc:Parsing")
 		@TutorialReference(tutorial: "doc:Processing-Edits")
-		@Comment {
-            @TutorialReference(tutorial: "doc:Queries")
-        }
-    }	
+		@TutorialReference(tutorial: "doc:Queries")
+    }
+	
+	@Comment {
+	@Chapter(name: "SwiftTreeSitter Features") {
+		Learn about APIs are that specific to SwiftTreeSitter.
+		
+		@TutorialReference(tutorial: "doc:ResolvingCursors")
+	}
+	}
 }

@@ -1,47 +1,52 @@
 @Tutorial(time: 10) {
-    @Intro(title: "Queries") {
-		Use the tree-sitter query system to inspect the syntax tree.
+    @Intro(title: "Running Queries") {
+		Building and maintaing a parse tree on its own isn't very useful. You'll probably want to inspect the tree using language-specific patterns and matches. The tree-sitter query system is built to do exactly that.
     }
     
     @Section(title: "Getting Query Definitions") {
         @ContentAndMedia {
-            text
+            Let's build on our original example by running queries against our tree. You can write your own queries. Here, we'll use `highlights.scm`, a file many parser include for synatx highlighting.
         }
         
         @Steps {
             @Step {
-                one  
+                Here we've parsed some text and have tree object set up.  
                 
-                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
+                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-example.swift")
             }
+			
+			@Step {
+				Create a `URL` to the query definition file.
+				
+				These are copied into the Swift packages. Their locations differ for macOS and iOS.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-4-2-example.swift")
+			}
+			
+			@Step {
+				Initialize the `query` object.
+				
+				This can be expensive, depending on the language grammar/queries.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-4-3-example.swift")
+			}
+			
+			@Step {
+				Execute the query.
+				
+				Queries must be run against a tree
+				This produces a `QueryCursor`, which can be used to iterate over the results.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-4-4-example.swift")
+			}
+			
+			@Step {
+				Use a loop to print all of the matches.
+				
+				`QueryCursor` conforms to `Sequence`.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-essentials-4-5-example.swift")
+			}
         }
-    }
-        
-    @Section(title: "Executing Queries") {
-        @ContentAndMedia {
-            text
-        }
-        
-        @Steps {
-            @Step {
-                one  
-                
-                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
-            }
-        }
-    }
-        
-    @Section(title: "Using ResolvingQueryCursor") {
-        @ContentAndMedia {
-            text
-        }
-        
-        @Steps {
-            @Step {
-                one  
-                
-                @Code(name: "TreeSitterExample.swift", file: "using-essentials-4-1-queries.swift")
-            }
-        }
-    }
+    }        
 }

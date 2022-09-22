@@ -37,6 +37,11 @@ public enum QueryPredicateError: Error {
     case textContentUnavailable
 }
 
+/// An object that represents a collection of tree-sitter query statements.
+///
+/// Typically, query definitions are stored in a `.scm` file.
+///
+/// Tree-sitter's official documenation: [Pattern Matching with Queries](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries)
 public class Query {
     let internalQuery: OpaquePointer
     let predicateList: [[Predicate]]
@@ -87,6 +92,13 @@ public class Query {
         return Int(ts_query_string_count(internalQuery))
     }
 
+	/// Ru  a query
+	///
+	/// Note that both the node **and** the tree is is part of
+	/// must remain valid as long as the query is being used.
+	///
+	/// - Parameter node: the root node for the query
+	/// - Parameter tree: keep an optional reference to the tree
     public func execute(node: Node, in tree: Tree? = nil) -> QueryCursor {
         let cursor = QueryCursor()
 
@@ -207,8 +219,8 @@ public class QueryCursor {
     /// Note that the node **and** the Tree is is part of
     /// must remain valid as long as the query is being used.
     ///
-    /// - Parameter query: they query object to execute
-    /// - Parameter node: they query object to execute
+    /// - Parameter query: the query object to execute
+    /// - Parameter node: the root node for the query
     /// - Parameter tree: keep an optional reference to the tree
     public func execute(query: Query, node: Node, in tree: Tree? = nil) {
         self.activeQuery = query
