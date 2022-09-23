@@ -130,62 +130,23 @@ extension ResolvingQueryCursor {
     }
 
     func evaluatePredicate(_ predicate: Predicate, match: QueryMatch, textProvider: TextProvider) -> Bool {
-        switch predicate {
-        case .eq(let strings, let names):
-            return evaluateTextPredicate(match: match, captureNames: names, textProvider: textProvider) { text in
-                return strings.allSatisfy({ $0 == text })
-            }
-        case .notEq(let strings, let names):
-            return evaluateTextPredicate(match: match, captureNames: names, textProvider: textProvider) { text in
-                return strings.allSatisfy({ $0 != text })
-            }
-        case .match(let exp, let names):
-            return evaluateTextPredicate(match: match, captureNames: names, textProvider: textProvider) { text in
-                let range = NSRange(0..<text.utf16.count)
+		for captureName in predicate.captureNames {
+			let captures = match.captures(named: captureName)
 
-                return exp.rangeOfFirstMatch(in: text, options: [], range: range) == range
-            }
-        case .notMatch(let exp, let names):
-            return evaluateTextPredicate(match: match, captureNames: names, textProvider: textProvider) { text in
-                let range = NSRange(0..<text.utf16.count)
+			for capture in captures {
+				let range = capture.node.range
+				let pointRange = capture.node.pointRange
 
-                return exp.rangeOfFirstMatch(in: text, options: [], range: range).location == NSNotFound
-            }
-        case .anyOf(let set, let name):
-            return evaluateTextPredicate(match: match, captureNames: [name], textProvider: textProvider) { text in
-                return set.contains(text)
-            }
-        case .notAnyOf(let set, let name):
-            return evaluateTextPredicate(match: match, captureNames: [name], textProvider: textProvider) { text in
-                return set.contains(text) == false
-            }
-        case .isNot:
-            return false
-		case .set:
-			return true
-        case .generic:
-            return false
-        }
-    }
+				guard let text = textProvider(range, pointRange) else {
+					return false
+				}
 
-    func evaluateTextPredicate(match: QueryMatch, captureNames: [String], textProvider: TextProvider, predicate: (String) -> Bool) -> Bool {
-        for captureName in captureNames {
-            let captures = match.captures(named: captureName)
+				if predicate.evalulate(with: text) == false {
+					return false
+				}
+			}
+		}
 
-            for capture in captures {
-                let range = capture.node.range
-                let pointRange = capture.node.pointRange
-
-                guard let text = textProvider(range, pointRange) else {
-                    return false
-                }
-
-                if predicate(text) == false {
-                    return false
-                }
-            }
-        }
-
-        return true
+		return true
     }
 }

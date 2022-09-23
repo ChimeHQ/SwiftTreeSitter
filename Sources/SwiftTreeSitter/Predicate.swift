@@ -63,6 +63,33 @@ public enum Predicate: Hashable {
             return names.contains(name)
         })
     }
+
+	public func evalulate(with text: String) -> Bool {
+		switch self {
+		case .eq(let strings, _):
+			return strings.allSatisfy({ $0 == text })
+		case .notEq(let strings, _):
+			return strings.allSatisfy({ $0 != text })
+		case .match(let exp, _):
+			let range = NSRange(0..<text.utf16.count)
+
+			return exp.firstMatch(in: text, range: range) != nil
+		case .notMatch(let exp, _):
+			let range = NSRange(0..<text.utf16.count)
+
+			return exp.firstMatch(in: text, range: range) == nil
+		case .anyOf(let set, _):
+			return set.contains(text)
+		case .notAnyOf(let set, _):
+			return set.contains(text) == false
+		case .isNot:
+			return false
+		case .set:
+			return true
+		case .generic:
+			return false
+		}
+	}
 }
 
 enum PredicateParserError: Error {

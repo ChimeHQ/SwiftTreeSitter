@@ -201,3 +201,35 @@ final class PredicateTests: XCTestCase {
         XCTAssertEqual(predicates, expectedPredicates)
     }
 }
+
+extension PredicateTests {
+	func testEvaluateMatch() throws {
+		let pred = Predicate.match(try NSRegularExpression(pattern: "^(private|protected|public)$"), captureNames: ["@type"])
+
+		XCTAssertTrue(pred.evalulate(with: "private"))
+		XCTAssertFalse(pred.evalulate(with: "nonprivate"))
+	}
+
+	func testEvaluateMatchWithDifferentLengthStrings() throws {
+		let pred = Predicate.match(try NSRegularExpression(pattern: "^[A-Z]"), captureNames: ["@type"])
+
+		XCTAssertTrue(pred.evalulate(with: "Abc"))
+		XCTAssertFalse(pred.evalulate(with: "abc"))
+	}
+
+	func testEvaluateIsNot() throws {
+		let pred = Predicate.isNot("local")
+
+		XCTAssertFalse(pred.evalulate(with: ""))
+		XCTAssertFalse(pred.evalulate(with: "abc"))
+	}
+
+	func testEvaluateAnyOf() throws {
+		let pred = Predicate.anyOf(["a", "b", "c"], captureName: "@value")
+
+		XCTAssertTrue(pred.evalulate(with: "a"))
+		XCTAssertTrue(pred.evalulate(with: "b"))
+		XCTAssertTrue(pred.evalulate(with: "c"))
+		XCTAssertFalse(pred.evalulate(with: "d"))
+	}
+}
