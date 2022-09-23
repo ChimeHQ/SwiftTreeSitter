@@ -11,11 +11,9 @@
 		@TutorialReference(tutorial: "doc:Queries")
     }
 	
-	@Comment {
-	@Chapter(name: "SwiftTreeSitter Features") {
-		Learn about APIs are that specific to SwiftTreeSitter.
+	@Chapter(name: "Doing more with Queries") {
+		Learn how to take full advantage of the tree-sitter query system.
 		
-		@TutorialReference(tutorial: "doc:ResolvingCursors")
-	}
+		@TutorialReference(tutorial: "doc:Resolving-Query-Cursors")
 	}
 }

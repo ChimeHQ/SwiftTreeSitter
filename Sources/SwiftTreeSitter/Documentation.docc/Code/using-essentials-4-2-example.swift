@@ -12,11 +12,11 @@ func hello() {
 }
 """
 
-let tree = parser.parse(source)
+let tree = parser.parse(source)!
 
 print("tree: ", tree)
 
 let url = Bundle.main
-              .resourceURL
+              .resourceURL?
               .appendingPathComponent("TreeSitterSwift_TreeSitterSwift.bundle")
-              .appendingPathComponent("queries/highlights.scm")
+              .appendingPathComponent("Contents/Resources/queries/highlights.scm")

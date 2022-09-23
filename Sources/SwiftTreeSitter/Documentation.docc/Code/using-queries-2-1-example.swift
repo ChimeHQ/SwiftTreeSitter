@@ -7,11 +7,10 @@ let parser = Parser()
 try parser.setLanguage(language)
 
 let source = """
-func hello() {
-	print("hello from tree-sitter")
+func example() {
+	SomeType.method()
+	variable.method()
 }
 """
 
 let tree = parser.parse(source)!
-
-print("tree: ", tree)

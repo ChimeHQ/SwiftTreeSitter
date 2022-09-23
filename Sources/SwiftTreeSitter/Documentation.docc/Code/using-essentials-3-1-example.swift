@@ -12,6 +12,6 @@ func hello() {
 }
 """
 
-let tree = parser.parse(source)
+let tree = parser.parse(source)!
 
 print("tree: ", tree)

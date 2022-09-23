@@ -1,11 +1,11 @@
 @Tutorial(time: 10) {
     @Intro(title: "Running Queries") {
-		Building and maintaing a parse tree on its own isn't very useful. You'll probably want to inspect the tree using language-specific patterns and matches. The tree-sitter query system is built to do exactly that.
+		Building and maintaining a parse tree on its own isn't very useful. You'll probably want to inspect the tree using language-specific patterns and matches. The tree-sitter query system is built to do exactly that.
     }
     
     @Section(title: "Getting Query Definitions") {
         @ContentAndMedia {
-            Let's build on our original example by running queries against our tree. You can write your own queries. Here, we'll use `highlights.scm`, a file many parser include for synatx highlighting.
+            Let's build on our original example by running queries against our tree. You can write your own queries. Here, we'll use `highlights.scm`, a file many parser include for syntax highlighting.
         }
         
         @Steps {

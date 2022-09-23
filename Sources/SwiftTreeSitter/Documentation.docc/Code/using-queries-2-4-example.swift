@@ -7,20 +7,21 @@ let parser = Parser()
 try parser.setLanguage(language)
 
 let source = """
-func hello() {
-	print("hello from tree-sitter")
+func example() {
+	SomeType.method()
+	variable.method()
 }
 """
 
-let tree = parser.parse(source)
-
-print("tree: ", tree)
+let tree = parser.parse(source)!
 
 let url = Bundle.main
-              .resourceURL?
-              .appendingPathComponent("TreeSitterSwift_TreeSitterSwift.bundle")
-              .appendingPathComponent("Contents/Resources/queries/highlights.scm")
+			  .resourceURL?
+			  .appendingPathComponent("TreeSitterSwift_TreeSitterSwift.bundle")
+			  .appendingPathComponent("Contents/Resources/queries/highlights.scm")
 
 let query = try language.query(contentsOf: url!)
 
 let cursor = query.execute(node: tree.rootNode!)
+
+let typeCaptures = cursor

@@ -1,0 +1,134 @@
+@Tutorial(time: 10) {
+    @Intro(title: "Using ResolvingQueryCursor") {
+		While powerful, tree-sitter's query language cannot describe all syntax tree states. To help expand its capabilities, it allows for embedding arbitrary statements. These provide an additional way to filter matches. Tree-sitter's built-in query system does not evaluate predicates. Not all queries use predicates, but if they are present, the built-in types ignore them. This will lead to incorrect matching. 
+		
+		`ResolvingQueryCursor` is a wrapper around the `QueryCursor` type which can transparently evaluate and filter results using query predicates. You can read more about predicates in tree-sitter's [query documentation](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries).
+    }
+    
+    @Section(title: "Understanding Predicates") {
+        @ContentAndMedia {
+			It isn't necessary to fully understand the tree-sitter query syntax, but it can be helpful to see a little to understand what queries and predicates do. Let's take a look at a small section of Swift's highlight queries.
+        }
+        
+        @Steps {
+            @Step {
+                Swift's highlights.scm contains a statement matching `navigation_expression`.
+				
+				This is matching any child `simple_identifier` node and giving it the label `@type`. This is explained in the comment at the top. However, this query on its own will match too many syntax constructs.
+                
+				@Code(name: "highlights.scm", file: "using-queries-1-1-highlights.scm")
+            }
+			
+			@Step {
+				Expand the query's S-expression-style parentheses.
+				
+				@Code(name: "highlights.scm", file: "using-queries-1-2-highlights.scm")
+			}
+			
+			@Step {
+				Add a `#match` predicate.
+				
+				This restricts `@label` to only capture values that match a regular expression.
+				
+				@Code(name: "highlights.scm", file: "using-queries-1-3-highlights.scm")
+			}
+        }
+    }
+		
+	@Section(title: "Enumerating Matches with Cursor") {
+		@ContentAndMedia {
+			Let's see how this pattern matches Swift code using a standard `Cursor`.
+		}
+		
+		@Steps {
+			@Step {
+				Set up our language and parser as before.
+				
+				We're just using different source text.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-1-example.swift")
+			}
+			
+			@Step {
+				Build our query object.
+				
+				Remember, this can be expensive.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-2-example.swift")
+			}
+			
+			@Step {
+				Execute the query on the tree, returning a cursor.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-3-example.swift")
+			}
+			
+			@Step {
+				Create a new variable to hold the results of the cursor.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-4-example.swift")
+			}
+			
+			@Step {
+				Extract just the captures.
+				
+				Captures are nodes with labels, starting with the `@` symbol in the query pattern.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-5-example.swift")
+			}
+			
+			@Step {
+				Convert it into a flat array.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-6-example.swift")
+			}
+			
+			@Step {
+				Print out all of the matching ranges.
+				
+				Because `Cursor` does not evaluate predicates, we've matched too many nodes.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-7-example.swift") {
+					@Image(source: "cursor-output.png", alt: "")
+				}
+			}
+		}
+	}
+		
+	@Section(title: "Enumerating Matches with ResolvingQueryCursor") {
+		@ContentAndMedia {
+			A `ResolvingQueryCursor` works just like a regular `Cursor`, but can evaluate predicates to further filter matches. To do this, it does need access to the text content at evaluation time.
+		}
+		
+		@Steps {
+			@Step {
+				Start with our previous implementation.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-7-example.swift")
+			}
+			@Step {
+				Create a `ResolvingQueryCursor`.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-8-example.swift")
+			}
+			
+			@Step {
+				Prepare it, passing in a function that can return text content.
+				
+				Here, we're using a a simple String extension helper. You may need more a more involved implemenation.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-9-example.swift")
+			}
+			
+			@Step {
+				Swap the `cursor` for our new `resolvingCursor`.
+				
+				We now get one match, just like we'd expect.
+				
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-10-example.swift") {
+					@Image(source: "resolving-cursor-output.png", alt: "")
+				}
+			}
+		}
+	}
+}
