@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "TreeSitterSwift",
+        "repositoryURL": "https://github.com/alex-pinkus/tree-sitter-swift/",
+        "state": {
+          "branch": "with-generated-files",
+          "revision": "f04b305a7f18009c47091247d662707a8b629669",
+          "version": null
+        }
+      }
+    ]
+  },
+  "version": 1
+}
