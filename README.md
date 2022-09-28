@@ -23,7 +23,9 @@ dependencies: [
 
 Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation].
 
-| Language    | Offical Repo |
+But, since you're here, you might find SPM the most convenient. Here's a list of parsers available as Swift packages:
+
+> | Language    | Official Repo |
 | --- | :---: |
 | [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm) | |
 | [C](https://github.com/tree-sitter/tree-sitter-c) | ✅ |
