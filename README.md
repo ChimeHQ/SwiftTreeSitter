@@ -23,8 +23,8 @@ dependencies: [
 
 Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation]. How they can be installed an incorporated varies. Since you're here, you might find SPM the most convenient.
 
-> | Language | Make | SPM | Official Repo |
-| --- | :---: | :---: | :---: | :---: |
+| Parser | Make | SPM | Official Repo |
+| --- | :---: | :---: | :---: |
 | [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm) | | ✅ | |
 | [C](https://github.com/tree-sitter/tree-sitter-c) | | ✅ | ✅ |
 | [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
