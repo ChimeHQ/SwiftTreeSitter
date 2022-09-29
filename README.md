@@ -21,31 +21,44 @@ dependencies: [
 
 ## Language Parsers
 
-Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation].
+Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation]. How they can be installed an incorporated varies. Since you're here, you might find SPM the most convenient.
 
-But, since you're here, you might find SPM the most convenient. Here's a list of parsers available as Swift packages:
-
-> | Language    | Official Repo |
-| --- | :---: |
-| [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm) | |
-| [C](https://github.com/tree-sitter/tree-sitter-c) | ✅ |
-| [C++](https://github.com/tree-sitter/tree-sitter-cpp) | ✅ |
-| [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | ✅ |
-| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | |
-| [Go](https://github.com/tree-sitter/tree-sitter-go) | |
-| [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | |
-| [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | |
-| [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ |
-| [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | ✅ |
+> | Language | Make | SPM | Official Repo |
+| --- | :---: | :---: | :---: | :---: |
+| [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm) | | ✅ | |
+| [C](https://github.com/tree-sitter/tree-sitter-c) | | ✅ | ✅ |
+| [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
+| [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | | ✅ | ✅ |
+| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | | ✅ |
+| [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | | | |
+| [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | | | |
+| [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
+| [Go](https://github.com/tree-sitter/tree-sitter-go) | | | |
+| [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | | | |
+| [GoWork](https://github.com/omertuc/tree-sitter-go-work) | | | |
+| [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | | |
+| [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | |✅| |
+| [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ | ✅ | ✅ |
+| [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | | ✅ | ✅ |
 | [JSON](https://github.com/tree-sitter/tree-sitter-json) | ✅ |
-| [Lua](https://github.com/Azganoth/tree-sitter-lua) | ✅ |
-| [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown-2/tree/feature/spm) | |
-| [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ |
-| [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm) | |
-| [Ruby](https://github.com/tree-sitter/tree-sitter-ruby) | ✅ |
-| [Rust](https://github.com/tree-sitter/tree-sitter-rust) | ✅ |
-| [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ |
-| [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | |
+| [Julia](https://github.com/tree-sitter/tree-sitter-julia) | | | |
+| [Kotlin](https://github.com/fwcd/tree-sitter-kotlin) | | | |
+| [Lua](https://github.com/Azganoth/tree-sitter-lua) | | ✅ | ✅ |
+| [Make](https://github.com/alemuller/tree-sitter-make) | | | |
+| [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown-2/tree/feature/spm) | | ✅ | |
+| [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | | |
+| [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | | |
+| [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
+| [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm) | | ✅ | |
+| [Ruby](https://github.com/tree-sitter/tree-sitter-ruby) | ✅ | ✅ | ✅ |
+| [Rust](https://github.com/tree-sitter/tree-sitter-rust) | | ✅ | ✅ |
+| [Scala](https://github.com/tree-sitter/tree-sitter-scala) | | | |
+| [Scss](https://github.com/serenadeai/tree-sitter-scss) | | | |
+| [SQL](https://github.com/derekstride/tree-sitter-sql) | | | |
+| [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ | ✅ | ✅ |
+| [TOML](https://github.com/ikatyang/tree-sitter-toml) | | | |
+| [Typescript](https://github.com/tree-sitter/tree-sitter-typescript) | | | |
+| [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | | ✅ | |
 
 ## Suggestions or Feedback
 
