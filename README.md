@@ -29,7 +29,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [C](https://github.com/tree-sitter/tree-sitter-c) | | ✅ | ✅ |
 | [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
 | [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | | ✅ | ✅ |
-| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | | ✅ |
+| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | ✅ | ✅ |
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | | | |
 | [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | ✅ | ✅ | ✅ |
 | [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
