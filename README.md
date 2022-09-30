@@ -33,8 +33,8 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | | | |
 | [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | ✅ | | |
 | [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
-| [Go](https://github.com/tree-sitter/tree-sitter-go) | | | |
-| [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | | | |
+| [Go](https://github.com/tree-sitter/tree-sitter-go) | ✅ | ✅ | ✅ |
+| [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | ✅ | ✅ | ✅ |
 | [GoWork](https://github.com/omertuc/tree-sitter-go-work) | | | |
 | [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | | |
 | [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | |✅| |
