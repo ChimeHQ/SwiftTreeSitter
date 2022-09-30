@@ -46,7 +46,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Latex](https://github.com/latex-lsp/tree-sitter-latex) | | | |
 | [Lua](https://github.com/Azganoth/tree-sitter-lua) | | ✅ | ✅ |
 | [Make](https://github.com/alemuller/tree-sitter-make) | | | |
-| [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown-2/tree/feature/spm) | | ✅ | |
+| [Markdown](https://github.com/MDeiml/tree-sitter-markdown) | | ✅ | ✅ |
 | [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | | |
 | [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | | |
 | [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
