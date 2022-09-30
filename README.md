@@ -36,8 +36,8 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Go](https://github.com/tree-sitter/tree-sitter-go) | ✅ | ✅ | ✅ |
 | [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | ✅ | ✅ | ✅ |
 | [GoWork](https://github.com/omertuc/tree-sitter-go-work) | | | |
-| [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | | |
-| [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | |✅| |
+| [Haskell](https://github.com/mattmassicotte/tree-sitter-haskell/tree/feature/spm) | | ✅ | |
+| [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | | ✅ | |
 | [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ | ✅ | ✅ |
 | [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | | ✅ | ✅ |
 | [JSON](https://github.com/tree-sitter/tree-sitter-json) | ✅ |
