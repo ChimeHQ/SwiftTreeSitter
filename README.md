@@ -41,7 +41,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ | ✅ | ✅ |
 | [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | | ✅ | ✅ |
 | [JSON](https://github.com/tree-sitter/tree-sitter-json) | | ✅ | ✅ |
-| [Julia](https://github.com/tree-sitter/tree-sitter-julia) | | | |
+| [Julia](https://github.com/mattmassicotte/tree-sitter-julia/tree/feature/spm) | | ✅ | |
 | [Kotlin](https://github.com/fwcd/tree-sitter-kotlin) | | | |
 | [Latex](https://github.com/latex-lsp/tree-sitter-latex) | | | |
 | [Lua](https://github.com/Azganoth/tree-sitter-lua) | | ✅ | ✅ |
