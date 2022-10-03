@@ -45,7 +45,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [gitignore](https://github.com/shunsambongi/tree-sitter-gitignore) | | | |
 | [Go](https://github.com/tree-sitter/tree-sitter-go) | ✅ | ✅ | ✅ |
 | [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | ✅ | ✅ | ✅ |
-| [GoWork](https://github.com/omertuc/tree-sitter-go-work) | | | |
+| [GoWork](https://github.com/omertuc/tree-sitter-go-work) | ✅ | | |
 | [graphql](https://github.com/bkegley/tree-sitter-graphql) | | | |
 | [Hack](https://github.com/slackhq/tree-sitter-hack) | | | |
 | [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | ✅ | ✅ |
