@@ -61,6 +61,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Lua](https://github.com/Azganoth/tree-sitter-lua) | | ✅ | ✅ |
 | [Make](https://github.com/alemuller/tree-sitter-make) | | | |
 | [Markdown](https://github.com/MDeiml/tree-sitter-markdown) | | ✅ | ✅ |
+| [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown) | ✅ | | |
 | [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | | |
 | [Pascal](https://github.com/Isopod/tree-sitter-pascal) | | | |
 | [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | | |
