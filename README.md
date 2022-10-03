@@ -85,7 +85,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Verilog](https://github.com/tree-sitter/tree-sitter-verilog) | | | |
 | [Vue](https://github.com/ikatyang/tree-sitter-vue) | | | |
 | [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | | ✅ | |
-| [Zig](https://github.com/maxxnino/tree-sitter-zig) | | ✅ | ✅ |
+| [Zig](https://github.com/maxxnino/tree-sitter-zig) | ✅ | ✅ | ✅ |
 
 ## Suggestions or Feedback
 
