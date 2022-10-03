@@ -62,6 +62,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [TOML](https://github.com/ikatyang/tree-sitter-toml) | | | |
 | [Typescript](https://github.com/tree-sitter/tree-sitter-typescript) | | | |
 | [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | | ✅ | |
+| [Zig](https://github.com/maxxnino/tree-sitter-zig) | | ✅ | ✅ |
 
 ## Suggestions or Feedback
 
