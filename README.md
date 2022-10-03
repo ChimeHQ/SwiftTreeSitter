@@ -58,6 +58,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Scala](https://github.com/tree-sitter/tree-sitter-scala) | | | |
 | [Scss](https://github.com/serenadeai/tree-sitter-scss) | | | |
 | [SQL](https://github.com/derekstride/tree-sitter-sql) | | | |
+| [SSH](https://github.com/metio/tree-sitter-ssh-client-config) | | | |
 | [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ | ✅ | ✅ |
 | [TOML](https://github.com/ikatyang/tree-sitter-toml) | | | |
 | [Typescript](https://github.com/tree-sitter/tree-sitter-typescript) | | | |
