@@ -32,7 +32,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Clojure](https://github.com/sogaiu/tree-sitter-clojure) | | | |
 | [CMake](https://github.com/uyha/tree-sitter-cmake) | | | |
 | [Comment](https://github.com/stsewd/tree-sitter-comment) | | | |
-| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | ✅ | ✅ |
+| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | ✅ | |
 | [D](https://github.com/CyberShadow/tree-sitter-d) | | | |
 | [Dart](https://github.com/UserNobody14/tree-sitter-dart) | | | |
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | | | |
