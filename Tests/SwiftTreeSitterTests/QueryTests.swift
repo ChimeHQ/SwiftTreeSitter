@@ -4,6 +4,7 @@ import SwiftTreeSitter
 import TestTreeSitterSwift
 
 final class QueryTests: XCTestCase {
+#if !os(WASI)
 	func testParseQueryWithSetDirectives() throws {
 		let language = Language(language: tree_sitter_swift())
 
@@ -59,4 +60,5 @@ func main() {
 
 		XCTAssertEqual(capture.metadata["abc"], "def")
 	}
+#endif
 }
