@@ -81,7 +81,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [SSH](https://github.com/metio/tree-sitter-ssh-client-config) | | | |
 | [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ | ✅ | ✅ |
 | [TOML](https://github.com/ikatyang/tree-sitter-toml) | | | |
-| [Tree-sitter query language](https://github.com/nvim-treesitter/tree-sitter-query) | | | |
+| [Tree-sitter query language](https://github.com/mattmassicotte/tree-sitter-query/tree/feature/spm) | | ✅ | |
 | [Typescript](https://github.com/tree-sitter/tree-sitter-typescript) | | | |
 | [Verilog](https://github.com/tree-sitter/tree-sitter-verilog) | | | |
 | [Vue](https://github.com/ikatyang/tree-sitter-vue) | | | |
