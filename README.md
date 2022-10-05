@@ -64,7 +64,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown) | ✅ | | |
 | [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | | |
 | [Pascal](https://github.com/Isopod/tree-sitter-pascal) | | | |
-| [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | | |
+| [Perl](https://github.com/mattmassicotte/tree-sitter-perl/tree/feature/spm) | | ✅ | |
 | [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
 | [PowerShell](https://github.com/PowerShell/tree-sitter-PowerShell) | | | |
 | [Python](https://github.com/lukepistrol/tree-sitter-python/tree/feature/spm) | ✅ | ✅ | |
