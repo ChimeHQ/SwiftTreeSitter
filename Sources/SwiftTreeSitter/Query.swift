@@ -172,7 +172,7 @@ public struct QueryCapture {
 	}
 
 	private static func evaluateDirectives(_ predicates: [Predicate], with name: String) -> [String: String] {
-		let pairs = predicates.compactMap { predicate in
+		let pairs = predicates.compactMap { predicate -> (String, String)? in
 			switch predicate {
 			case let .set(captureName: captureName, key: key, value: value):
 				if captureName == name {
@@ -311,7 +311,7 @@ public class QueryCursor {
 
 extension QueryCursor: Sequence, IteratorProtocol {
 	private func evaluateDirectives(_ predicates: [Predicate]) -> [String: String] {
-		let pairs = predicates.compactMap { predicate in
+		let pairs = predicates.compactMap { predicate -> (String, String)? in
 			switch predicate {
 			case .set(captureName: nil, key: let key, value: let value):
 				return (key, value)
