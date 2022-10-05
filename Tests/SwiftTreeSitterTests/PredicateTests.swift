@@ -176,11 +176,28 @@ final class PredicateTests: XCTestCase {
 		let predicates = try PredicateParser().parse(steps)
 
 		let expectedPredicates = [
-			Predicate.set("value", value: "foo"),
+			Predicate.set(key: "value", value: "foo"),
 		]
 
 		XCTAssertEqual(predicates, expectedPredicates)
+	}
 
+	func testParseSetWithCapture() throws {
+		let steps: [QueryPredicateStep] = [
+			.string("set!"),
+			.capture("@label"),
+			.string("value"),
+			.string("foo"),
+			.done
+		]
+
+		let predicates = try PredicateParser().parse(steps)
+
+		let expectedPredicates = [
+			Predicate.set(captureName: "@label", key: "value", value: "foo"),
+		]
+
+		XCTAssertEqual(predicates, expectedPredicates)
 	}
 
     func testParseUnknown() throws {

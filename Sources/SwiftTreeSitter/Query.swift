@@ -147,8 +147,9 @@ public struct QueryCapture {
     public let index: Int
     public let nameComponents: [String]
     public let patternIndex: Int
+	public let metadata: [String: String]
 
-    init?(tsCapture: TSQueryCapture, name: String?, patternIndex: Int) {
+    init?(tsCapture: TSQueryCapture, name: String?, patternIndex: Int, metadata: [String: String]) {
         guard let node = Node(internalNode: tsCapture.node) else {
             return nil
         }
@@ -157,7 +158,35 @@ public struct QueryCapture {
         self.index = Int(tsCapture.index)
         self.nameComponents = name?.components(separatedBy: ".") ?? []
         self.patternIndex = patternIndex
+		self.metadata = metadata
     }
+
+	init?(tsCapture: TSQueryCapture, query: Query?, patternIndex: Int) {
+		let name = query?.captureName(for: Int(tsCapture.index))
+
+		let predicates = query?.predicates(for: patternIndex) ?? []
+
+		let metadata = name.map { QueryCapture.evaluateDirectives(predicates, with: $0) } ?? [:]
+
+		self.init(tsCapture: tsCapture, name: name, patternIndex: patternIndex, metadata: metadata)
+	}
+
+	private static func evaluateDirectives(_ predicates: [Predicate], with name: String) -> [String: String] {
+		let pairs = predicates.compactMap { predicate in
+			switch predicate {
+			case let .set(captureName: captureName, key: key, value: value):
+				if captureName == name {
+					return (key, value)
+				}
+			default:
+				break
+			}
+
+			return nil
+		}
+
+		return Dictionary(pairs, uniquingKeysWith: { $1 })
+	}
 
     public var range: NSRange {
         return node.range
@@ -195,12 +224,17 @@ public struct QueryMatch {
     public var patternIndex: Int
     public var captures: [QueryCapture]
     public let predicates: [Predicate]
+	public let metadata: [String: String]
 
     public func captures(named name: String) -> [QueryCapture] {
         return captures.filter({ $0.name == name })
     }
 }
 
+/// A tree-sitter TSQueryCursor wrapper
+///
+/// This class is pretty faithful to to C API. However,
+/// it does evaluate `#set!` directives.
 public class QueryCursor {
     let internalCursor: OpaquePointer
     public private(set) var activeQuery: Query?
@@ -253,12 +287,6 @@ public class QueryCursor {
         ts_query_cursor_set_point_range(internalCursor, start, end)
     }
 
-    func makeCapture(from capture: TSQueryCapture, patternIndex: Int) -> QueryCapture? {
-        let name = activeQuery?.captureName(for: Int(capture.index))
-
-        return QueryCapture(tsCapture: capture, name: name, patternIndex: patternIndex)
-    }
-
     @available(*, deprecated, renamed: "next")
     public func nextMatch() -> QueryMatch? {
         return next()
@@ -277,11 +305,24 @@ public class QueryCursor {
 
         let capture = captureBuffer[Int(index)]
 
-        return makeCapture(from: capture, patternIndex: Int(match.pattern_index))
+		return QueryCapture(tsCapture: capture, query: activeQuery, patternIndex: Int(match.pattern_index))
     }
 }
 
 extension QueryCursor: Sequence, IteratorProtocol {
+	private func evaluateDirectives(_ predicates: [Predicate]) -> [String: String] {
+		let pairs = predicates.compactMap { predicate in
+			switch predicate {
+			case .set(captureName: nil, key: let key, value: let value):
+				return (key, value)
+			default:
+				return nil
+			}
+		}
+
+		return Dictionary(pairs, uniquingKeysWith: { $1 })
+	}
+
     public func next() -> QueryMatch? {
         var match = TSQueryMatch(id: 0, pattern_index: 0, capture_count: 0, captures: nil)
 
@@ -294,12 +335,16 @@ extension QueryCursor: Sequence, IteratorProtocol {
 
         let patternIndex = Int(match.pattern_index)
         let predicates = activeQuery?.predicates(for: patternIndex) ?? []
+		let metadata = evaluateDirectives(predicates)
 
-        let captures = captureBuffer.compactMap({ makeCapture(from: $0, patternIndex: patternIndex) })
+		let captures = captureBuffer.compactMap({
+			return QueryCapture(tsCapture: $0, query: activeQuery, patternIndex: patternIndex)
+		})
 
         return QueryMatch(id: Int(match.id),
                           patternIndex: Int(match.pattern_index),
                           captures: captures,
-                          predicates: predicates)
+                          predicates: predicates,
+						  metadata: metadata)
     }
 }

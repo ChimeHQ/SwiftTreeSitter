@@ -1,36 +1,62 @@
 import XCTest
+
 import SwiftTreeSitter
-//import tree_sitter_language_resources
+import TestTreeSitterSwift
 
 final class QueryTests: XCTestCase {
-//    static let rubyQueryWithIsNotLocal = """
-//((identifier) @function.method
-// (#is-not? local))
-//"""
-//
-//    static let rubyQueryWithNoPredicates = """
-//(identifier) @function.method
-//"""
-//
-//    func testParseQueryWithPredicates() throws {
-//        let ruby = LanguageResource.ruby
-//        let language = Language(language: ruby.parser)
-//
-//        let queryData = try XCTUnwrap(QueryTests.rubyQueryWithIsNotLocal.data(using: .utf8))
-//        let query = try Query(language: language, data: queryData)
-//
-//        XCTAssertEqual(query.patternCount, 1)
-//        XCTAssertTrue(query.hasPredicates)
-//    }
-//
-//    func testParseQueryWithNoPredicates() throws {
-//        let ruby = LanguageResource.ruby
-//        let language = Language(language: ruby.parser)
-//
-//        let queryData = try XCTUnwrap(QueryTests.rubyQueryWithNoPredicates.data(using: .utf8))
-//        let query = try Query(language: language, data: queryData)
-//
-//        XCTAssertEqual(query.patternCount, 1)
-//        XCTAssertFalse(query.hasPredicates)
-//    }
+	func testParseQueryWithSetDirectives() throws {
+		let language = Language(language: tree_sitter_swift())
+
+		let queryText = """
+("func" @keyword.function (#set! abc "def"))
+"""
+		let queryData = try XCTUnwrap(queryText.data(using: .utf8))
+		let query = try Query(language: language, data: queryData)
+
+		let text = """
+func main() {
+}
+"""
+
+		let parser = Parser()
+		try parser.setLanguage(language)
+
+		let tree = try XCTUnwrap(parser.parse(text))
+		let root = try XCTUnwrap(tree.rootNode)
+
+		let cursor = query.execute(node: root, in: tree)
+
+		let match = try XCTUnwrap(cursor.next())
+		XCTAssertEqual(match.metadata["abc"], "def")
+	}
+
+	func testParseQueryWithCaptureSetDirectives() throws {
+		let language = Language(language: tree_sitter_swift())
+
+		let queryText = """
+("func" @keyword.function (#set! @keyword.function abc "def"))
+"""
+		let queryData = try XCTUnwrap(queryText.data(using: .utf8))
+		let query = try Query(language: language, data: queryData)
+
+		let text = """
+func main() {
+}
+"""
+
+		let parser = Parser()
+		try parser.setLanguage(language)
+
+		let tree = try XCTUnwrap(parser.parse(text))
+		let root = try XCTUnwrap(tree.rootNode)
+
+		let cursor = query.execute(node: root, in: tree)
+
+		let match = try XCTUnwrap(cursor.next())
+		XCTAssertTrue(match.metadata.isEmpty)
+
+		let capture = try XCTUnwrap(match.captures.first)
+
+		XCTAssertEqual(capture.metadata["abc"], "def")
+	}
 }

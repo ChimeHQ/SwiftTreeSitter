@@ -18,7 +18,7 @@ import Foundation
 /// - `any-of?`
 /// - `not-any-of?`
 /// - `is-not?` (parsed, but not implemented)
-/// - `set!` (parsed, but not implemented)
+/// - `set!` (handled by `QueryCursor`)
 ///
 /// Here's an example of how it is used:
 /// ```swift
@@ -99,7 +99,7 @@ extension ResolvingQueryCursor: Sequence, IteratorProtocol {
                 continue
             }
 
-            return match
+			return match
         }
 
         return nil

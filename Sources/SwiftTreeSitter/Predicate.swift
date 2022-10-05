@@ -28,7 +28,7 @@ public enum Predicate: Hashable {
     case isNot(String)
     case anyOf(Set<String>, captureName: String)
     case notAnyOf(Set<String>, captureName: String)
-	case set(String, value: String)
+	case set(captureName: String? = nil, key: String, value: String)
     case generic(String, strings: [String], captureNames: [String])
 
     public var captureNames: [String] {
@@ -187,11 +187,11 @@ struct PredicateParser {
 
             return .isNot(strings.first!)
 		case "set!":
-			if strings.count != 2 && captures.count == 0 {
+			if strings.count != 2 || captures.count > 1 {
 				return .generic(name, strings: strings, captureNames: captures)
 			}
 
-			return .set(strings[0], value: strings[1])
+			return .set(captureName: captures.first, key: strings[0], value: strings[1])
         default:
             return .generic(name, strings: strings, captureNames: captures)
         }
