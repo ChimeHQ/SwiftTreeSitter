@@ -10,9 +10,9 @@ on:
 
 jobs:
   test:
-    name: BezierKit WASM support
+    name: WASM support
     runs-on: ubuntu-latest
-    container: ghcr.io/swiftwasm/carton:0.16.0
+    container: ghcr.io/swiftwasm/carton:0.17.0
 
     steps:
       - name: Checkout
