@@ -20,5 +20,11 @@ jobs:
         with:
           submodules: recursive
 
+      # Work around to avoid this issue: https://github.com/ChimeHQ/SwiftTreeSitter/issues/8
+      # We are running wasm-opt -O before execute the test for avoiding maximum of locals
       - name: Test WebAssembly
-        run: carton test
+        run: |
+          swift build -c debug --product SwiftTreeSitterPackageTests -Xswiftc -color-diagnostics --triple wasm32-unknown-wasi
+          wasm-opt -O .build/wasm32-unknown-wasi/debug/SwiftTreeSitterPackageTests.wasm -o SwiftTreeSitterPackageTests.wasm
+          wasmer SwiftTreeSitterPackageTests.wasm
+
