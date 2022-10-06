@@ -7,6 +7,11 @@
 
 Swift API for the [tree-sitter](https://tree-sitter.github.io/) incremental parsing system.
 
+- Close to full coverage of the C API
+- Swift/Foundation types where possible
+- Standard query result mapping for injections
+- Query predicate support via `ResolvingQueryCursor`
+
 SwiftTreeSitter is fairly low-level. If you are looking a higher-level system for syntax highlighting and other syntactic operations, you might want to have a look at [Neon](https://github.com/ChimeHQ/Neon).
 
 📖 [Documentation][documentation] is available in DocC format.
