@@ -42,7 +42,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Dart](https://github.com/UserNobody14/tree-sitter-dart) | | | |
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | | | |
 | [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | ✅ | ✅ | ✅ |
-| [Elm](https://github.com/elm-tooling/tree-sitter-elm) | | | |
+| [Elm](https://github.com/mattmassicotte/tree-sitter-elm/tree/feature/spm) | | ✅ | |
 | [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
 | [Fish](https://github.com/ram02z/tree-sitter-fish) | | | |
 | [Fortran](https://github.com/stadelmanma/tree-sitter-fortran) | | | |
