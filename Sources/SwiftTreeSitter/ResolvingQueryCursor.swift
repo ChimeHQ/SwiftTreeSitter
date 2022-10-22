@@ -39,7 +39,7 @@ public final class ResolvingQueryCursor {
     private var matches: [QueryMatch]
     private let cursor: QueryCursor
     private var index: Array.Index
-    private var textProvider: TextProvider
+    private(set) var textProvider: TextProvider
 
     public init(cursor: QueryCursor) {
         self.cursor = cursor
