@@ -5,15 +5,19 @@ import Foundation
 /// Useful for generalizing data from query matches.
 public struct NamedRange: Codable, Equatable, Sendable, Hashable {
 	public let nameComponents: [String]
-	public let range: NSRange
+	public let tsRange: TSRange
 
-	public init(nameComponents: [String], range: NSRange) {
+	public init(nameComponents: [String], tsRange: TSRange) {
 		self.nameComponents = nameComponents
-		self.range = range
+		self.tsRange = tsRange
 	}
 
 	public var name: String {
 		return nameComponents.joined(separator: ".")
+	}
+
+	public var range: NSRange {
+		return tsRange.bytes.range
 	}
 }
 
@@ -26,7 +30,7 @@ public extension QueryMatch {
 	///
 	/// If `textProvider` is nil and a node contents is needed, the injection is dropped.
 	func injection(with textProvider: ResolvingQueryCursor.TextProvider?) -> NamedRange? {
-		guard let range = captures(named: "injection.content").first?.range else {
+		guard let contentCapture = captures(named: "injection.content").first else {
 			return nil
 		}
 
@@ -46,7 +50,7 @@ public extension QueryMatch {
 			return nil
 		}
 
-		return NamedRange(nameComponents: [language], range: range)
+		return NamedRange(nameComponents: [language], tsRange: contentCapture.node.tsRange)
 	}
 }
 
@@ -58,7 +62,7 @@ public extension QueryCapture {
 		let components = nameComponents
 		guard components.isEmpty == false else { return nil }
 
-		return NamedRange(nameComponents: components, range: range)
+		return NamedRange(nameComponents: components, tsRange: node.tsRange)
 	}
 }
 
