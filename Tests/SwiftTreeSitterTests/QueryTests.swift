@@ -87,10 +87,12 @@ func main() {
 
 		let cursor = query.execute(node: root, in: tree)
 
+		let expectedPoints = Point(row: 0, column: 0)..<Point(row: 0, column: 8)
+		let expectedRange = TSRange(points: expectedPoints, bytes: 0..<8)
 		let expected = [
-			NamedRange(nameComponents: ["a"], range: NSRange(0..<4)),
-			NamedRange(nameComponents: ["a", "b"], range: NSRange(0..<4)),
-			NamedRange(nameComponents: ["a", "b", "c"], range: NSRange(0..<4)),
+			NamedRange(nameComponents: ["a"], tsRange: expectedRange),
+			NamedRange(nameComponents: ["a", "b"], tsRange: expectedRange),
+			NamedRange(nameComponents: ["a", "b", "c"], tsRange: expectedRange)
 		]
 
 		XCTAssertEqual(cursor.highlights(), expected)

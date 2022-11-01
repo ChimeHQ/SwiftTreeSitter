@@ -9,7 +9,7 @@
 import Foundation
 import tree_sitter
 
-public struct Point {
+public struct Point: Codable, Sendable {
     public let row: UInt32
     public let column: UInt32
 

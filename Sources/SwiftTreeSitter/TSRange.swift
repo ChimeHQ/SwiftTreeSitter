@@ -1,7 +1,7 @@
 import Foundation
 import tree_sitter
 
-public struct TSRange {
+public struct TSRange: Codable, Hashable, Sendable {
     public let points: Range<Point>
     public let bytes: Range<UInt32>
 
@@ -33,11 +33,9 @@ public struct TSRange {
 	}
 }
 
-extension TSRange: Equatable {
-}
-
 extension TSRange: Comparable {
     public static func < (lhs: TSRange, rhs: TSRange) -> Bool {
         return lhs.points.lowerBound < rhs.points.lowerBound
     }
 }
+
