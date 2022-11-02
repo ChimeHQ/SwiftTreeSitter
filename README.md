@@ -30,7 +30,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 
 | Parser | Make | SPM | Official Repo |
 | --- | :---: | :---: | :---: |
-| [Bash](https://github.com/lukepistrol/tree-sitter-bash/tree/feature/spm) | | ✅ | |
+| [Bash](https://github.com/tree-sitter/tree-sitter-bash) | | ✅ | ✅ |
 | [C](https://github.com/tree-sitter/tree-sitter-c) | | ✅ | ✅ |
 | [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
 | [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | | ✅ | ✅ |
