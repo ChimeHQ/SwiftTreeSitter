@@ -18,7 +18,7 @@ jobs:
           - "platform=macOS"
           - "platform=iOS Simulator,name=iPhone 11"
           - "platform=tvOS Simulator,name=Apple TV"
-          - "platform=watchOS Simulator,name=Apple Watch Series 6 - 40mm"
+          - "platform=watchOS Simulator,name=Apple Watch Series 6 (40mm)"
     
     steps:
       - name: Checkout
