@@ -22,11 +22,11 @@ public struct NamedRange: Codable, Equatable, Sendable, Hashable {
 }
 
 public extension QueryMatch {
-	/// Intrepret the match using the "injections.scm" definition
+	/// Interpret the match using the "injections.scm" definition
 	///
 	/// - `injection.content` defines the range of the injection
 	/// - a node with `injection.language` specifies the value of the language in the text
-	/// - if that is not prsent, uses `injection.language` metadata
+	/// - if that is not present, uses `injection.language` metadata
 	///
 	/// If `textProvider` is nil and a node contents is needed, the injection is dropped.
 	func injection(with textProvider: ResolvingQueryCursor.TextProvider?) -> NamedRange? {
@@ -55,7 +55,7 @@ public extension QueryMatch {
 }
 
 public extension QueryCapture {
-	/// Intrepret the capture using the "highlights.scm" definition
+	/// Interpret the capture using the "highlights.scm" definition
 	///
 	/// Capture names are used without modification.
 	var highlight: NamedRange? {
@@ -67,16 +67,16 @@ public extension QueryCapture {
 }
 
 public extension QueryCursor {
-	/// Intrepret the cursor using the "injections.scm" definition
+	/// Interpret the cursor using the "injections.scm" definition
 	///
 	/// If `textProvider` is nil and a node contents is needed, the injection is dropped.
 	func injections(with textProvider: ResolvingQueryCursor.TextProvider?) -> [NamedRange] {
 		return compactMap({ $0.injection(with: textProvider) })
 	}
 
-	/// Intrepret the cursor using the "highlights.scm" definition
+	/// Interpret the cursor using the "highlights.scm" definition
 	///
-	/// Results are sorted such that less-specific matches come before more-specific. This helps to resolve ambigious patterns.
+	/// Results are sorted such that less-specific matches come before more-specific. This helps to resolve ambiguous patterns.
 	func highlights() -> [NamedRange] {
 		return map({ $0.captures })
 			.flatMap({ $0 })
@@ -86,17 +86,16 @@ public extension QueryCursor {
 }
 
 public extension ResolvingQueryCursor {
-	/// Intrepret the cursor using the "injections.scm" definition
+	/// Interpret the cursor using the "injections.scm" definition
 	///
 	/// If the cursor's textProvider is nil and a node contents is needed, the injection is dropped.
 	func injections() -> [NamedRange] {
 		return compactMap({ $0.injection(with: textProvider) })
 	}
 
-	/// Intrepret the cursor using the "highlights.scm" definition
+	/// Interpret the cursor using the "highlights.scm" definition
 	///
-	///
-	/// Results are sorted such that less-specific matches come before more-specific. This helps to resolve ambigious patterns.
+	/// Results are sorted such that less-specific matches come before more-specific. This helps to resolve ambiguous patterns.
 	func highlights() -> [NamedRange] {
 		return map({ $0.captures })
 			.flatMap({ $0 })
