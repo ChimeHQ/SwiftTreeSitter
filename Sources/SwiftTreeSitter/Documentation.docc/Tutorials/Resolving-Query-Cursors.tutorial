@@ -115,7 +115,7 @@
 			@Step {
 				Prepare it, passing in a function that can return text content.
 				
-				Here, we're using a a simple String extension helper. You may need more a more involved implemenation.
+				Here, we're using a a simple String extension helper. You may need more a more involved implementation.
 				
 				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-9-example.swift")
 			}
