@@ -22,6 +22,7 @@ final class ParserTests: XCTestCase {
 		XCTAssertEqual(parser.timeout, 1.0)
 	}
 
+#if !os(WASI)
 	func testLanguageAccessor() throws {
 		let language = Language(language: tree_sitter_swift())
 
@@ -32,7 +33,6 @@ final class ParserTests: XCTestCase {
 		XCTAssertEqual(parser.language, language)
 	}
 
-#if !os(WASI)
 	func testParseEmojiInEdit() throws {
 		let language = Language(language: tree_sitter_swift())
 
