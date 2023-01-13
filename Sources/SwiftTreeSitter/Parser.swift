@@ -23,6 +23,15 @@ public class Parser {
 }
 
 extension Parser {
+	/// Access the parser's language
+	///
+	/// Setting a language via this property isn't possible because that operation is failable. Please use `setLanguage`.
+	public var language: Language? {
+		get {
+			return ts_parser_language(internalParser).map { Language(language: $0) }
+		}
+	}
+
     public func setLanguage(_ language: Language) throws {
         try setLanguage(language.tsLanguage)
     }

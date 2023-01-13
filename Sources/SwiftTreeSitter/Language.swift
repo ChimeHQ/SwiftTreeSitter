@@ -55,6 +55,9 @@ extension Language {
     }
 }
 
+extension Language: Equatable {
+}
+
 #if !os(WASI)
 public extension Language {
     /// Construct a query object from data in a file.
