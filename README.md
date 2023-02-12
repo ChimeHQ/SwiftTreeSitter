@@ -41,6 +41,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [D](https://github.com/CyberShadow/tree-sitter-d) | | | |
 | [Dart](https://github.com/UserNobody14/tree-sitter-dart) | | | |
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | ✅ | ✅ | ✅ |
+| [Diff](https://github.com/the-mikedavis/tree-sitter-diff) | | ✅ | ✅ |
 | [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | ✅ | ✅ | ✅ |
 | [Elm](https://github.com/elm-tooling/tree-sitter-elm) | | ✅ | ✅ |
 | [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
