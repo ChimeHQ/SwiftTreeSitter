@@ -77,6 +77,36 @@ public extension Language {
         let fileManager = FileManager.default
         var bundle = Bundle.main
 
+        func findFile(_ filename: String, in directory: URL) -> URL? {
+            do {
+                let contents = try fileManager.contentsOfDirectory(
+                    at: directory,
+                    includingPropertiesForKeys: [.nameKey, .isDirectoryKey],
+                    options: [.skipsHiddenFiles]
+                )
+
+                for item in contents {
+                    var isDirectory: ObjCBool = false
+                    fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory)
+
+                    if isDirectory.boolValue {
+                        if let foundURL = findFile(filename, in: item.standardizedFileURL) {
+                            return foundURL
+                        }
+                    } else {
+                        if item.lastPathComponent == filename {
+                            return item
+                        }
+                    }
+                }
+            }
+            catch {
+                return nil
+            }
+
+            return nil
+        }
+
         if bundle.isXCTestRunner {
             bundle = Bundle.allBundles
                 .first(where: { $0.bundlePath.components(separatedBy: "/").last!.contains("Tests.xctest") == true })!
@@ -84,13 +114,12 @@ public extension Language {
 
         guard
             let resourceDirectory,
-            let bundleURL = bundle.resourceURL,
             let foundBundleURL = try? fileManager
-                .contentsOfDirectory(at: bundleURL, includingPropertiesForKeys: nil)
-                .first(where: { $0.absoluteString.contains(resourceDirectory) })
+                .contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: nil)
+                .first(where: { $0.lastPathComponent.contains(resourceDirectory) })
         else { return nil }
 
-        return foundBundleURL.appendingPathComponent("Contents/Resources/queries/\(name).scm")
+        return findFile("\(name).scm", in: foundBundleURL)
     }
 }
 
