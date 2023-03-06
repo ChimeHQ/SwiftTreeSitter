@@ -4,8 +4,14 @@ import tree_sitter
 public struct Language {
     public var tsLanguage: UnsafePointer<TSLanguage>
 
-    public init(language: UnsafePointer<TSLanguage>) {
+    /// The topmost directory inside of the main bundle which will contain the scm resources for queries, highlights,
+    /// etc. This does not need to be the precise name of a Swift package's resource bundle and is often the name
+    /// of the Swift package vending resources (when used in a Swift Package Manager context).
+    public var resourceDirectory: String?
+
+    public init(language: UnsafePointer<TSLanguage>, resourceDirectory: String? = nil) {
         self.tsLanguage = language
+        self.resourceDirectory = resourceDirectory
     }
 }
 
@@ -57,6 +63,44 @@ extension Language {
 
 extension Language: Equatable {
 }
+
+public extension Language {
+    var highlightsFileURL: URL? {
+        return searchForResource(named: "highlights")
+    }
+
+    var injectionsFileURL: URL? {
+        return searchForResource(named: "injections")
+    }
+
+    private func searchForResource(named name: String) -> URL? {
+        let fileManager = FileManager.default
+        var bundle = Bundle.main
+
+        if bundle.isXCTestRunner {
+            bundle = Bundle.allBundles
+                .first(where: { $0.bundlePath.components(separatedBy: "/").last!.contains("Tests.xctest") == true })!
+        }
+
+        guard
+            let resourceDirectory,
+            let bundleURL = bundle.resourceURL,
+            let foundBundleURL = try? fileManager
+                .contentsOfDirectory(at: bundleURL, includingPropertiesForKeys: nil)
+                .first(where: { $0.absoluteString.contains(resourceDirectory) })
+        else { return nil }
+
+        return foundBundleURL.appendingPathComponent("Contents/Resources/queries/\(name).scm")
+    }
+}
+
+private extension Bundle {
+    var isXCTestRunner: Bool {
+        guard NSClassFromString("XCTest") != nil else { return false }
+        return bundlePath.contains("/Developer/Library/Xcode/Agents")
+    }
+}
+
 
 #if !os(WASI)
 public extension Language {
