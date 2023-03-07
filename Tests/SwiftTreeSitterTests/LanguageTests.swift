@@ -28,6 +28,21 @@ final class LanguageTests: XCTestCase {
         try removeFile(filename, in: dirPath)
     }
 
+    func testMatchHappensWhenMultiplePathsShareCommonName() throws {
+        let filename = "injections.scm"
+        let jsonDirPath = "JSON/queries"
+        let json5DirPath = "JSON5/queries"
+        try setupFile(filename, in: jsonDirPath)
+        try setupFile(filename, in: json5DirPath)
+
+        let language = Language(language: tree_sitter_swift(), resourceDirectory: "JSON")
+        XCTAssertNotNil(language.injectionsFileURL)
+        XCTAssertTrue(language.injectionsFileURL!.absoluteString.contains("JSON/queries"))
+
+        try removeFile(filename, in: jsonDirPath)
+        try removeFile(filename, in: json5DirPath)
+    }
+
     private func setupFile(_ filename: String, in directoryPath: String) throws {
         let dir = Bundle.test.bundlePath.appending("/\(directoryPath)")
         let filePath = "\(dir)/\(filename)"
