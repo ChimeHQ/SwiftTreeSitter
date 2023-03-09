@@ -11,7 +11,10 @@ final class LanguageTests: XCTestCase {
         let bundlePath = "Swift.bundle/Contents/Resources/queries"
         try setupFile(filename, in: bundlePath)
 
-        let language = Language(language: tree_sitter_swift(), resourceDirectory: "Swift")
+        let language = Language(
+            language: tree_sitter_swift(),
+            directoryProvider: embeddedResourceProvider(named: "Swift")
+        )
         XCTAssertNotNil(language.highlightsFileURL)
 
         try removeFile(filename, in: bundlePath)
@@ -22,7 +25,10 @@ final class LanguageTests: XCTestCase {
         let dirPath = "Markdown/queries"
         try setupFile(filename, in: dirPath)
 
-        let language = Language(language: tree_sitter_swift(), resourceDirectory: "Markdown")
+        let language = Language(
+            language: tree_sitter_swift(),
+            directoryProvider: embeddedResourceProvider(named: "Markdown")
+        )
         XCTAssertNotNil(language.injectionsFileURL)
 
         try removeFile(filename, in: dirPath)
@@ -35,7 +41,10 @@ final class LanguageTests: XCTestCase {
         try setupFile(filename, in: jsonDirPath)
         try setupFile(filename, in: json5DirPath)
 
-        let language = Language(language: tree_sitter_swift(), resourceDirectory: "JSON")
+        let language = Language(
+            language: tree_sitter_swift(),
+            directoryProvider: embeddedResourceProvider(named: "JSON")
+        )
         XCTAssertNotNil(language.injectionsFileURL)
         XCTAssertTrue(language.injectionsFileURL!.absoluteString.contains("JSON/queries"))
 
