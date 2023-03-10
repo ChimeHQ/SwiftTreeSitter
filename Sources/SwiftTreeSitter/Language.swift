@@ -132,13 +132,13 @@ extension Language {
             let foundBundleURL = try? fileManager
                 .contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: nil)
                 .first(where: { $0.lastPathComponent.contains(resourceDirectory) }),
-            let resourceDirURL = searchForFileExtension("scm", startingIn: foundBundleURL)
+            let resourceDirURL = searchForDirectoryContainingFileExtension("scm", startingIn: foundBundleURL)
         else { return nil }
 
         return { resourceDirURL }
     }
 
-    private static func searchForFileExtension(_ ext: String, startingIn directory: URL) -> URL? {
+    private static func searchForDirectoryContainingFileExtension(_ ext: String, startingIn directory: URL) -> URL? {
         let fileManager = FileManager.default
 
         do {
@@ -159,7 +159,7 @@ extension Language {
                         return urlComponents.url
                     }
                 } else {
-                    if let foundURL = searchForFileExtension(ext, startingIn: item.standardizedFileURL) {
+                    if let foundURL = searchForDirectoryContainingFileExtension(ext, startingIn: item.standardizedFileURL) {
                         return foundURL
                     }
                 }
