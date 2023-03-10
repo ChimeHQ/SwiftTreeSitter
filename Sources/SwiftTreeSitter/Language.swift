@@ -11,9 +11,23 @@ public struct Language {
     public var tsLanguage: UnsafePointer<TSLanguage>
     public var directoryProvider: DirectoryProvider?
 
+    /// Creates an instance.
+    /// - Parameters:
+    ///   - language: The language to parse.
+    ///   - directoryProvider: An optional closure which would return a `URL` that can be searched for resources
+    ///   used by the language (such as highlights.scm).
     public init(language: UnsafePointer<TSLanguage>, directoryProvider: DirectoryProvider? = nil) {
         self.tsLanguage = language
         self.directoryProvider = directoryProvider
+    }
+
+    /// Creates an instance.
+    /// - Parameters:
+    ///   - language: The language to parse.
+    ///   - languageName: The name of the language. This is used to attempt to find the embeeded resource directory
+    ///    for the language (which would contain files like highlights.scm).
+    public init(language: UnsafePointer<TSLanguage>, languageName: String) {
+        self.init(language: language, directoryProvider: embeddedResourceProvider(named: languageName))
     }
 }
 
@@ -78,7 +92,7 @@ extension Language: Equatable {
 /// in an app context vs an XCTest context.
 /// - Parameter resourceDirectory: The name of the directory or bundle to search for embedded within the main bundle.
 /// - Returns: If found, returns the directory provider closure.
-public func embeddedResourceProvider(named resourceDirectory: String) -> DirectoryProvider? {
+private func embeddedResourceProvider(named resourceDirectory: String) -> DirectoryProvider? {
     let fileManager = FileManager.default
     var bundle = Bundle.main
 
