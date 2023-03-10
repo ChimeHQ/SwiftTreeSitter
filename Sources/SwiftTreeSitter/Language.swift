@@ -82,30 +82,11 @@ extension Language: Equatable {
 
 public extension Language {
     var highlightsFileURL: URL? {
-        guard let url = directoryProvider?() else { return nil }
-        return findFile("highlights.scm", in: url)
+        return directoryProvider?().appendingPathComponent("highlights.scm")
     }
 
     var injectionsFileURL: URL? {
-        guard let url = directoryProvider?() else { return nil }
-        return findFile("injections.scm", in: url)
-    }
-
-    private func findFile(_ filename: String, in directory: URL) -> URL? {
-        let fileManager = FileManager.default
-
-        do {
-            let contents = try fileManager.contentsOfDirectory(
-                at: directory,
-                includingPropertiesForKeys: [.nameKey, .isDirectoryKey],
-                options: [.skipsHiddenFiles]
-            )
-
-            return contents.first(where: { $0.lastPathComponent == filename })
-        }
-        catch {
-            return nil
-        }
+        return directoryProvider?().appendingPathComponent("injections.scm")
     }
 }
 
