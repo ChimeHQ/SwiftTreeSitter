@@ -13,7 +13,7 @@ final class LanguageTests: XCTestCase {
 
         let language = Language(
             language: tree_sitter_swift(),
-            languageName: "Swift"
+            name: "Swift"
         )
         XCTAssertNotNil(language.highlightsFileURL)
 
@@ -27,7 +27,7 @@ final class LanguageTests: XCTestCase {
 
         let language = Language(
             language: tree_sitter_swift(),
-            languageName: "Markdown"
+            name: "Markdown"
         )
         XCTAssertNotNil(language.injectionsFileURL)
 
@@ -43,7 +43,7 @@ final class LanguageTests: XCTestCase {
 
         let language = Language(
             language: tree_sitter_swift(),
-            languageName: "JSON"
+            name: "JSON"
         )
         XCTAssertNotNil(language.injectionsFileURL)
         XCTAssertTrue(language.injectionsFileURL!.absoluteString.contains("JSON/queries"))

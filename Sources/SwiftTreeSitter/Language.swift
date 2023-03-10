@@ -23,8 +23,8 @@ public struct Language {
     ///   - language: The language to parse.
     ///   - languageName: The name of the language. This is used to attempt to find the embedded resource directory
     ///    for the language (which would contain files like highlights.scm).
-    public init(language: UnsafePointer<TSLanguage>, languageName: String) {
-        self.init(language: language, directoryProvider: Language.embeddedResourceProvider(named: languageName))
+    public init(language: UnsafePointer<TSLanguage>, name: String) {
+        self.init(language: language, directoryProvider: Language.embeddedResourceProvider(named: name))
     }
 }
 
