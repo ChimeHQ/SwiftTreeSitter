@@ -114,7 +114,8 @@ extension Language {
 
         guard
             let foundBundleURL = try? fileManager
-                .contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: nil)
+                .contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: [.isDirectoryKey])
+                .filter({ (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
                 .first(where: { $0.lastPathComponent.contains(resourceDirectory) }),
             let resourceDirURL = searchForDirectoryContainingFileExtension("scm", startingIn: foundBundleURL)
         else { return nil }
