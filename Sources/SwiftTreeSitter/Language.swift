@@ -18,6 +18,7 @@ public struct Language {
         self.directoryProvider = directoryProvider
     }
 
+    #if !os(WASI)
     /// Creates an instance.
     /// - Parameters:
     ///   - language: The language to parse.
@@ -26,6 +27,7 @@ public struct Language {
     public init(language: UnsafePointer<TSLanguage>, name: String) {
         self.init(language: language, directoryProvider: Language.embeddedResourceProvider(named: name))
     }
+    #endif
 }
 
 extension Language {
@@ -90,6 +92,7 @@ public extension Language {
     }
 }
 
+#if !os(WASI)
 extension Language {
     /// For languages where the resources are embedded in the app's bundle, this function returns the directory provider
     /// that finds the location of the resource's containing folder on disk. The match is fuzzy so if a Swift Package
@@ -161,8 +164,6 @@ private extension Bundle {
     }
 }
 
-
-#if !os(WASI)
 public extension Language {
     /// Construct a query object from data in a file.
     func query(contentsOf url: URL) throws -> Query {

@@ -1,3 +1,4 @@
+#if !os(WASI)
 import Foundation
 import TestTreeSitterSwift
 import SwiftTreeSitter
@@ -80,3 +81,4 @@ private extension Bundle {
             )!
     }
 }
+#endif
