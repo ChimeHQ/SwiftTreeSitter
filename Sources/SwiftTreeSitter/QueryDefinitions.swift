@@ -12,6 +12,19 @@ public struct NamedRange: Codable, Equatable, Sendable, Hashable {
 		self.tsRange = tsRange
 	}
 
+	public init(name: String, tsRange: TSRange) {
+		let components = name.split(separator: ".").map(String.init)
+
+		self.init(nameComponents: components, tsRange: tsRange)
+	}
+
+	public init (name: String, range: NSRange, pointRange: Range<Point> = Point.zero..<Point.zero) {
+		let tsRange = TSRange(points: pointRange,
+							  bytes: range.byteRange)
+
+		self.init(name: name, tsRange: tsRange)
+	}
+
 	public var name: String {
 		return nameComponents.joined(separator: ".")
 	}
