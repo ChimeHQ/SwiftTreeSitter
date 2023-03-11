@@ -46,8 +46,10 @@ final class LanguageTests: XCTestCase {
             language: tree_sitter_swift(),
             name: "JSON"
         )
-        XCTAssertNotNil(language.injectionsFileURL)
-        XCTAssertTrue(language.injectionsFileURL!.absoluteString.contains("JSON/queries"))
+
+		let url = try XCTUnwrap(language.injectionsFileURL)
+
+        XCTAssertTrue(url.absoluteString.contains("JSON/queries"))
 
         try removeFile(filename, in: jsonDirPath)
         try removeFile(filename, in: json5DirPath)
