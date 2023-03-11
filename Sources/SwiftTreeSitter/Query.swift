@@ -42,7 +42,7 @@ public enum QueryPredicateError: Error {
 /// Typically, query definitions are stored in a `.scm` file.
 ///
 /// Tree-sitter's official documentation: [Pattern Matching with Queries](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries)
-public class Query {
+public final class Query: Sendable {
     let internalQuery: OpaquePointer
     let predicateList: [[Predicate]]
 

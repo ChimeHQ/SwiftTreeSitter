@@ -20,7 +20,7 @@ extension QueryPredicateStep: CustomStringConvertible {
     }
 }
 
-public enum Predicate: Hashable {
+public enum Predicate: Hashable, Sendable {
     case eq([String], captureNames: [String])
     case notEq([String], captureNames: [String])
     case match(NSRegularExpression, captureNames: [String])
