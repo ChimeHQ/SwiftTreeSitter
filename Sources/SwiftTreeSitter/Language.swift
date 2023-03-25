@@ -105,64 +105,75 @@ extension Language {
     /// - Returns: If found, returns the directory provider closure.
     static func embeddedResourceProvider(named resourceDirectory: String) -> Language.DirectoryProvider? {
         let fileManager = FileManager.default
-        var bundle = Bundle.main
+        let bundle = effectiveBundle
 
-        if bundle.isXCTestRunner {
-            bundle = Bundle.allBundles
-                .first(where: { $0.bundlePath.components(separatedBy: "/").last!.contains("Tests.xctest") == true })!
-        }
+		let foundBundleURL = try? fileManager
+			.contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: [.isDirectoryKey])
+			.filter({ (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
+			.first(where: { $0.lastPathComponent.contains(resourceDirectory) })
 
         guard
-            let foundBundleURL = try? fileManager
-                .contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: [.isDirectoryKey])
-                .filter({ (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
-                .first(where: { $0.lastPathComponent.contains(resourceDirectory) }),
+            let foundBundleURL = foundBundleURL,
             let resourceDirURL = searchForDirectoryContainingFileExtension("scm", startingIn: foundBundleURL)
         else { return nil }
 
         return { resourceDirURL }
     }
 
+	private static var effectiveBundle: Bundle {
+		let mainBundle = Bundle.main
+
+		guard mainBundle.isXCTestRunner else {
+			return mainBundle
+		}
+
+		let testBundle = Bundle.allBundles .first(where: {
+			$0.bundlePath.components(separatedBy: "/").last?.contains("Tests.xctest") == true
+		})
+
+		return testBundle ?? mainBundle
+	}
+
     private static func searchForDirectoryContainingFileExtension(_ ext: String, startingIn directory: URL) -> URL? {
         let fileManager = FileManager.default
 
-        do {
-            let contents = try fileManager.contentsOfDirectory(
-                at: directory,
-                includingPropertiesForKeys: [.nameKey, .isDirectoryKey],
-                options: [.skipsHiddenFiles]
-            )
+		let contents = try? fileManager.contentsOfDirectory(
+			at: directory,
+			includingPropertiesForKeys: [.nameKey, .isDirectoryKey],
+			options: [.skipsHiddenFiles]
+		)
 
-            for item in contents {
-                var isDirectory: ObjCBool = false
-                fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory)
+		guard let contents = contents else { return nil }
 
-                if isDirectory.boolValue == false {
-                    if item.lastPathComponent.contains(ext) {
-                        var urlComponents = URLComponents(url: item, resolvingAgainstBaseURL: false)!
-                        urlComponents.path = (urlComponents.path as NSString).deletingLastPathComponent
-                        return urlComponents.url
-                    }
-                } else {
-                    if let foundURL = searchForDirectoryContainingFileExtension(ext, startingIn: item.standardizedFileURL) {
-                        return foundURL
-                    }
-                }
-            }
-        }
-        catch {
-            return nil
-        }
+		for item in contents {
+			var isDirectory: ObjCBool = false
+			fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory)
+
+			if isDirectory.boolValue == false {
+				if item.lastPathComponent.contains(ext) {
+					var urlComponents = URLComponents(url: item, resolvingAgainstBaseURL: false)!
+					urlComponents.path = (urlComponents.path as NSString).deletingLastPathComponent
+					return urlComponents.url
+				}
+			} else {
+				if let foundURL = searchForDirectoryContainingFileExtension(ext, startingIn: item.standardizedFileURL) {
+					return foundURL
+				}
+			}
+		}
 
         return nil
     }
 }
 
 private extension Bundle {
-    var isXCTestRunner: Bool {
-        guard NSClassFromString("XCTest") != nil else { return false }
-        return bundlePath.contains("/Developer/Library/Xcode/Agents")
-    }
+	var isXCTestRunner: Bool {
+#if DEBUG
+		return NSClassFromString("XCTest") != nil
+#else
+		return false
+#endif
+	}
 }
 
 public extension Language {
