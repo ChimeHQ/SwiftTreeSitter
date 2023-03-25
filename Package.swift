@@ -23,5 +23,8 @@ let package = Package(
         .target(name: "SwiftTreeSitter", dependencies: ["tree-sitter"]),
         .testTarget(name: "SwiftTreeSitterTests",
 					dependencies: ["SwiftTreeSitter", "TestTreeSitterSwift"]),
+		.target(name: "TreeSitterDocument", dependencies: ["SwiftTreeSitter"]),
+		.testTarget(name: "TreeSitterDocumentTests",
+					dependencies: ["TreeSitterDocument", "TestTreeSitterSwift"]),
     ]
 )

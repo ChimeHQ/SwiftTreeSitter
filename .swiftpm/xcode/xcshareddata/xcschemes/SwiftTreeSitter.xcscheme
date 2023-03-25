@@ -76,6 +76,20 @@
                ReferencedContainer = "container:">
             </BuildableReference>
          </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TreeSitterDocument"
+               BuildableName = "TreeSitterDocument"
+               BlueprintName = "TreeSitterDocument"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </BuildActionEntry>
       </BuildActionEntries>
    </BuildAction>
    <TestAction
@@ -102,6 +116,16 @@
                BlueprintIdentifier = "SwiftTreeSitterTests"
                BuildableName = "SwiftTreeSitterTests"
                BlueprintName = "SwiftTreeSitterTests"
+               ReferencedContainer = "container:">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "TreeSitterDocumentTests"
+               BuildableName = "TreeSitterDocumentTests"
+               BlueprintName = "TreeSitterDocumentTests"
                ReferencedContainer = "container:">
             </BuildableReference>
          </TestableReference>
