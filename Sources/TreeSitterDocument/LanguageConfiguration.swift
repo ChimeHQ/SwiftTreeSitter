@@ -14,6 +14,7 @@ public struct LanguageConfiguration {
 	}
 }
 
+#if !os(WASI)
 extension LanguageConfiguration {
 	public init(language: Language, name: String) throws {
 		let bundleName = "TreeSitter\(name)_TreeSitter\(name)"
@@ -25,7 +26,7 @@ extension LanguageConfiguration {
 		try self.init(language: Language(language: tsLanguage), name: name)
 	}
 
-#if !os(WASI)
+
 	public init(language: Language, name: String, bundleName: String) throws {
 		var queries: [Query.Definition: Query] = [:]
 
@@ -74,5 +75,5 @@ extension LanguageConfiguration {
 			.flatMap { try? Data(contentsOf: $0) }
 			.map { try Query(language: language, data: $0) }
 	}
-#endif
 }
+#endif
