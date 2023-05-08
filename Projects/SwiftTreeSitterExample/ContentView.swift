@@ -1,6 +1,9 @@
 import SwiftUI
 
 import SwiftTreeSitter
+import TreeSitterDocument
+import TreeSitterMarkdown
+import TreeSitterMarkdownInline
 import TreeSitterSwift
 
 struct ContentView: View {
@@ -22,39 +25,56 @@ struct ContentView: View {
     }
 
 	func runTreeSitterTest() throws {
-		let language = Language(language: tree_sitter_swift())
+		let markdownConfig = try LanguageConfiguration(tsLanguage: tree_sitter_markdown(),
+													   name: "Markdown")
+		let markdownInlineConfig = try LanguageConfiguration(tsLanguage: tree_sitter_markdown_inline(),
+															 name: "MarkdownInline",
+															 bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline")
+		let swiftConfig = try LanguageConfiguration(tsLanguage: tree_sitter_swift(), name: "Swift")
 
-		let parser = Parser()
-		try parser.setLanguage(language)
+		let config = LanguageLayerTree.Configuration(locationTransformer: nil,
+													invalidationHandler: nil,
+													languageProvider: { name in
+			switch name {
+			case "markdown":
+				return markdownConfig
+			case "markdown_inline":
+				return markdownInlineConfig
+			case "swift":
+				return swiftConfig
+			default:
+				return nil
+			}
+		})
+
+		let tree = try! LanguageLayerTree(rootLanguageConfig: markdownConfig, configuration: config)
 
 		let source = """
-func example() {
-    SomeType.method()
-	variable.method()
+# this is markdown
+
+```swift
+func main() {
+	print("hello world")
 }
+```
+
+## also markdown
+
+```swift
+let value = "abc"
+```
 """
 
-		let tree = parser.parse(source)!
+		tree.replaceContent(with: source)
 
-		let url = Bundle.main
-					  .resourceURL?
-					  .appendingPathComponent("TreeSitterSwift_TreeSitterSwift.bundle")
-					  .appendingPathComponent("Contents/Resources/queries/highlights.scm")
+		let fullRange = NSRange(source.startIndex..<source.endIndex, in: source)
 
-		let query = try language.query(contentsOf: url!)
+		let cursor = try tree.executeQuery(.highlights, in: fullRange)
 
-		let cursor = query.execute(node: tree.rootNode!)
+		cursor.prepare(with: source.cursorTextProvider)
 
-		let resolvingCursor = ResolvingQueryCursor(cursor: cursor)
-
-		resolvingCursor.prepare(with: source.cursorTextProvider)
-
-		let typeCaptures = resolvingCursor
-			.map { $0.captures(named: "type") }
-			.flatMap({ $0 })
-
-		for capture in typeCaptures {
-			print("matched range:", capture.range)
+		for namedRange in cursor.highlights() {
+			print("\(namedRange.name): \(namedRange.range)")
 		}
 	}
 }

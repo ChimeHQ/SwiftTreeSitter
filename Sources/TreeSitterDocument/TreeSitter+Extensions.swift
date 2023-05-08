@@ -44,4 +44,24 @@ extension Parser {
 
 		return ParseState(tree: newTree)
 	}
+
+	var incluedRangeSet: IndexSet {
+		var set = IndexSet()
+
+		for tsRange in includedRanges {
+			guard let range = Range(tsRange.bytes.range) else { continue }
+
+			set.insert(integersIn: range)
+		}
+
+		return set
+	}
+}
+
+extension Query {
+	public enum Definition: Hashable, Sendable {
+		case injections
+		case highlights
+		case custom(String)
+	}
 }

@@ -55,13 +55,3 @@ extension ParseState {
 		return set
 	}
 }
-
-extension ParseState {
-	func executeQuery(_ query: Query) throws -> QueryCursor {
-		guard let node = tree?.rootNode else {
-			throw LanguageLayer.Failure.noRootNode
-		}
-
-		return query.execute(node: node, in: tree)
-	}
-}

@@ -2,6 +2,15 @@
   "object": {
     "pins": [
       {
+        "package": "TreeSitterMarkdown",
+        "repositoryURL": "https://github.com/MDeiml/tree-sitter-markdown",
+        "state": {
+          "branch": "split_parser",
+          "revision": "fa6bfd51727e4bef99f7eec5f43947f73d64ea7d",
+          "version": null
+        }
+      },
+      {
         "package": "TreeSitterSwift",
         "repositoryURL": "https://github.com/alex-pinkus/tree-sitter-swift/",
         "state": {
