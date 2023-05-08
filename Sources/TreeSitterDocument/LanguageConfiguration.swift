@@ -25,6 +25,7 @@ extension LanguageConfiguration {
 		try self.init(language: Language(language: tsLanguage), name: name)
 	}
 
+#if !os(WASI)
 	public init(language: Language, name: String, bundleName: String) throws {
 		var queries: [Query.Definition: Query] = [:]
 
@@ -50,11 +51,7 @@ extension LanguageConfiguration {
 			return mainBundle
 		}
 
-		let testBundle = Bundle.allBundles .first(where: {
-			$0.bundlePath.components(separatedBy: "/").last?.contains("Tests.xctest") == true
-		})
-
-		return testBundle ?? mainBundle
+		return Bundle.testBundle ?? mainBundle
 	}()
 	
 	static func queryDirectoryURL(for bundleName: String) -> URL? {
@@ -77,14 +74,5 @@ extension LanguageConfiguration {
 			.flatMap { try? Data(contentsOf: $0) }
 			.map { try Query(language: language, data: $0) }
 	}
-}
-
-private extension Bundle {
-	var isXCTestRunner: Bool {
-#if DEBUG
-		return NSClassFromString("XCTest") != nil
-#else
-		return false
 #endif
-	}
 }
