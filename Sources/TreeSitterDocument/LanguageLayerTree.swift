@@ -2,6 +2,12 @@ import Foundation
 
 import SwiftTreeSitter
 
+extension IndexSet {
+	init(range nsRange: NSRange) {
+		self.init(integersIn: Range(nsRange) ?? 0..<0)
+	}
+}
+
 /// Represents a source document as a tree of language sections.
 public final class LanguageLayerTree {
 	public typealias TextProvider = ResolvingQueryCursor.TextProvider
@@ -108,8 +114,40 @@ extension LanguageLayerTree {
 
 	/// Execute a query against the full tree.
 	public func executeQuery(_ query: Query.Definition, in range: NSRange) throws -> LayeredQueryCursor {
-		let set = IndexSet(integersIn: Range(range) ?? 0..<0)
+		return try executeQuery(query, in: IndexSet(range: range))
+	}
 
-		return try executeQuery(query, in: set)
+	public func highlights(in set: IndexSet) throws -> [NamedRange] {
+		var highlights = [NamedRange]()
+
+		try enumerateLanguageLayers(in: set) { layer in
+			let regions = layer.rangeSet?.intersection(set) ?? set
+
+			let layerHighlights = try regions.rangeView
+				.map { NSRange($0) }
+				.map { try layer.executeShallowQuery(.highlights, in: $0) }
+				.flatMap { $0.highlights() }
+
+			highlights.append(contentsOf: layerHighlights)
+		}
+
+		return highlights
+	}
+
+	public func highlights(in range: NSRange) throws -> [NamedRange] {
+		try highlights(in: IndexSet(range: range))
+			.sorted(by: { a, b in
+				a.range.location < b.range.location
+			})
+	}
+}
+
+extension LanguageLayerTree {
+	func enumerateLanguageLayers(in range: NSRange, block: (LanguageLayer) throws -> Void) rethrows {
+		try enumerateLanguageLayers(in: IndexSet(range: range), block: block)
+	}
+
+	func enumerateLanguageLayers(in set: IndexSet, block: (LanguageLayer) throws -> Void) rethrows {
+		try rootLayer.enumerateLanguageLayers(in: set, block: block)
 	}
 }

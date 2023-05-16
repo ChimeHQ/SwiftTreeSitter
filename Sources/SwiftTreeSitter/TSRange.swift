@@ -39,3 +39,8 @@ extension TSRange: Comparable {
     }
 }
 
+extension TSRange: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		"<TSRange \(bytes), \(points)>"
+	}
+}

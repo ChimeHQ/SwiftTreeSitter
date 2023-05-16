@@ -88,6 +88,18 @@ extension LanguageLayer {
 }
 
 extension LanguageLayer {
+	func enumerateLanguageLayers(in set: IndexSet, block: (LanguageLayer) throws -> Void) rethrows {
+		let effectiveSet = rangeSet?.intersection(set) ?? set
+
+		try block(self)
+
+		for layer in sublayers {
+			try layer.enumerateLanguageLayers(in: effectiveSet, block: block)
+		}
+	}
+}
+
+extension LanguageLayer {
 	func executeShallowQuery(_ queryDef: Query.Definition, in range: NSRange) throws -> ResolvingQueryCursor {
 		guard let query = languageConfig.queries[queryDef] else {
 			let name = languageConfig.name
