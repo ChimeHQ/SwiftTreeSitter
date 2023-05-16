@@ -62,6 +62,20 @@ extension Query {
 	public enum Definition: Hashable, Sendable {
 		case injections
 		case highlights
+		case locals
 		case custom(String)
+
+		var name: String {
+			switch self {
+			case .injections:
+				return "injections"
+			case .highlights:
+				return "highlights"
+			case .locals:
+				return "locals"
+			case .custom(let value):
+				return value
+			}
+		}
 	}
 }
