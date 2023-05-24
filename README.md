@@ -24,6 +24,10 @@ dependencies: [
 ]
 ```
 
+## TreeSitterDocument
+
+This is an experimental target that ties together a lot of the tree-sitter highlighting concepts into one easier-to-use library. It is currently experimental.
+
 ## Language Parsers
 
 Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation]. How they can be installed an incorporated varies. Since you're here, you might find SPM the most convenient.
