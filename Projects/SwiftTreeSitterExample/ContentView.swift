@@ -68,13 +68,13 @@ let value = "abc"
 
 		let fullRange = NSRange(source.startIndex..<source.endIndex, in: source)
 
-		let subqueryProvider: Predicate.SubqueryMatchProvider = { query, range, _ in
+		let membershipProvider: Predicate.GroupMembershipProvider = { query, range, _ in
 			guard query == "local" else { return false }
 
 			return false
 		}
 
-		let context = Predicate.Context(textProvider: source.cursorTextProvider, subqueryMatchProvider: subqueryProvider)
+		let context = Predicate.Context(textProvider: source.cursorTextProvider, groupMembershipProvider: membershipProvider)
 
 		let highlights = try tree.highlights(in: fullRange, context: context)
 
