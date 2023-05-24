@@ -30,10 +30,20 @@ extension LayeredQueryCursor {
 		cursors.forEach { $0.1.prepare(with: textProvider) }
 	}
 
+	public func prepare(with context: Predicate.Context) {
+		cursors.forEach { $0.1.prepare(with: context) }
+	}
+
 	public func highlights() -> [NamedRange] {
 		return map({ $0.1.captures })
 			.flatMap({ $0 })
 			.sorted()
 			.compactMap { $0.highlight }
+	}
+
+	public func locals() -> [NamedRange] {
+		return map({ $0.1.captures })
+			.flatMap({ $0 })
+			.compactMap { $0.locals }
 	}
 }

@@ -118,4 +118,8 @@ let b = "var b = 1"
 		XCTAssertEqual(highlights, expected)
 	}
 }
+
+extension DocumentLayerTreeTests {
+}
+
 #endif

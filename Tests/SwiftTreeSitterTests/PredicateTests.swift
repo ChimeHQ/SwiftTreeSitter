@@ -127,6 +127,22 @@ final class PredicateTests: XCTestCase {
         XCTAssertEqual(predicates, expectedPredicates)
     }
 
+	func testParseIsNotGroupMember() throws {
+		let steps: [QueryPredicateStep] = [
+			.string("is-not?"),
+			.string("some_group_name"),
+			.done
+		]
+
+		let predicates = try PredicateParser().parse(steps)
+
+		let expectedPredicates = [
+			Predicate.isNot("some_group_name")
+		]
+
+		XCTAssertEqual(predicates, expectedPredicates)
+	}
+
     func testParseAnyOf() throws {
         let steps: [QueryPredicateStep] = [
             .string("any-of?"),

@@ -7,10 +7,10 @@ public enum LanguageLayerError: Error {
 	case queryUnavailable(String, Query.Definition)
 }
 
-final class LanguageLayer {
+public final class LanguageLayer {
 	typealias Configuration = LanguageLayerTree.Configuration
 
-	let languageConfig: LanguageConfiguration
+	public let languageConfig: LanguageConfiguration
 	private let configuration: Configuration
 	private let parser = Parser()
 	private(set) var state = ParseState()
@@ -91,10 +91,26 @@ extension LanguageLayer {
 	func enumerateLanguageLayers(in set: IndexSet, block: (LanguageLayer) throws -> Void) rethrows {
 		let effectiveSet = rangeSet?.intersection(set) ?? set
 
+		if effectiveSet.isEmpty {
+			return
+		}
+
 		try block(self)
 
 		for layer in sublayers {
 			try layer.enumerateLanguageLayers(in: effectiveSet, block: block)
+		}
+	}
+
+	func queryLanguageLayers(_ query: Query.Definition, in set: IndexSet, block: (LanguageLayer, ResolvingQueryCursor) throws -> Void) throws {
+		try enumerateLanguageLayers(in: set) { layer in
+			let ranges = (layer.rangeSet ?? set).rangeView
+
+			for range in ranges {
+				let subcursor = try layer.executeShallowQuery(query, in: NSRange(range))
+
+				try block(layer, subcursor)
+			}
 		}
 	}
 }

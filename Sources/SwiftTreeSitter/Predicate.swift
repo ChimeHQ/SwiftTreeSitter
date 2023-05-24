@@ -21,48 +21,129 @@ extension QueryPredicateStep: CustomStringConvertible {
 }
 
 public enum Predicate: Hashable, Sendable {
-    case eq([String], captureNames: [String])
-    case notEq([String], captureNames: [String])
-    case match(NSRegularExpression, captureNames: [String])
-    case notMatch(NSRegularExpression, captureNames: [String])
-    case isNot(String)
-    case anyOf(Set<String>, captureName: String)
-    case notAnyOf(Set<String>, captureName: String)
+	case eq([String], captureNames: [String])
+	case notEq([String], captureNames: [String])
+	case match(NSRegularExpression, captureNames: [String])
+	case notMatch(NSRegularExpression, captureNames: [String])
+	case isNot(String)
+	case anyOf(Set<String>, captureName: String)
+	case notAnyOf(Set<String>, captureName: String)
 	case set(captureName: String? = nil, key: String, value: String)
-    case generic(String, strings: [String], captureNames: [String])
+	case generic(String, strings: [String], captureNames: [String])
 
-    public var captureNames: [String] {
-        switch self {
-        case .eq(_, let names):
-            return names
-        case .notEq(_, let names):
-            return names
-        case .match(_, let names):
-            return names
-        case .notMatch(_, let names):
-            return names
-        case .isNot:
-            return []
-        case .anyOf(_, let names):
-            return [names]
-        case .notAnyOf(_, let names):
-            return [names]
-		case .set:
+	/// Returns an array of capture names that the predicate references.
+	///
+	/// This value can be empty.
+	public var captureNames: [String] {
+		switch self {
+		case .eq(_, let names):
+			return names
+		case .notEq(_, let names):
+			return names
+		case .match(_, let names):
+			return names
+		case .notMatch(_, let names):
+			return names
+		case .isNot:
 			return []
-        case .generic(_, _, let names):
-            return names
-        }
-    }
+		case .anyOf(_, let names):
+			return [names]
+		case .notAnyOf(_, let names):
+			return [names]
+		case .set(let name, _, _):
+			if let name = name {
+				return [name]
+			}
 
-    public func captures(in match: QueryMatch) -> [QueryCapture] {
-        let names = captureNames
+			return []
+		case .generic(_, _, let names):
+			return names
+		}
+	}
 
-        return match.captures.filter({ capture in
-            guard let name = capture.name else { return false }
+	/// Returns all of the `QueryCapture` instances that correspond to this predicate.
+	public func captures(in match: QueryMatch) -> [QueryCapture] {
+		let names = captureNames
 
-            return names.contains(name)
-        })
-    }
+		if names.isEmpty {
+			return match.captures
+		}
+
+		return match.captures.filter({ capture in
+			guard let name = capture.name else { return false }
+
+			return names.contains(name)
+		})
+	}
+}
+
+extension Predicate {
+	public typealias TextProvider = ResolvingQueryCursor.TextProvider
+	public typealias GroupMembershipProvider = (String, NSRange, Range<Point>) -> Bool
+
+	public struct Context {
+		public let textProvider: TextProvider
+		public let groupMembershipProvider: GroupMembershipProvider
+
+		public init(textProvider: @escaping TextProvider, groupMembershipProvider: @escaping GroupMembershipProvider) {
+			self.textProvider = textProvider
+			self.groupMembershipProvider = groupMembershipProvider
+		}
+
+		public static var none = Context(textProvider: { _, _ in return nil },
+										 groupMembershipProvider: { _, _, _ in return false })
+
+		var cachingContext: Context {
+			var cachedText = [NSRange : String]()
+
+			// create a caching provider
+			let cachingTextProvider: TextProvider = { (range, pointRange) in
+				if let value = cachedText[range] {
+					return value
+				}
+
+				let value = textProvider(range, pointRange)
+
+				cachedText[range] = value
+
+				return value
+			}
+
+			return Context(textProvider: cachingTextProvider, groupMembershipProvider: groupMembershipProvider)
+		}
+	}
+
+	func allowsMatch(_ match: QueryMatch, context: Context) -> Bool {
+		switch self {
+		case .set, .generic:
+			return true
+		case .eq, .notEq, .anyOf, .notAnyOf, .match, .notMatch, .isNot:
+			return captures(in: match).allSatisfy { capture in
+				allowsMatch(for: capture, context: context)
+			}
+		}
+	}
+
+	func allowsMatch(for capture: QueryCapture, context: Context) -> Bool {
+		allowsMatch(range: capture.node.range,
+					pointRange: capture.node.pointRange,
+					context: context)
+	}
+
+	func allowsMatch(range: NSRange, pointRange: Range<Point>, context: Context) -> Bool {
+		switch self {
+		case .set, .generic:
+			return true
+		case .isNot(let groupName):
+			return context.groupMembershipProvider(groupName, range, pointRange) == false
+		case .eq, .notEq, .anyOf, .notAnyOf, .match, .notMatch:
+			guard let text = context.textProvider(range, pointRange) else {
+				return false
+			}
+
+			return evalulate(with: text)
+		}
+	}
 
 	public func evalulate(with text: String) -> Bool {
 		switch self {
@@ -181,11 +262,11 @@ struct PredicateParser {
 
             return .notAnyOf(Set(strings), captureName: capture)
         case "is-not?":
-            if strings != ["local"] {
-                return .generic(name, strings: strings, captureNames: captures)
-            }
+			guard let name = strings.first, strings.count == 1 else {
+				return .generic(name, strings: strings, captureNames: captures)
+			}
 
-            return .isNot(strings.first!)
+            return .isNot(name)
 		case "set!":
 			if strings.count != 2 || captures.count > 1 {
 				return .generic(name, strings: strings, captureNames: captures)

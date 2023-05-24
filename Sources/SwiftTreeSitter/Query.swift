@@ -229,6 +229,11 @@ public struct QueryMatch {
     public func captures(named name: String) -> [QueryCapture] {
         return captures.filter({ $0.name == name })
     }
+
+	/// Returns all nodes that correspond to the captures.s
+	public var nodes: [Node] {
+		captures.map { $0.node }
+	}
 }
 
 /// A tree-sitter TSQueryCursor wrapper

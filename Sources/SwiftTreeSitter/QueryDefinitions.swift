@@ -34,6 +34,16 @@ public struct NamedRange: Codable, Equatable, Sendable, Hashable {
 	}
 }
 
+extension NamedRange: Comparable {
+	public static func < (lhs: NamedRange, rhs: NamedRange) -> Bool {
+		if lhs.tsRange != rhs.tsRange {
+			return lhs.tsRange < rhs.tsRange
+		}
+
+		return lhs.nameComponents.count < rhs.nameComponents.count
+	}
+}
+
 public extension QueryMatch {
 	/// Interpret the match using the "injections.scm" definition
 	///
@@ -79,6 +89,12 @@ public extension QueryCapture {
 	}
 }
 
+public extension QueryCapture {
+	var locals: NamedRange? {
+		return highlight
+	}
+}
+
 public extension QueryCursor {
 	/// Interpret the cursor using the "injections.scm" definition
 	///
@@ -103,7 +119,7 @@ public extension ResolvingQueryCursor {
 	///
 	/// If the cursor's textProvider is nil and a node contents is needed, the injection is dropped.
 	func injections() -> [NamedRange] {
-		return compactMap({ $0.injection(with: textProvider) })
+		return compactMap({ $0.injection(with: context.textProvider) })
 	}
 
 	/// Interpret the cursor using the "highlights.scm" definition
@@ -114,5 +130,13 @@ public extension ResolvingQueryCursor {
 			.flatMap({ $0 })
 			.sorted()
 			.compactMap { $0.highlight }
+	}
+}
+
+public extension ResolvingQueryCursor {
+	func locals() -> [NamedRange] {
+		return map({ $0.captures })
+			.flatMap({ $0 })
+			.compactMap({ $0.locals })
 	}
 }

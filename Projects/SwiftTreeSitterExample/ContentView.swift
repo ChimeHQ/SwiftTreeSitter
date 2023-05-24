@@ -53,8 +53,7 @@ struct ContentView: View {
 # this is markdown
 
 ```swift
-func main() {
-	print("hello world")
+func main(a: Int) {
 }
 ```
 
@@ -69,11 +68,17 @@ let value = "abc"
 
 		let fullRange = NSRange(source.startIndex..<source.endIndex, in: source)
 
-		let cursor = try tree.executeQuery(.highlights, in: fullRange)
+		let subqueryProvider: Predicate.SubqueryMatchProvider = { query, range, _ in
+			guard query == "local" else { return false }
 
-		cursor.prepare(with: source.cursorTextProvider)
+			return false
+		}
 
-		for namedRange in cursor.highlights() {
+		let context = Predicate.Context(textProvider: source.cursorTextProvider, subqueryMatchProvider: subqueryProvider)
+
+		let highlights = try tree.highlights(in: fullRange, context: context)
+
+		for namedRange in highlights {
 			print("\(namedRange.name): \(namedRange.range)")
 		}
 	}

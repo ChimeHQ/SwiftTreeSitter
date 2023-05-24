@@ -117,28 +117,26 @@ extension LanguageLayerTree {
 		return try executeQuery(query, in: IndexSet(range: range))
 	}
 
-	public func highlights(in set: IndexSet) throws -> [NamedRange] {
+	public func highlights(in set: IndexSet, context: Predicate.Context? = nil) throws -> [NamedRange] {
 		var highlights = [NamedRange]()
 
-		try enumerateLanguageLayers(in: set) { layer in
-			let regions = layer.rangeSet?.intersection(set) ?? set
+		try queryLanguageLayers(.highlights, in: set, block: { _, cursor in
+			let layerHighlights = cursor.highlights()
 
-			let layerHighlights = try regions.rangeView
-				.map { NSRange($0) }
-				.map { try layer.executeShallowQuery(.highlights, in: $0) }
-				.flatMap { $0.highlights() }
+			if let context = context {
+				cursor.prepare(with: context)
+			}
 
 			highlights.append(contentsOf: layerHighlights)
-		}
+		})
+
+		highlights.sort()
 
 		return highlights
 	}
 
-	public func highlights(in range: NSRange) throws -> [NamedRange] {
-		try highlights(in: IndexSet(range: range))
-			.sorted(by: { a, b in
-				a.range.location < b.range.location
-			})
+	public func highlights(in range: NSRange, context: Predicate.Context? = nil) throws -> [NamedRange] {
+		try highlights(in: IndexSet(range: range), context: context)
 	}
 }
 
@@ -149,5 +147,9 @@ extension LanguageLayerTree {
 
 	func enumerateLanguageLayers(in set: IndexSet, block: (LanguageLayer) throws -> Void) rethrows {
 		try rootLayer.enumerateLanguageLayers(in: set, block: block)
+	}
+
+	public func queryLanguageLayers(_ query: Query.Definition, in set: IndexSet, block: (LanguageLayer, ResolvingQueryCursor) throws -> Void) throws {
+		try rootLayer.queryLanguageLayers(query, in: set, block: block)
 	}
 }

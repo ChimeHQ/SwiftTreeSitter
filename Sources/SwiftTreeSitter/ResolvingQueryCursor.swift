@@ -17,8 +17,8 @@ import Foundation
 /// - `not-match?`
 /// - `any-of?`
 /// - `not-any-of?`
-/// - `is-not?` (parsed, but not implemented)
-/// - `set!` (handled by `QueryCursor`)
+/// - `is-not?`
+/// - `set!`
 ///
 /// Here's an example of how it is used:
 /// ```swift
@@ -39,13 +39,13 @@ public final class ResolvingQueryCursor {
     private var matches: [QueryMatch]
     private let cursor: QueryCursor
     private var index: Array.Index
-    private(set) var textProvider: TextProvider
+    private(set) var context: Predicate.Context
 
-    public init(cursor: QueryCursor) {
+	public init(cursor: QueryCursor, context: Predicate.Context = .none) {
         self.cursor = cursor
         self.matches = []
         self.index = matches.startIndex
-        self.textProvider = { _, _ in return nil }
+		self.context = context.cachingContext
     }
 
     /// Eagerly load all `QueryMatch` objects.
@@ -66,38 +66,34 @@ public final class ResolvingQueryCursor {
         self.index = matches.startIndex
     }
 
-    public func prepare(with textProvider: @escaping TextProvider) {
-        self.index = matches.startIndex
+	/// Establish context for the cursor to evaluate matches.
+	public func prepare(with provider: @escaping TextProvider) {
+		let context = Predicate.Context(textProvider: provider,
+										groupMembershipProvider: { _, _, _ in return false })
 
-        var cachedText = [NSRange : String]()
+		self.prepare(with: context)
+	}
 
-        // create a caching provider
-        self.textProvider = { (range, pointRange) in
-            if let value = cachedText[range] {
-                return value
-            }
+	/// Establish context for the cursor to evaluate matches.
+	public func prepare(with context: Predicate.Context) {
+		self.index = matches.startIndex
 
-            let value = textProvider(range, pointRange)
-
-            cachedText[range] = value
-
-            return value
-        }
-    }
+		self.context = context.cachingContext
+	}
 }
 
 extension ResolvingQueryCursor: Sequence, IteratorProtocol {
     /// Get the next set of TextElement results
     ///
     /// If this cursor is evaluating a match with predicates,
-    /// the parameters to the `prepare(textProvider:)` call will
+    /// the parameters to the `prepare(with:)` call will
     /// be applied. Otherwise, any results that require predicate
-    /// evaluation will be dropped.
+    /// evaluation will be incorrectly matched or skipped.
     public func next() -> QueryMatch? {
         while let match = nextMatch() {
-            if evaluateMatch(match, textProvider: textProvider) == false {
-                continue
-            }
+			if match.allowed(with: context) == false {
+				continue
+			}
 
 			return match
         }
@@ -123,30 +119,8 @@ extension ResolvingQueryCursor: Sequence, IteratorProtocol {
     }
 }
 
-
-extension ResolvingQueryCursor {
-    func evaluateMatch(_ queryMatch: QueryMatch, textProvider: TextProvider) -> Bool {
-        return queryMatch.predicates.allSatisfy({ evaluatePredicate($0, match: queryMatch, textProvider: textProvider) })
-    }
-
-    func evaluatePredicate(_ predicate: Predicate, match: QueryMatch, textProvider: TextProvider) -> Bool {
-		for captureName in predicate.captureNames {
-			let captures = match.captures(named: captureName)
-
-			for capture in captures {
-				let range = capture.node.range
-				let pointRange = capture.node.pointRange
-
-				guard let text = textProvider(range, pointRange) else {
-					return false
-				}
-
-				if predicate.evalulate(with: text) == false {
-					return false
-				}
-			}
-		}
-
-		return true
-    }
+extension QueryMatch {
+	func allowed(with context: Predicate.Context) -> Bool {
+		predicates.allSatisfy { $0.allowsMatch(self, context: context) }
+	}
 }
