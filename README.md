@@ -84,7 +84,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Regex](https://github.com/tree-sitter/tree-sitter-regex) | | | |
 | [Ruby](https://github.com/tree-sitter/tree-sitter-ruby) | ✅ | ✅ | ✅ |
 | [Rust](https://github.com/tree-sitter/tree-sitter-rust) | | ✅ | ✅ |
-| [Scala](https://github.com/tree-sitter/tree-sitter-scala) | | | |
+| [Scala](https://github.com/mattmassicotte/tree-sitter-scala) | | ✅ | |
 | [Scheme](https://github.com/6cdh/tree-sitter-scheme) | | | |
 | [Scss](https://github.com/serenadeai/tree-sitter-scss) | | | |
 | [SQL](https://github.com/DerekStride/tree-sitter-sql) | | ✅ | ✅ |
