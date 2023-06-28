@@ -60,7 +60,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Hack](https://github.com/slackhq/tree-sitter-hack) | | | |
 | [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | ✅ | ✅ |
 | [HCL](https://github.com/MichaHoffmann/tree-sitter-hcl) | | ✅ | ✅ |
-| [HTML](https://github.com/mattmassicotte/tree-sitter-html/tree/feature/spm) | | ✅ | |
+| [HTML](https://github.com/tree-sitter/tree-sitter-html) | | ✅ | ✅ |
 | [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ | ✅ | ✅ |
 | [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | | ✅ | ✅ |
 | [JSON](https://github.com/tree-sitter/tree-sitter-json) | ✅ | ✅ | ✅ |
