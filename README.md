@@ -78,7 +78,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | ✅ | ✅ |
 | [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
 | [PowerShell](https://github.com/PowerShell/tree-sitter-PowerShell) | | | |
-| [Python](https://github.com/mattmassicotte/tree-sitter-python/feature/spm) | | ✅ | |
+| [Python](https://github.com/tree-sitter/tree-sitter-python) | | ✅ | ✅ |
 | [R](https://github.com/r-lib/tree-sitter-r) | | | |
 | [Racket](https://github.com/6cdh/tree-sitter-racket) | | | |
 | [Regex](https://github.com/tree-sitter/tree-sitter-regex) | | | |
