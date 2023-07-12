@@ -1,5 +1,7 @@
 import Foundation
+
 import SwiftTreeSitter
+import enum SwiftTreeSitter.Predicate
 
 public struct LayeredQueryCursor {
 	public typealias NamedCursor = (String, ResolvingQueryCursor)

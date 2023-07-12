@@ -1,6 +1,7 @@
 import Foundation
 
 import SwiftTreeSitter
+import enum SwiftTreeSitter.Predicate
 
 extension IndexSet {
 	init(range nsRange: NSRange) {
