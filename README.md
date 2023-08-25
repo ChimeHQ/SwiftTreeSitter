@@ -38,7 +38,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [C](https://github.com/tree-sitter/tree-sitter-c) | | ✅ | ✅ |
 | [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
 | [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | | ✅ | ✅ |
-| [Clojure](https://github.com/sogaiu/tree-sitter-clojure) | | | |
+| [Clojure](https://github.com/mattmassicotte/tree-sitter-clojure/tree/feature/spm) | | ✅ | |
 | [CMake](https://github.com/uyha/tree-sitter-cmake) | | | |
 | [Comment](https://github.com/stsewd/tree-sitter-comment) | | | |
 | [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | ✅ | |
