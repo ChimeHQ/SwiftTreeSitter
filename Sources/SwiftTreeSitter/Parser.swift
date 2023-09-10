@@ -106,8 +106,8 @@ extension Parser {
         return optionalTreePtr.flatMap({ Tree(internalTree: $0) })
     }
 
-    public func parse(tree: Tree?, readBlock: @escaping ReadBlock) -> Tree? {
-        let input = Input(encoding: TSInputEncodingUTF16, readBlock: readBlock)
+	public func parse(tree: Tree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> Tree? {
+        let input = Input(encoding: encoding, readBlock: readBlock)
 
         guard let internalInput = input.internalInput else {
             return nil
