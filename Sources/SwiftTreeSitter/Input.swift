@@ -30,10 +30,7 @@ class Input {
             return internalBuffer
         }
         set {
-            if newValue == nil {
-                internalBuffer?.deallocate()
-            }
-
+            internalBuffer?.deallocate()
             internalBuffer = newValue
         }
     }
@@ -60,7 +57,7 @@ private func readFunction(payload: UnsafeMutableRawPointer?, byteIndex: UInt32, 
     }
 
     // copy the data into an internally-managed buffer with a lifetime of wrapper
-    let buffer = UnsafeMutableBufferPointer<Int8>.allocate(capacity: data.count)
+	let buffer = Input.Buffer.allocate(capacity: data.count)
     let copiedLength = data.copyBytes(to: buffer)
     precondition(copiedLength == data.count)
 
