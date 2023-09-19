@@ -11,13 +11,15 @@ import tree_sitter
 
 public struct Node {
     let internalNode: TSNode
+	let internalTree: Tree
 
-    init?(internalNode: TSNode) {
+	init?(internalNode: TSNode, internalTree: Tree) {
         if ts_node_is_null(internalNode) {
             return nil
         }
 
         self.internalNode = internalNode
+		self.internalTree = internalTree
     }
 }
 
@@ -109,7 +111,7 @@ extension Node {
     public func child(byFieldName fieldName: String) -> Node? {
         let count = UInt32(fieldName.utf8.count)
         let n = ts_node_child_by_field_name(internalNode, fieldName, count)
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
     
     public var childCount: Int {
@@ -123,43 +125,43 @@ extension Node {
     public func child(at index: Int) -> Node? {
         let n = ts_node_child(internalNode, UInt32(index))
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public func namedChild(at index: Int) -> Node? {
         let n = ts_node_named_child(internalNode, UInt32(index))
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public var parent: Node? {
         let n = ts_node_parent(internalNode)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public var nextSibling: Node? {
         let n = ts_node_next_sibling(internalNode)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public var previousSibling: Node? {
         let n = ts_node_prev_sibling(internalNode)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public var nextNamedSibling: Node? {
         let n = ts_node_next_named_sibling(internalNode)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public var previousNamedSibling: Node? {
         let n = ts_node_prev_named_sibling(internalNode)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public func descendant(in pointRange: Range<Point>) -> Node? {
@@ -168,7 +170,7 @@ extension Node {
 
         let n = ts_node_descendant_for_point_range(internalNode, lower.internalPoint, upper.internalPoint)
 
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 
     public func descendant(in byteRange: Range<UInt32>) -> Node? {
@@ -177,7 +179,7 @@ extension Node {
 
         let n = ts_node_descendant_for_byte_range(internalNode, lower, upper)
         
-        return Node(internalNode: n)
+        return Node(internalNode: n, internalTree: internalTree)
     }
 }
 
@@ -209,6 +211,6 @@ extension Node {
     public var treeCursor: TreeCursor {
         let cursor = ts_tree_cursor_new(internalNode)
 
-        return TreeCursor(internalCursor: cursor)
+        return TreeCursor(internalCursor: cursor, internalTree: internalTree)
     }
 }

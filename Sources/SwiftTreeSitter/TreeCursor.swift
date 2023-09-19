@@ -3,9 +3,11 @@ import tree_sitter
 
 public class TreeCursor {
     private var internalCursor: TSTreeCursor
+	private let internalTree: Tree
 
-    init(internalCursor: TSTreeCursor) {
+	init(internalCursor: TSTreeCursor, internalTree: Tree) {
         self.internalCursor = internalCursor
+		self.internalTree = internalTree
     }
 
     deinit {
@@ -33,7 +35,7 @@ extension TreeCursor {
 
 extension TreeCursor {
     public var currentNode: Node? {
-        return Node(internalNode: ts_tree_cursor_current_node(&internalCursor))
+		return Node(internalNode: ts_tree_cursor_current_node(&internalCursor), internalTree: internalTree)
     }
     
     public var currentFieldName: String? {

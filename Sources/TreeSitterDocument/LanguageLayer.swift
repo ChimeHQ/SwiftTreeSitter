@@ -123,11 +123,15 @@ extension LanguageLayer {
 			throw LanguageLayerError.queryUnavailable(name, queryDef)
 		}
 
-		guard let node = state.tree?.rootNode else {
+		guard let tree = state.tree else {
 			throw LanguageLayerError.noRootNode
 		}
 
-		let cursor = query.execute(node: node, in: state.tree)
+		guard let node = tree.rootNode else {
+			throw LanguageLayerError.noRootNode
+		}
+
+		let cursor = query.execute(node: node, in: tree)
 
 		cursor.setRange(range)
 

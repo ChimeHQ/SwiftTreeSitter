@@ -9,7 +9,7 @@
 import Foundation
 import tree_sitter
 
-public class Tree {
+public final class Tree {
     let internalTree: OpaquePointer
 
     init(internalTree: OpaquePointer) {
@@ -33,7 +33,7 @@ extension Tree {
     public var rootNode: Node? {
         let node = ts_tree_root_node(internalTree)
 
-        return Node(internalNode: node)
+		return Node(internalNode: node, internalTree: self)
     }
 }
 
