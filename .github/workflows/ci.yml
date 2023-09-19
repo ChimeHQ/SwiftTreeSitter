@@ -4,9 +4,12 @@ on:
   push:
     branches:
       - main
+    paths-ignore:
+      - 'README.md'
+      - 'CODE_OF_CONDUCT.md'
   pull_request:
     branches:
-      - '**'
+      - main
 
 jobs:
   test:
@@ -22,8 +25,10 @@ jobs:
     
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           submodules: recursive
+      - name: Install XCBeautify
+        run: brew install xcbeautify
       - name: Test platform ${{ matrix.destination }}
-        run: set -o pipefail && xcodebuild -scheme SwiftTreeSitter -destination "${{ matrix.destination }}" test | xcpretty
+        run: set -o pipefail && xcodebuild -scheme SwiftTreeSitter -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
