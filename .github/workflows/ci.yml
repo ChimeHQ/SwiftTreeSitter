@@ -32,3 +32,18 @@ jobs:
         run: brew install xcbeautify
       - name: Test platform ${{ matrix.destination }}
         run: set -o pipefail && xcodebuild -scheme SwiftTreeSitter -destination "${{ matrix.destination }}" test | xcbeautify --renderer github-actions
+
+  linux_test:
+    name: Test Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Install swiftly
+        run: curl -L https://swift-server.github.io/swiftly/swiftly-install.sh | bash -s -- -y
+      - name: Install the latest Swift toolchain
+        run: swiftly install latest
+      - name: Build and run the unit tests
+        run: swift test
