@@ -133,6 +133,13 @@ extension Node {
 
         return Node(internalNode: n, internalTree: internalTree)
     }
+    
+    public func fieldNameForChild(at index: Int) -> String? {
+        let name = ts_node_field_name_for_child(internalNode, UInt32(index))
+        
+        guard let name else { return nil }
+        return String(cString: name)
+    }
 
     public var parent: Node? {
         let n = ts_node_parent(internalNode)
