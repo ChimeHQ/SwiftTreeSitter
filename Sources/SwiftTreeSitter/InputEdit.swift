@@ -1,11 +1,3 @@
-//
-//  InputEdit.swift
-//  SwiftTreeSitter
-//
-//  Created by Matt Massicotte on 2018-12-18.
-//  Copyright © 2018 Chime Systems. All rights reserved.
-//
-
 import Foundation
 import tree_sitter
 
@@ -32,7 +24,7 @@ import tree_sitter
 /// // you can now compute a diff to determine what has changed
 /// let changedRanges = existingTree.changedRanges(newTree)
 /// ```
-public struct InputEdit {
+public struct InputEdit: Hashable, Sendable {
     public let startByte: UInt32
     public let oldEndByte: UInt32
     public let newEndByte: UInt32
@@ -66,7 +58,4 @@ public struct InputEdit {
                            old_end_point: oldEndPoint.internalPoint,
                            new_end_point: newEndPoint.internalPoint)
     }
-}
-
-extension InputEdit: Hashable {
 }

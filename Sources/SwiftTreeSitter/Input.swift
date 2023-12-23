@@ -9,7 +9,7 @@
 import Foundation
 import tree_sitter
 
-class Input {
+final class Input {
     typealias Buffer = UnsafeMutableBufferPointer<Int8>
 
     private let encoding: TSInputEncoding

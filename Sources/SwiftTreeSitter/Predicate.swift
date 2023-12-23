@@ -1,7 +1,7 @@
 import Foundation
 import tree_sitter
 
-public enum QueryPredicateStep: Hashable {
+public enum QueryPredicateStep: Hashable, Sendable {
     case done
     case capture(String)
     case string(String)
@@ -173,7 +173,7 @@ extension Predicate {
 	}
 }
 
-enum PredicateParserError: Error {
+enum PredicateParserError: Error, Hashable {
     case stepNameExpected
     case doneExpected
     case argumentsContainDone
