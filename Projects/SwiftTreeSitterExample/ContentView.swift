@@ -18,6 +18,7 @@ struct ContentView: View {
 		.onAppear {
 			do {
 				try runTreeSitterTest()
+				try runTreeSitterDocumentTest()
 			} catch {
 				print("error: ", error)
 			}
@@ -25,6 +26,27 @@ struct ContentView: View {
     }
 
 	func runTreeSitterTest() throws {
+		let language = Language(language: tree_sitter_swift(), name: "Swift")
+
+		let parser = Parser()
+		try parser.setLanguage(language)
+
+		let input = """
+func main() {}
+"""
+		let tree = parser.parse(input)!
+
+		let query = try language.query(contentsOf: language.highlightsFileURL!)
+
+		let cursor = query.execute(in: tree)
+		let resolvingCursor = ResolvingQueryCursor(cursor: cursor, context: .init(string: input))
+
+		for namedRange in resolvingCursor.highlights() {
+			print("range: ", namedRange)
+		}
+	}
+
+	func runTreeSitterDocumentTest() throws {
 		let markdownConfig = try LanguageConfiguration(tsLanguage: tree_sitter_markdown(),
 													   name: "Markdown")
 		let markdownInlineConfig = try LanguageConfiguration(tsLanguage: tree_sitter_markdown_inline(),
@@ -68,7 +90,7 @@ let value = "abc"
 
 		let fullRange = NSRange(source.startIndex..<source.endIndex, in: source)
 
-		let membershipProvider: Predicate.GroupMembershipProvider = { query, range, _ in
+		let membershipProvider: SwiftTreeSitter.Predicate.GroupMembershipProvider = { query, range, _ in
 			guard query == "local" else { return false }
 
 			return false

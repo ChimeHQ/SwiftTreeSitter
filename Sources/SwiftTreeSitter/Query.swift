@@ -95,7 +95,7 @@ public final class Query: Sendable {
 	/// Run a query
 	///
 	/// - Parameter node: the root node for the query
-	/// - Parameter tree: keep an reference to the tree
+	/// - Parameter tree: a reference to the tree
     public func execute(node: Node, in tree: Tree) -> QueryCursor {
         let cursor = QueryCursor(internalTree: tree)
 
@@ -103,6 +103,19 @@ public final class Query: Sendable {
 
         return cursor
     }
+
+	/// Run a query against the root node of a tree.
+	///
+	/// - Parameter tree: a reference to the tree
+	public func execute(in tree: Tree) -> QueryCursor {
+		let cursor = QueryCursor(internalTree: tree)
+
+		if let node = tree.rootNode {
+			cursor.execute(query: self, node: node)
+		}
+
+		return cursor
+	}
 
     public func captureName(for id: Int) -> String? {
         var length: UInt32 = 0

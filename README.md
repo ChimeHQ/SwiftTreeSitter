@@ -1,7 +1,11 @@
+<div align="center">
+
 [![Build Status][build status badge]][build status]
-[![License][license badge]][license]
 [![Platforms][platforms badge]][platforms]
 [![Documentation][documentation badge]][documentation]
+[![Discord][discord badge]][discord]
+
+</div>
 
 # SwiftTreeSitter
 
@@ -27,6 +31,33 @@ dependencies: [
 ## TreeSitterDocument
 
 This is an experimental target that ties together a lot of the tree-sitter highlighting concepts into one easier-to-use library. It is currently experimental.
+
+## Highlighting
+
+A very common use of tree-sitter is to do syntax highlighting. It is possible to use this library directly, especially if your source text does not change. Here's a little example that sets everything up with a SPM-bundled language.
+
+Note: the query url discovery is broken in the current release, but is fixed on the main branch.
+
+```swift
+let language = Language(language: tree_sitter_swift(), name: "Swift")
+
+let parser = Parser()
+try parser.setLanguage(language)
+
+let input = """
+func main() {}
+"""
+let tree = parser.parse(input)!
+
+let query = try language.query(contentsOf: language.highlightsFileURL!)
+
+let cursor = query.execute(in: tree)
+let resolvingCursor = ResolvingQueryCursor(cursor: cursor, context: .init(string: input))
+
+for namedRange in resolvingCursor.highlights() {
+    print("range: ", namedRange)
+}
+```
 
 ## Language Parsers
 
@@ -102,7 +133,7 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 
 ## Contributing and Collaboration
 
-I'd love to hear from you! Get in touch via an issue or pull request.
+I would love to hear from you! Issues or pull requests work great. A [Discord server][discord] is also available for live help, but I have a strong bias towards answering in the form of documentation.
 
 I prefer collaboration, and would love to find ways to work together if you have a similar project.
 
@@ -112,9 +143,9 @@ By participating in this project you agree to abide by the [Contributor Code of 
 
 [build status]: https://github.com/ChimeHQ/SwiftTreeSitter/actions
 [build status badge]: https://github.com/ChimeHQ/SwiftTreeSitter/workflows/CI/badge.svg
-[license]: https://opensource.org/licenses/BSD-3-Clause
-[license badge]: https://img.shields.io/github/license/ChimeHQ/SwiftTreeSitter
 [platforms]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter
 [platforms badge]: https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2FChimeHQ%2FSwiftTreeSitter%2Fbadge%3Ftype%3Dplatforms
 [documentation]: https://swiftpackageindex.com/ChimeHQ/SwiftTreeSitter/main/documentation
 [documentation badge]: https://img.shields.io/badge/Documentation-DocC-blue
+[discord]: https://discord.gg/esFpX6sErJ
+[discord badge]: https://img.shields.io/badge/Discord-purple?logo=Discord&label=Chat&color=%235A64EC

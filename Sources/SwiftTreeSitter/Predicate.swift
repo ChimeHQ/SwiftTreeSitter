@@ -85,13 +85,28 @@ extension Predicate {
 		public let textProvider: TextProvider
 		public let groupMembershipProvider: GroupMembershipProvider
 
-		public init(textProvider: @escaping TextProvider, groupMembershipProvider: @escaping GroupMembershipProvider) {
+		public static let none = Context(textProvider: { _, _ in return nil })
+
+		public init(
+			textProvider: @escaping TextProvider,
+			groupMembershipProvider: @escaping GroupMembershipProvider = { _, _, _ in return false }
+		) {
 			self.textProvider = textProvider
 			self.groupMembershipProvider = groupMembershipProvider
 		}
 
-		public static let none = Context(textProvider: { _, _ in return nil },
-										 groupMembershipProvider: { _, _, _ in return false })
+		/// Initialize with a constant string.
+		public init(string: String) {
+			self.init(
+				textProvider: { range, _ in
+					guard let strRange = Range<String.Index>(range, in: string) else {
+						return nil
+					}
+
+					return String(string[strRange])
+				}
+			)
+		}
 
 		var cachingContext: Context {
 			var cachedText = [NSRange : String]()

@@ -3,14 +3,14 @@ import tree_sitter
 
 public struct Language {
     /// This is a closure whose output URL is to the directory which has the language `scm` files.
-    public typealias DirectoryProvider = () -> URL
+    public typealias DirectoryProvider = () -> URL?
 
     public var tsLanguage: UnsafePointer<TSLanguage>
     public var directoryProvider: DirectoryProvider?
 
     /// Creates an instance.
     /// - Parameters:
-    ///   - language: The language to parse.
+    ///   - language: The TSLanguage instance to wrap.
     ///   - directoryProvider: An optional closure which would return a directory `URL` to the container of the
     ///   language's `scm` resources.
     public init(language: UnsafePointer<TSLanguage>, directoryProvider: DirectoryProvider? = nil) {
@@ -21,12 +21,31 @@ public struct Language {
     #if !os(WASI)
     /// Creates an instance.
     /// - Parameters:
-    ///   - language: The language to parse.
-    ///   - languageName: The name of the language. This is used to attempt to find the embedded resource directory
-    ///    for the language (which would contain files like highlights.scm).
-    public init(language: UnsafePointer<TSLanguage>, name: String) {
-        self.init(language: language, directoryProvider: Language.embeddedResourceProvider(named: name))
+    ///   - language: The TSLanguage instance to wrap.
+    ///   - bundle: The name of the language bundle.
+	public init(language: UnsafePointer<TSLanguage>, bundle: String) {
+		self.init(
+			language: language,
+			directoryProvider: {
+				Language.bundledQueriesDirectory(named: bundle)
+			}
+		)
     }
+
+	/// Creates an instance.
+	///
+	/// This assumes that the bundle follows the patter: "TreeSitter\(name)_TreeSitter\(name), which many do.
+	/// - Parameters:
+	///   - language: The TSLanguage instance to wrap.
+	///   - name: The name of the language.
+	public init(language: UnsafePointer<TSLanguage>, name: String) {
+		self.init(
+			language: language,
+			directoryProvider: {
+				Language.bundledQueriesDirectory(named: "TreeSitter\(name)_TreeSitter\(name)")
+			}
+		)
+	}
     #endif
 }
 
@@ -82,42 +101,28 @@ extension Language: Equatable {
     }
 }
 
-public extension Language {
-    var highlightsFileURL: URL? {
-        return directoryProvider?().appendingPathComponent("highlights.scm")
-    }
+extension Language {
+	public var highlightsFileURL: URL? {
+		return directoryProvider?()?.appendingPathComponent("highlights.scm")
+	}
 
-    var injectionsFileURL: URL? {
-        return directoryProvider?().appendingPathComponent("injections.scm")
-    }
+	public var injectionsFileURL: URL? {
+		return directoryProvider?()?.appendingPathComponent("injections.scm")
+	}
 }
 
 #if !os(WASI)
 extension Language {
-    /// For languages where the resources are embedded in the app's bundle, this function returns the directory provider
-    /// that finds the location of the resource's containing folder on disk. The match is fuzzy so if a Swift Package
-    /// Manager's resource bundle is in use it could take the shape of `PackageName_PackageName.bundle` in which case
-    /// this function only needs `PackageName` as its input to find the path to the bundle.
-    ///
-    /// This function also normalizes for tests so that resources can be found while under test. `Bundle.main` is different
-    /// in an app context vs an XCTest context.
-    /// - Parameter resourceDirectory: The name of the directory or bundle to search for embedded within the main bundle.
-    /// - Returns: If found, returns the directory provider closure.
-    static func embeddedResourceProvider(named resourceDirectory: String) -> Language.DirectoryProvider? {
-        let fileManager = FileManager.default
-        let bundle = effectiveBundle
+	static func bundledQueriesDirectory(named name: String) -> URL? {
+		let embeddedBundleURL = effectiveBundle
+			.resourceURL?
+			.appendingPathComponent("\(name).bundle", isDirectory: true)
 
-		let foundBundleURL = try? fileManager
-			.contentsOfDirectory(at: bundle.bundleURL, includingPropertiesForKeys: [.isDirectoryKey])
-			.filter({ (try? $0.resourceValues(forKeys: [.isDirectoryKey]).isDirectory) == true })
-			.first(where: { $0.lastPathComponent.contains(resourceDirectory) })
+		guard let embeddedBundleURL else { return nil }
 
-        guard
-            let foundBundleURL = foundBundleURL,
-            let resourceDirURL = searchForDirectoryContainingFileExtension("scm", startingIn: foundBundleURL)
-        else { return nil }
-
-        return { resourceDirURL }
+		return Bundle(url: embeddedBundleURL)?
+			.resourceURL?
+			.appendingPathComponent("queries", isDirectory: true)
     }
 
 	private static var effectiveBundle: Bundle {
@@ -133,37 +138,6 @@ extension Language {
 
 		return testBundle ?? mainBundle
 	}
-
-    private static func searchForDirectoryContainingFileExtension(_ ext: String, startingIn directory: URL) -> URL? {
-        let fileManager = FileManager.default
-
-		let contents = try? fileManager.contentsOfDirectory(
-			at: directory,
-			includingPropertiesForKeys: [.nameKey, .isDirectoryKey],
-			options: [.skipsHiddenFiles]
-		)
-
-		guard let contents = contents else { return nil }
-
-		for item in contents {
-			var isDirectory: ObjCBool = false
-			fileManager.fileExists(atPath: item.path, isDirectory: &isDirectory)
-
-			if isDirectory.boolValue == false {
-				if item.lastPathComponent.contains(ext) {
-					var urlComponents = URLComponents(url: item, resolvingAgainstBaseURL: false)!
-					urlComponents.path = (urlComponents.path as NSString).deletingLastPathComponent
-					return urlComponents.url
-				}
-			} else {
-				if let foundURL = searchForDirectoryContainingFileExtension(ext, startingIn: item.standardizedFileURL) {
-					return foundURL
-				}
-			}
-		}
-
-        return nil
-    }
 }
 
 private extension Bundle {
@@ -176,9 +150,9 @@ private extension Bundle {
 	}
 }
 
-public extension Language {
+extension Language {
     /// Construct a query object from data in a file.
-    func query(contentsOf url: URL) throws -> Query {
+    public func query(contentsOf url: URL) throws -> Query {
         let data = try Data(contentsOf: url)
 
         return try Query(language: self, data: data)
