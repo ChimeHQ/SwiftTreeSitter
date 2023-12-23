@@ -52,7 +52,7 @@ extension LanguageConfiguration {
 		try self.init(language: Language(language: tsLanguage), name: name, bundleName: bundleName)
 	}
 
-	static var effectiveBundle: Bundle = {
+	static let effectiveBundle: Bundle = {
 		let mainBundle = Bundle.main
 
 		guard mainBundle.isXCTestRunner else {

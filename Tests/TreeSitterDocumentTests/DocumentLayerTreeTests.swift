@@ -12,7 +12,7 @@ extension Point {
 
 #if !os(WASI)
 final class DocumentLayerTreeTests: XCTestCase {
-	private static var swiftConfig: LanguageConfiguration = {
+	private static let swiftConfig: LanguageConfiguration = {
 		let language = Language(language: tree_sitter_swift())
 
 		let queryText = """
@@ -27,7 +27,7 @@ final class DocumentLayerTreeTests: XCTestCase {
 									 queries: [.highlights: highlightQuery])
 	}()
 
-	private static var selfInjectingSwiftConfig: LanguageConfiguration = {
+	private static let selfInjectingSwiftConfig: LanguageConfiguration = {
 		let queryText = """
 ((line_str_text) @injection.content (#set! injection.language "swift"))
 """

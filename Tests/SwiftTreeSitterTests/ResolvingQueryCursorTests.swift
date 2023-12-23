@@ -5,7 +5,7 @@ import TestTreeSitterSwift
 
 final class ResolvingQueryCursorTests: XCTestCase {
 #if !os(WASI)
-	private static var swiftLang = Language(language: tree_sitter_swift())
+	private static let swiftLang = Language(language: tree_sitter_swift())
 
 	func testIsNotPredicate() throws {
 		let language = Self.swiftLang

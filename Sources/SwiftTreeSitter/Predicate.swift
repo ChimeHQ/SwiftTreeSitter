@@ -90,7 +90,7 @@ extension Predicate {
 			self.groupMembershipProvider = groupMembershipProvider
 		}
 
-		public static var none = Context(textProvider: { _, _ in return nil },
+		public static let none = Context(textProvider: { _, _ in return nil },
 										 groupMembershipProvider: { _, _, _ in return false })
 
 		var cachingContext: Context {
