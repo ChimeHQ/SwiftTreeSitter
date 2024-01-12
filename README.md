@@ -42,9 +42,11 @@ targets: [
 
 ## SwiftTreeSitterLayer
 
-The core SwiftTreeSitter library is largely a wrapper around the tree-sitter C runtime. But, there are may common uses that require substantial work to support. One is the more-popular ones is language "injections". This is when one language is nested inside of a each other - like CSS within an HTML document.
+The core SwiftTreeSitter library is largely a wrapper around the tree-sitter C runtime. But, there are many common uses that require substantial work to support. One of the more-popular ones is language "injections". This is when one language is nested inside of another - like CSS within an HTML document.
 
 SwiftTreeSitterLayer supports arbitrary nested language resolution and querying, as well as snapshotting for easier compatibility with Swift concurrency. Neon may still be an easier way to integrate tree-sitter into your project, but SwiftTreeSitterLayer may be a good middle-ground.
+
+SwiftTreeSitterLayer is still quite rough, and nested languages can have serious peformance implications.
 
 ## Highlighting
 
