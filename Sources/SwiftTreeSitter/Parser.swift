@@ -90,7 +90,7 @@ extension Parser {
 extension Parser {
     public typealias ReadBlock = (Int, Point) -> Data?
 
-    public func parse(_ string: String) -> Tree? {
+    public func parse(_ string: String) -> MutableTree? {
         guard let data = string.data(using: encoding) else { return nil }
 
         let dataLength = data.count
@@ -103,10 +103,10 @@ extension Parser {
             return ts_parser_parse_string_encoding(internalParser, nil, ptr, UInt32(dataLength), TSInputEncodingUTF16)
         })
 
-        return optionalTreePtr.flatMap({ Tree(internalTree: $0) })
+        return optionalTreePtr.flatMap({ MutableTree(internalTree: $0) })
     }
 
-	public func parse(tree: Tree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> Tree? {
+	public func parse(tree: Tree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> MutableTree? {
         let input = Input(encoding: encoding, readBlock: readBlock)
 
         guard let internalInput = input.internalInput else {
@@ -117,14 +117,22 @@ extension Parser {
             return nil
         }
 
-        return Tree(internalTree: newTree)
+        return MutableTree(internalTree: newTree)
     }
 
-    public func parse(tree: Tree?, string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Tree? {
+	public func parse(tree: MutableTree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> MutableTree? {
+		parse(tree: tree?.tree, encoding: encoding, readBlock: readBlock)
+	}
+
+    public func parse(tree: Tree?, string: String, limit: Int? = nil, chunkSize: Int = 2048) -> MutableTree? {
         let readFunction = Parser.readFunction(for: string, limit: limit, chunkSize: chunkSize)
 
         return parse(tree: tree, readBlock: readFunction)
     }
+
+	public func parse(tree: MutableTree?, string: String, limit: Int? = nil, chunkSize: Int = 2048) -> MutableTree? {
+		parse(tree: tree?.tree, string: string, limit: limit, chunkSize: chunkSize)
+	}
 
     public static func readFunction(for string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Parser.ReadBlock {
         let usableLimit = limit ?? string.utf16.count

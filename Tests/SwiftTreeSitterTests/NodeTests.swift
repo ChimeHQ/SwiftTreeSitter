@@ -16,7 +16,7 @@ func main() {
 		let parser = Parser()
 		try parser.setLanguage(language)
 
-		var tree: Tree? = try XCTUnwrap(parser.parse(text))
+		var tree: MutableTree? = try XCTUnwrap(parser.parse(text))
 		let root = try XCTUnwrap(tree?.rootNode)
 
 		tree = nil

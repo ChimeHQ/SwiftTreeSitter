@@ -1,8 +1,9 @@
 import XCTest
 
-import TreeSitterDocument
-import TestTreeSitterSwift
 import SwiftTreeSitter
+import SwiftTreeSitterLayer
+import TestTreeSitterSwift
+
 
 extension Point {
 	init(_ row: Int, _ column: Int) {
@@ -11,7 +12,7 @@ extension Point {
 }
 
 #if !os(WASI)
-final class DocumentLayerTreeTests: XCTestCase {
+final class LanguageLayerTests: XCTestCase {
 	private static let swiftConfig: LanguageConfiguration = {
 		let language = Language(language: tree_sitter_swift())
 
@@ -43,10 +44,10 @@ final class DocumentLayerTreeTests: XCTestCase {
 	}()
 }
 
-extension DocumentLayerTreeTests {
+extension LanguageLayerTests {
 	func testExecuteQuery() throws {
-		let config = LanguageLayerTree.Configuration()
-		let tree = try LanguageLayerTree(rootLanguageConfig: Self.swiftConfig, configuration: config)
+		let config = LanguageLayer.Configuration()
+		let tree = try LanguageLayer(languageConfig: Self.swiftConfig, configuration: config)
 
 		let text = """
 func main() {
@@ -65,13 +66,13 @@ func main() {
 	}
 
 	func testSingleInjection() throws {
-		let config = LanguageLayerTree.Configuration(languageProvider: { name in
+		let config = LanguageLayer.Configuration(languageProvider: { name in
 			precondition(name == "swift")
 
 			return Self.swiftConfig
 		})
 
-		let tree = try LanguageLayerTree(rootLanguageConfig: Self.selfInjectingSwiftConfig, configuration: config)
+		let tree = try LanguageLayer(languageConfig: Self.selfInjectingSwiftConfig, configuration: config)
 
 		let text = """
 let a = "var a = 1"
@@ -80,7 +81,7 @@ func main() {}
 """
 		tree.replaceContent(with: text)
 
-		let highlights = try tree.highlights(in: NSRange(0..<text.utf16.count))
+		let highlights = try tree.highlights(in: NSRange(0..<text.utf16.count), provider: { _, _ in nil })
 
 		let expected = [
 			NamedRange(name: "keyword", range: NSRange(0..<3), pointRange: Point(0, 0)..<Point(0, 6)),
@@ -92,13 +93,13 @@ func main() {}
 	}
 
 	func testMultipleInjectionsinSameLayer() throws {
-		let config = LanguageLayerTree.Configuration(languageProvider: { name in
+		let config = LanguageLayer.Configuration(languageProvider: { name in
 			precondition(name == "swift")
 
 			return Self.swiftConfig
 		})
 
-		let tree = try LanguageLayerTree(rootLanguageConfig: Self.selfInjectingSwiftConfig, configuration: config)
+		let tree = try LanguageLayer(languageConfig: Self.selfInjectingSwiftConfig, configuration: config)
 
 		let text = """
 let a = "var a = 1"
@@ -106,7 +107,7 @@ let b = "var b = 1"
 """
 		tree.replaceContent(with: text)
 
-		let highlights = try tree.highlights(in: NSRange(0..<text.utf16.count))
+		let highlights = try tree.highlights(in: NSRange(0..<text.utf16.count), provider: { _, _ in nil })
 
 		let expected = [
 			NamedRange(name: "keyword", range: NSRange(0..<3), pointRange: Point(0, 0)..<Point(0, 6)),
@@ -117,9 +118,6 @@ let b = "var b = 1"
 
 		XCTAssertEqual(highlights, expected)
 	}
-}
-
-extension DocumentLayerTreeTests {
 }
 
 #endif

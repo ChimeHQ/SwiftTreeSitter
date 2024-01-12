@@ -78,7 +78,7 @@ public enum Predicate: Hashable, Sendable {
 }
 
 extension Predicate {
-	public typealias TextProvider = ResolvingQueryCursor.TextProvider
+	public typealias TextProvider = (NSRange, Range<Point>) -> String?
 	public typealias GroupMembershipProvider = (String, NSRange, Range<Point>) -> Bool
 
 	public struct Context {
@@ -98,13 +98,7 @@ extension Predicate {
 		/// Initialize with a constant string.
 		public init(string: String) {
 			self.init(
-				textProvider: { range, _ in
-					guard let strRange = Range<String.Index>(range, in: string) else {
-						return nil
-					}
-
-					return String(string[strRange])
-				}
+				textProvider: string.cursorTextProvider
 			)
 		}
 

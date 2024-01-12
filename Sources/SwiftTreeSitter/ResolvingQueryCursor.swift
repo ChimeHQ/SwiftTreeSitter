@@ -32,9 +32,10 @@ import Foundation
 ///     print("match: ", match)
 /// }
 /// ```
+@available(*, deprecated, message: "Please use ResolvingQueryMatchSequence")
 public final class ResolvingQueryCursor {
 	/// A function that can produce text content.
-    public typealias TextProvider = (NSRange, Range<Point>) -> String?
+	public typealias TextProvider = Predicate.TextProvider
 
     private var matches: [QueryMatch]
     private let cursor: QueryCursor
@@ -91,7 +92,7 @@ extension ResolvingQueryCursor: Sequence, IteratorProtocol {
     /// evaluation will be incorrectly matched or skipped.
     public func next() -> QueryMatch? {
         while let match = nextMatch() {
-			if match.allowed(with: context) == false {
+			if match.allowed(in: context) == false {
 				continue
 			}
 
@@ -117,10 +118,4 @@ extension ResolvingQueryCursor: Sequence, IteratorProtocol {
 
         return queryMatch
     }
-}
-
-extension QueryMatch {
-	func allowed(with context: Predicate.Context) -> Bool {
-		predicates.allSatisfy { $0.allowsMatch(self, context: context) }
-	}
 }

@@ -76,6 +76,11 @@ public final class Query: Sendable {
         self.predicateList = try PredicateParser().predicates(in: queryPtr)
     }
 
+	/// Construct a query object from scm data located at a url
+	public convenience init(language: Language, url: URL) throws {
+		try self.init(language: language, data: try Data(contentsOf: url))
+	}
+
     deinit {
         ts_query_delete(internalQuery)
     }
@@ -104,6 +109,10 @@ public final class Query: Sendable {
         return cursor
     }
 
+	public func execute(node: Node, in tree: MutableTree) -> QueryCursor {
+		execute(node: node, in: tree.tree)
+	}
+
 	/// Run a query against the root node of a tree.
 	///
 	/// - Parameter tree: a reference to the tree
@@ -115,6 +124,10 @@ public final class Query: Sendable {
 		}
 
 		return cursor
+	}
+
+	public func execute(in tree: MutableTree) -> QueryCursor {
+		execute(in: tree.tree)
 	}
 
     public func captureName(for id: Int) -> String? {
@@ -244,13 +257,17 @@ public struct QueryMatch {
 	public var nodes: [Node] {
 		captures.map { $0.node }
 	}
+
+	/// Determines if this match is actually allowed given the context.
+	public func allowed(in context: Predicate.Context) -> Bool {
+		predicates.allSatisfy { $0.allowsMatch(self, context: context) }
+	}
 }
 
 /// A tree-sitter TSQueryCursor wrapper
 ///
-/// This class is pretty faithful to to C API. However,
-/// it does evaluate `#set!` directives.
-public class QueryCursor {
+/// This class is pretty faithful to to C API. However, it does evaluate `#set!` directives.
+public final class QueryCursor {
     let internalCursor: OpaquePointer
 	let internalTree: Tree
 
@@ -362,4 +379,40 @@ extension QueryCursor: Sequence, IteratorProtocol {
                           predicates: predicates,
 						  metadata: metadata)
     }
+}
+
+public struct ResolvingQueryMatchSequence<MatchSequence: Sequence> where MatchSequence.Element == QueryMatch {
+	private let sequence: MatchSequence
+	private var iterator: MatchSequence.Iterator
+	private let context: Predicate.Context
+
+	public init(sequence: MatchSequence, context: Predicate.Context) {
+		self.sequence = sequence
+		self.iterator = sequence.makeIterator()
+		self.context = context.cachingContext
+	}
+
+	public func injections() -> [NamedRange] {
+		return compactMap({ $0.injection(with: context.textProvider) })
+	}
+}
+
+extension ResolvingQueryMatchSequence: Sequence, IteratorProtocol {
+	public mutating func next() -> QueryMatch? {
+		while let match = iterator.next() {
+			if match.allowed(in: context) == false {
+				continue
+			}
+
+			return match
+		}
+
+		return nil
+	}
+}
+
+extension Sequence where Element == QueryMatch {
+	public func resolve(with context: Predicate.Context = .none) -> ResolvingQueryMatchSequence<Self> {
+		ResolvingQueryMatchSequence(sequence: self, context: context)
+	}
 }

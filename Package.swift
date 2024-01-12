@@ -10,7 +10,7 @@ let package = Package(
 	name: "SwiftTreeSitter",
 	products: [
 		.library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
-		.library(name: "TreeSitterDocument", targets: ["TreeSitterDocument"]),
+		.library(name: "SwiftTreeSitterLayer", targets: ["SwiftTreeSitterLayer"]),
 	],
 	targets: [
 		.target(
@@ -38,13 +38,13 @@ let package = Package(
 			swiftSettings: settings
 		),
 		.target(
-			name: "TreeSitterDocument",
+			name: "SwiftTreeSitterLayer",
 			dependencies: ["SwiftTreeSitter"],
 			swiftSettings: settings
 		),
 		.testTarget(
-			name: "TreeSitterDocumentTests",
-			dependencies: ["TreeSitterDocument", "TestTreeSitterSwift"],
+			name: "SwiftTreeSitterLayerTests",
+			dependencies: ["SwiftTreeSitterLayer", "TestTreeSitterSwift"],
 			swiftSettings: settings
 		),
 	]

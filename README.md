@@ -14,7 +14,7 @@ Swift API for the [tree-sitter](https://tree-sitter.github.io/) incremental pars
 - Close to full coverage of the C API
 - Swift/Foundation types where possible
 - Standard query result mapping for highlights and injections
-- Query predicate support via `ResolvingQueryCursor`
+- Query predicate/directive support via `ResolvingQueryCursor` and `ResolvingQueryMatchSequence`
 
 SwiftTreeSitter is fairly low-level. If you are looking a higher-level system for syntax highlighting and other syntactic operations, you might want to have a look at [Neon](https://github.com/ChimeHQ/Neon).
 
@@ -25,16 +25,38 @@ SwiftTreeSitter is fairly low-level. If you are looking a higher-level system fo
 ```swift
 dependencies: [
     .package(url: "https://github.com/ChimeHQ/SwiftTreeSitter")
+],
+targets: [
+    .target(
+        name: "MySwiftTreeSitterTarget",
+        dependencies: ["SwiftTreeSitter"]
+	),
+    .target(
+        name: "MySwiftTreeSitterLayerTarget",
+        dependencies: [
+            .product(name: "SwiftTreeSitterLayer", package: "SwiftTreeSitter"),
+		]
+	),
 ]
 ```
 
-## TreeSitterDocument
+## SwiftTreeSitterLayer
 
-This is an experimental target that ties together a lot of the tree-sitter highlighting concepts into one easier-to-use library. It is currently experimental.
+The core SwiftTreeSitter library is largely a wrapper around the tree-sitter C runtime. But, there are may common uses that require substantial work to support. One is the more-popular ones is language "injections". This is when one language is nested inside of a each other - like CSS within an HTML document.
+
+SwiftTreeSitterLayer supports arbitrary nested language resolution and querying, as well as snapshotting for easier compatibility with Swift concurrency. Neon may still be an easier way to integrate tree-sitter into your project, but SwiftTreeSitterLayer may be a good middle-ground.
 
 ## Highlighting
 
 A very common use of tree-sitter is to do syntax highlighting. It is possible to use this library directly, especially if your source text does not change. Here's a little example that sets everything up with a SPM-bundled language.
+
+First, check out how it works with SwiftTreeSitterLayer.
+
+```swift
+forthcoming...
+```
+
+You can also use SwiftTreeSitter directly.
 
 Note: the query url discovery is broken in the current release, but is fixed on the main branch.
 

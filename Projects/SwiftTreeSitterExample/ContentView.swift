@@ -17,7 +17,7 @@ struct ContentView: View {
         .padding()
 		.onAppear {
 			do {
-				try runTreeSitterTest()
+//				try runTreeSitterTest()
 				try runTreeSitterDocumentTest()
 			} catch {
 				print("error: ", error)
@@ -54,20 +54,22 @@ func main() {}
 															 bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline")
 		let swiftConfig = try LanguageConfiguration(tsLanguage: tree_sitter_swift(), name: "Swift")
 
-		let config = LanguageLayerTree.Configuration(locationTransformer: nil,
-													invalidationHandler: nil,
-													languageProvider: { name in
-			switch name {
-			case "markdown":
-				return markdownConfig
-			case "markdown_inline":
-				return markdownInlineConfig
-			case "swift":
-				return swiftConfig
-			default:
-				return nil
+		let config = LanguageLayerTree.Configuration(
+			locationTransformer: nil,
+			languageProvider: {
+				name in
+				switch name {
+				case "markdown":
+					return markdownConfig
+				case "markdown_inline":
+					return markdownInlineConfig
+				case "swift":
+					return swiftConfig
+				default:
+					return nil
+				}
 			}
-		})
+		)
 
 		let tree = try! LanguageLayerTree(rootLanguageConfig: markdownConfig, configuration: config)
 
@@ -98,7 +100,7 @@ let value = "abc"
 
 		let context = Predicate.Context(textProvider: source.cursorTextProvider, groupMembershipProvider: membershipProvider)
 
-		let highlights = try tree.highlights(in: fullRange, context: context)
+		let highlights = try tree.highlights(in: fullRange, with: context)
 
 		for namedRange in highlights {
 			print("\(namedRange.name): \(namedRange.range)")
