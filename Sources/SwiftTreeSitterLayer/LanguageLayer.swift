@@ -27,7 +27,7 @@ public final class LanguageLayer {
 
 			self.init(
 				readHandler: read,
-				textProvider: string.cursorTextProvider
+				textProvider: string.predicateTextProvider
 			)
 		}
 	}

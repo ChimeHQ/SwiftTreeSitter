@@ -1,7 +1,8 @@
 import Foundation
-import SwiftTreeSitter
+
 import tree_sitter
 
+/// A structure that holds a language name and its assoicated queries.
 public struct LanguageData: Sendable {
 	public let name: String
 	public let queries: [Query.Definition: Query]
@@ -12,16 +13,17 @@ public struct LanguageData: Sendable {
 	}
 }
 
+/// A structure that holds a language parser, name, and its assoicated queries.
 public struct LanguageConfiguration: Sendable {
 	public let language: Language
 	public let data: LanguageData
 
-	public init(language: Language, data: LanguageData) {
+	public init(_ language: Language, data: LanguageData) {
 		self.language = language
 		self.data = data
 	}
 
-	public init(language: Language, name: String, queries: [Query.Definition: Query]) {
+	public init(_ language: Language, name: String, queries: [Query.Definition: Query]) {
 		self.language = language
 		self.data = LanguageData(name: name, queries: queries)
 	}
@@ -37,39 +39,45 @@ public struct LanguageConfiguration: Sendable {
 
 #if !os(WASI)
 extension LanguageConfiguration {
-	public init(language: Language, name: String) throws {
+    public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, queries: [Query.Definition: Query]) {
+        self.init(Language(tsLanguage), name: name, queries: queries)
+    }
+
+    /// Create a configuration with a name assumed to match a bundle.
+    ///
+    /// The bundle must be nested within resources and follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
+	public init(_ language: Language, name: String) throws {
 		let bundleName = "TreeSitter\(name)_TreeSitter\(name)"
 
-		try self.init(language: language, name: name, bundleName: bundleName)
+		try self.init(language, name: name, bundleName: bundleName)
 	}
 
-	public init(tsLanguage: UnsafePointer<TSLanguage>, name: String) throws {
-		try self.init(language: Language(tsLanguage), name: name)
+    /// Create a configuration with a name assumed to match a bundle.
+    ///
+    /// The bundle must be nested within resources and follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
+	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String) throws {
+		try self.init(Language(tsLanguage), name: name)
 	}
 
-	public init(tsLanguage: UnsafePointer<TSLanguage>, name: String, queries: [Query.Definition: Query]) {
-		self.init(language: Language(tsLanguage), name: name, queries: queries)
-	}
-
-	public init(language: Language, name: String, bundleName: String) throws {
+	public init(_ language: Language, name: String, bundleName: String) throws {
 		let queriesURL = Self.bundleQueriesDirectoryURL(for: bundleName)
 		let queries = try queriesURL.flatMap { try Query.queries(for: language, in: $0) } ?? [:]
 
-		self.init(language: language, name: name, queries: queries)
+		self.init(language, name: name, queries: queries)
 	}
 
-	public init(tsLanguage: UnsafePointer<TSLanguage>, name: String, bundleName: String) throws {
-		try self.init(language: Language(tsLanguage), name: name, bundleName: bundleName)
+	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, bundleName: String) throws {
+		try self.init(Language(tsLanguage), name: name, bundleName: bundleName)
 	}
 
-	public init(language: Language, name: String, queriesURL: URL) throws {
+	public init(_ language: Language, name: String, queriesURL: URL) throws {
 		let queries = try Query.queries(for: language, in: queriesURL)
 
-		self.init(language: language, name: name, queries: queries)
+		self.init(language, name: name, queries: queries)
 	}
 
-	public init(tsLanguage: UnsafePointer<TSLanguage>, name: String, queriesURL: URL) throws {
-		try self.init(language: Language(tsLanguage), name: name, queriesURL: queriesURL)
+	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, queriesURL: URL) throws {
+		try self.init(Language(tsLanguage), name: name, queriesURL: queriesURL)
 	}
 }
 

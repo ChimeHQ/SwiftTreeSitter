@@ -1,5 +1,31 @@
 import Foundation
 
+extension Query {
+	public enum Definition: Hashable, Sendable {
+		case injections
+		case highlights
+		case locals
+		case custom(String)
+
+		public var name: String {
+			switch self {
+			case .injections:
+				return "injections"
+			case .highlights:
+				return "highlights"
+			case .locals:
+				return "locals"
+			case .custom(let value):
+				return value
+			}
+		}
+
+		public var filename: String {
+			"\(name).scm"
+		}
+	}
+}
+
 /// A combined name and range
 ///
 /// Useful for generalizing data from query matches.
@@ -52,7 +78,7 @@ public extension QueryMatch {
 	/// - if that is not present, uses `injection.language` metadata
 	///
 	/// If `textProvider` is nil and a node contents is needed, the injection is dropped.
-	func injection(with textProvider: ResolvingQueryCursor.TextProvider) -> NamedRange? {
+	func injection(with textProvider: Predicate.TextProvider) -> NamedRange? {
 		guard let contentCapture = captures(named: "injection.content").first else {
 			return nil
 		}
@@ -107,7 +133,7 @@ extension Sequence where Element == QueryMatch {
 	}
 
 	/// Interpret the cursor using the "injections.scm" definition
-	public func injections(with textProvider: ResolvingQueryCursor.TextProvider) -> [NamedRange] {
+	public func injections(with textProvider: Predicate.TextProvider) -> [NamedRange] {
 		return compactMap({ $0.injection(with: textProvider) })
 	}
 
@@ -120,9 +146,6 @@ extension Sequence where Element == QueryMatch {
 }
 
 public extension ResolvingQueryCursor {
-	/// Interpret the cursor using the "injections.scm" definition
-	///
-	/// If the cursor's textProvider is nil and a node contents is needed, the injection is dropped.
 	func injections() -> [NamedRange] {
 		return compactMap({ $0.injection(with: context.textProvider) })
 	}

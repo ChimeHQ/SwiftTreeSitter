@@ -98,7 +98,7 @@ extension Predicate {
 		/// Initialize with a constant string.
 		public init(string: String) {
 			self.init(
-				textProvider: string.cursorTextProvider
+				textProvider: string.predicateTextProvider
 			)
 		}
 

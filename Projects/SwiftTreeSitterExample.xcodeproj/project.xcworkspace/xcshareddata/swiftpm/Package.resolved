@@ -1,25 +1,23 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "TreeSitterMarkdown",
-        "repositoryURL": "https://github.com/MDeiml/tree-sitter-markdown",
-        "state": {
-          "branch": "split_parser",
-          "revision": "fa6bfd51727e4bef99f7eec5f43947f73d64ea7d",
-          "version": null
-        }
-      },
-      {
-        "package": "TreeSitterSwift",
-        "repositoryURL": "https://github.com/alex-pinkus/tree-sitter-swift/",
-        "state": {
-          "branch": "with-generated-files",
-          "revision": "f04b305a7f18009c47091247d662707a8b629669",
-          "version": null
-        }
+  "pins" : [
+    {
+      "identity" : "tree-sitter-markdown",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/MDeiml/tree-sitter-markdown",
+      "state" : {
+        "branch" : "split_parser",
+        "revision" : "fa6bfd51727e4bef99f7eec5f43947f73d64ea7d"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "tree-sitter-swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/alex-pinkus/tree-sitter-swift/",
+      "state" : {
+        "branch" : "with-generated-files",
+        "revision" : "f04b305a7f18009c47091247d662707a8b629669"
+      }
+    }
+  ],
+  "version" : 2
 }

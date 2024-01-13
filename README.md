@@ -14,11 +14,20 @@ Swift API for the [tree-sitter](https://tree-sitter.github.io/) incremental pars
 - Close to full coverage of the C API
 - Swift/Foundation types where possible
 - Standard query result mapping for highlights and injections
-- Query predicate/directive support via `ResolvingQueryCursor` and `ResolvingQueryMatchSequence`
+- Query predicate/directive support via `ResolvingQueryMatchSequence`
+- Nested language support
+- Swift concurrency support where possible
 
-SwiftTreeSitter is fairly low-level. If you are looking a higher-level system for syntax highlighting and other syntactic operations, you might want to have a look at [Neon](https://github.com/ChimeHQ/Neon).
+# Structure
 
-📖 [Documentation][documentation] is available in DocC format.
+This project is actually split into two parts: `SwiftTreeSitter` and `SwiftTreeSitterLayer`.
+
+The SwiftTreeSitter target is a close match to the C runtime API. It adds only a few additional types to help support querying. It is fairly low-level, and there will be significant work to use it in a real project.
+
+SwiftTreeSitterLayer is an abstraction built on top of SwiftTreeSitter. It supports documents with nested languages and transparent querying across those nestings. It also supports asynchronous language resolution. While still low-level, SwiftTreeSitterLayer is easier to work with while also supporting more features.
+
+And yet there's more! If you are looking a higher-level system for syntax highlighting and other syntactic operations, you might want to have a look at [Neon](https://github.com/ChimeHQ/Neon). It is much easier to integrate with a text system, and has lots of additional performance-related features.
+
 
 ## Integration
 
@@ -40,52 +49,98 @@ targets: [
 ]
 ```
 
-## SwiftTreeSitterLayer
-
-The core SwiftTreeSitter library is largely a wrapper around the tree-sitter C runtime. But, there are many common uses that require substantial work to support. One of the more-popular ones is language "injections". This is when one language is nested inside of another - like CSS within an HTML document.
-
-SwiftTreeSitterLayer supports arbitrary nested language resolution and querying, as well as snapshotting for easier compatibility with Swift concurrency. Neon may still be an easier way to integrate tree-sitter into your project, but SwiftTreeSitterLayer may be a good middle-ground.
-
-SwiftTreeSitterLayer is still quite rough, and nested languages can have serious peformance implications.
-
 ## Highlighting
 
 A very common use of tree-sitter is to do syntax highlighting. It is possible to use this library directly, especially if your source text does not change. Here's a little example that sets everything up with a SPM-bundled language.
 
-First, check out how it works with SwiftTreeSitterLayer.
+First, check out how it works with SwiftTreeSitterLayer. It's complex, but does a lot for you.
 
 ```swift
-forthcoming...
+// LanguageConfiguration takes care of finding and loading queries in SPM-created bundles.
+let markdownConfig = try LanguageConfiguration(tree_sitter_markdown(), name: "Markdown")
+let markdownInlineConfig = try LanguageConfiguration(
+    tree_sitter_markdown_inline(),
+    name: "MarkdownInline",
+    bundleName: "TreeSitterMarkdown_TreeSitterMarkdownInline"
+)
+let swiftConfig = try LanguageConfiguration(tree_sitter_swift(), name: "Swift")
+
+// Unfortunately, injections do not use standardized language names, and can even be content-dependent. Your system must do this mapping.
+let config = LanguageLayer.Configuration(
+    languageProvider: {
+        name in
+        switch name {
+        case "markdown":
+            return markdownConfig
+        case "markdown_inline":
+            return markdownInlineConfig
+        case "swift":
+            return swiftConfig
+        default:
+            return nil
+        }
+    }
+)
+
+let rootLayer = try LanguageLayer(languageConfig: markdownConfig, configuration: config)
+
+let source = """
+# this is markdown
+
+```swift
+func main(a: Int) {
+}
 ```
 
-You can also use SwiftTreeSitter directly.
-
-Note: the query url discovery is broken in the current release, but is fixed on the main branch.
+## also markdown
 
 ```swift
-let language = Language(language: tree_sitter_swift(), name: "Swift")
+let value = "abc"
+```
+"""
+
+rootLayer.replaceContent(with: source)
+
+let fullRange = NSRange(source.startIndex..<source.endIndex, in: source)
+
+let textProvider = source.predicateTextProvider
+let highlights = try rootLayer.highlights(in: fullRange, provider: textProvider)
+
+for namedRange in highlights {
+    print("\(namedRange.name): \(namedRange.range)")
+}
+```
+
+You can also use SwiftTreeSitter directly:
+
+```swift
+let swiftConfig = try LanguageConfiguration(tree_sitter_swift(), name: "Swift")
 
 let parser = Parser()
-try parser.setLanguage(language)
+try parser.setLanguage(swiftConfig.language)
 
-let input = """
+let source = """
 func main() {}
 """
-let tree = parser.parse(input)!
+let tree = parser.parse(source)!
 
-let query = try language.query(contentsOf: language.highlightsFileURL!)
+let query = swiftConfig.queries[.highlights]!
 
 let cursor = query.execute(in: tree)
-let resolvingCursor = ResolvingQueryCursor(cursor: cursor, context: .init(string: input))
+let highlights = cursor
+    .resolve(with: .init(string: source))
+    .highlights()
 
-for namedRange in resolvingCursor.highlights() {
+for namedRange in highlights {
     print("range: ", namedRange)
 }
 ```
 
 ## Language Parsers
 
-Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation]. How they can be installed an incorporated varies. Since you're here, you might find SPM the most convenient.
+Tree-sitter language parsers are separate projects, and you'll probably need at least one. More details are available in the [documentation][documentation]. How they can be installed an incorporated varies.
+
+Here's a list of parsers that support SPM. Since you're here, you might find that convenient. And the `LanguageConfiguration` type supports loading bundled queries directly.
 
 | Parser | Make | SPM | Official Repo |
 | --- | :---: | :---: | :---: |
@@ -94,64 +149,40 @@ Tree-sitter language parsers are separate projects, and you'll probably need at 
 | [C++](https://github.com/tree-sitter/tree-sitter-cpp) | | ✅ | ✅ |
 | [C#](https://github.com/tree-sitter/tree-sitter-c-sharp) | | ✅ | ✅ |
 | [Clojure](https://github.com/mattmassicotte/tree-sitter-clojure/tree/feature/spm) | | ✅ | |
-| [CMake](https://github.com/uyha/tree-sitter-cmake) | | | |
-| [Comment](https://github.com/stsewd/tree-sitter-comment) | | | |
-| [CSS](https://github.com/lukepistrol/tree-sitter-css/tree/feature/spm) | ✅ | ✅ | |
-| [D](https://github.com/CyberShadow/tree-sitter-d) | | | |
-| [Dart](https://github.com/UserNobody14/tree-sitter-dart) | | | |
+| [CSS](https://github.com/tree-sitter/tree-sitter-css) | ✅ | ✅ | ✅ |
 | [Dockerfile](https://github.com/camdencheek/tree-sitter-dockerfile) | ✅ | ✅ | ✅ |
 | [Diff](https://github.com/the-mikedavis/tree-sitter-diff) | | ✅ | ✅ |
 | [Elixir](https://github.com/elixir-lang/tree-sitter-elixir) | ✅ | ✅ | ✅ |
 | [Elm](https://github.com/elm-tooling/tree-sitter-elm) | | ✅ | ✅ |
-| [Erlang](https://github.com/AbstractMachinesLab/tree-sitter-erlang) | | | |
-| [Fish](https://github.com/ram02z/tree-sitter-fish) | | | |
-| [Fortran](https://github.com/stadelmanma/tree-sitter-fortran) | | | |
-| [gitattributes](https://github.com/ObserverOfTime/tree-sitter-gitattributes) | | | |
-| [gitignore](https://github.com/shunsambongi/tree-sitter-gitignore) | | | |
 | [Go](https://github.com/tree-sitter/tree-sitter-go) | ✅ | ✅ | ✅ |
 | [GoMod](https://github.com/camdencheek/tree-sitter-go-mod) | ✅ | ✅ | ✅ |
 | [GoWork](https://github.com/omertuc/tree-sitter-go-work) | ✅ | | |
-| [graphql](https://github.com/bkegley/tree-sitter-graphql) | | | |
-| [Hack](https://github.com/slackhq/tree-sitter-hack) | | | |
 | [Haskell](https://github.com/tree-sitter/tree-sitter-haskell) | | ✅ | ✅ |
 | [HCL](https://github.com/MichaHoffmann/tree-sitter-hcl) | | ✅ | ✅ |
 | [HTML](https://github.com/tree-sitter/tree-sitter-html) | | ✅ | ✅ |
 | [Java](https://github.com/tree-sitter/tree-sitter-java) | ✅ | ✅ | ✅ |
 | [Javascript](https://github.com/tree-sitter/tree-sitter-javascript) | | ✅ | ✅ |
 | [JSON](https://github.com/tree-sitter/tree-sitter-json) | ✅ | ✅ | ✅ |
-| [Json5](https://github.com/Joakker/tree-sitter-json5) | | | |
 | [JSDoc](https://github.com/tree-sitter/tree-sitter-jsdoc) | | ✅ | ✅ |
 | [Julia](https://github.com/tree-sitter/tree-sitter-julia) | | ✅ | ✅ |
 | [Kotlin](https://github.com/fwcd/tree-sitter-kotlin) | ✅ | | |
-| [Latex](https://github.com/latex-lsp/tree-sitter-latex) | ✅ | ✅ | |
-| [LLVM](https://github.com/benwilliamgraham/tree-sitter-llvm) | | | |
+| [Latex](https://github.com/latex-lsp/tree-sitter-latex) | ✅ | ✅ | ✅ |
 | [Lua](https://github.com/Azganoth/tree-sitter-lua) | | ✅ | ✅ |
-| [Make](https://github.com/alemuller/tree-sitter-make) | | | |
 | [Markdown](https://github.com/MDeiml/tree-sitter-markdown) | | ✅ | ✅ |
-| [Markdown](https://github.com/mattmassicotte/tree-sitter-markdown) | ✅ | | |
 | [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | ✅ | ✅ |
-| [Pascal](https://github.com/Isopod/tree-sitter-pascal) | | | |
 | [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | ✅ | ✅ |
 | [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
-| [PowerShell](https://github.com/PowerShell/tree-sitter-PowerShell) | | | |
 | [Python](https://github.com/tree-sitter/tree-sitter-python) | | ✅ | ✅ |
-| [R](https://github.com/r-lib/tree-sitter-r) | | | |
-| [Racket](https://github.com/6cdh/tree-sitter-racket) | | | |
-| [Regex](https://github.com/tree-sitter/tree-sitter-regex) | | | |
 | [Ruby](https://github.com/tree-sitter/tree-sitter-ruby) | ✅ | ✅ | ✅ |
 | [Rust](https://github.com/tree-sitter/tree-sitter-rust) | | ✅ | ✅ |
 | [Scala](https://github.com/tree-sitter/tree-sitter-scala) | | ✅ | ✅ |
-| [Scheme](https://github.com/6cdh/tree-sitter-scheme) | | | |
-| [Scss](https://github.com/serenadeai/tree-sitter-scss) | | | |
 | [SQL](https://github.com/DerekStride/tree-sitter-sql/tree/gh-pages) | | ✅ | ✅ |
-| [Sqlite](https://github.com/dhcmrlchtdj/tree-sitter-sqlite) | | | |
 | [SSH](https://github.com/metio/tree-sitter-ssh-client-config) | | ✅ | ✅ |
 | [Swift](https://github.com/alex-pinkus/tree-sitter-swift/tree/with-generated-files) | ✅ | ✅ | ✅ |
 | [TOML](https://github.com/mattmassicotte/tree-sitter-toml/feature/spm) | | ✅ | |
 | [Tree-sitter query language](https://github.com/nvim-treesitter/tree-sitter-query) | | ✅ | ✅ |
 | [Typescript](https://github.com/tree-sitter/tree-sitter-typescript) | | ✅ | ✅ |
 | [Verilog](https://github.com/tree-sitter/tree-sitter-verilog) | | ✅ | ✅ |
-| [Vue](https://github.com/ikatyang/tree-sitter-vue) | | | |
 | [YAML](https://github.com/mattmassicotte/tree-sitter-yaml/tree/feature/spm) | | ✅ | |
 | [Zig](https://github.com/maxxnino/tree-sitter-zig) | ✅ | ✅ | ✅ |
 

@@ -12,9 +12,9 @@
 		C9B4E87B28DDC3290086FC0D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9B4E87A28DDC3290086FC0D /* Assets.xcassets */; };
 		C9B4E87E28DDC3290086FC0D /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C9B4E87D28DDC3290086FC0D /* Preview Assets.xcassets */; };
 		C9B4E88B28DDC4360086FC0D /* SwiftTreeSitter in Frameworks */ = {isa = PBXBuildFile; productRef = C9B4E88A28DDC4360086FC0D /* SwiftTreeSitter */; };
+		C9CDEB652B52A4D7009E252A /* SwiftTreeSitterLayer in Frameworks */ = {isa = PBXBuildFile; productRef = C9CDEB642B52A4D7009E252A /* SwiftTreeSitterLayer */; };
 		C9E726722A0436430019EFBB /* TreeSitterMarkdown in Frameworks */ = {isa = PBXBuildFile; productRef = C9E726712A0436430019EFBB /* TreeSitterMarkdown */; };
 		C9E726752A0436B00019EFBB /* TreeSitterSwift in Frameworks */ = {isa = PBXBuildFile; productRef = C9E726742A0436B00019EFBB /* TreeSitterSwift */; };
-		C9E726772A043B3C0019EFBB /* TreeSitterDocument in Frameworks */ = {isa = PBXBuildFile; productRef = C9E726762A043B3C0019EFBB /* TreeSitterDocument */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,8 +32,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C9E726772A043B3C0019EFBB /* TreeSitterDocument in Frameworks */,
 				C9B4E88B28DDC4360086FC0D /* SwiftTreeSitter in Frameworks */,
+				C9CDEB652B52A4D7009E252A /* SwiftTreeSitterLayer in Frameworks */,
 				C9E726722A0436430019EFBB /* TreeSitterMarkdown in Frameworks */,
 				C9E726752A0436B00019EFBB /* TreeSitterSwift in Frameworks */,
 			);
@@ -107,7 +107,7 @@
 				C9B4E88A28DDC4360086FC0D /* SwiftTreeSitter */,
 				C9E726712A0436430019EFBB /* TreeSitterMarkdown */,
 				C9E726742A0436B00019EFBB /* TreeSitterSwift */,
-				C9E726762A043B3C0019EFBB /* TreeSitterDocument */,
+				C9CDEB642B52A4D7009E252A /* SwiftTreeSitterLayer */,
 			);
 			productName = SwiftTreeSitterExample;
 			productReference = C9B4E87328DDC3280086FC0D /* SwiftTreeSitterExample.app */;
@@ -385,6 +385,10 @@
 			isa = XCSwiftPackageProductDependency;
 			productName = SwiftTreeSitter;
 		};
+		C9CDEB642B52A4D7009E252A /* SwiftTreeSitterLayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = SwiftTreeSitterLayer;
+		};
 		C9E726712A0436430019EFBB /* TreeSitterMarkdown */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C9E726702A0436420019EFBB /* XCRemoteSwiftPackageReference "tree-sitter-markdown" */;
@@ -394,10 +398,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = C9E726732A0436B00019EFBB /* XCRemoteSwiftPackageReference "tree-sitter-swift" */;
 			productName = TreeSitterSwift;
-		};
-		C9E726762A043B3C0019EFBB /* TreeSitterDocument */ = {
-			isa = XCSwiftPackageProductDependency;
-			productName = TreeSitterDocument;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
