@@ -1,8 +1,8 @@
 @Tutorial(time: 10) {
-    @Intro(title: "Using ResolvingQueryCursor") {
-		While powerful, tree-sitter's query language cannot describe all syntax tree states. To help expand its capabilities, it allows for embedding arbitrary statements. These provide an additional way to filter matches. Tree-sitter's built-in query system does not evaluate predicates. Not all queries use predicates, but if they are present, the built-in types ignore them. This will lead to incorrect matching. 
+    @Intro(title: "Fully Resolving Queries") {
+		While powerful, tree-sitter's query language cannot describe all syntax tree states. To help expand its capabilities, it allows for embedding arbitrary statements. These provide an additional way to filter matches. However, tree-sitter's built-in query system does not actually evaluate these statements. Not all queries use them, but if predicates are present, the built-in types ignore them. 
 		
-		`ResolvingQueryCursor` is a wrapper around the `QueryCursor` type which can transparently evaluate and filter results using query predicates. You can read more about predicates in tree-sitter's [query documentation](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries).
+		`ResolvingQueryMatchSequence` is a `Sequence` that wraps the `QueryCursor` type and can transparently evaluate and filter results using query predicates. You can read more about predicates in tree-sitter's [query documentation](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries).
     }
     
     @Section(title: "Understanding Predicates") {
@@ -89,15 +89,15 @@
 				Because `Cursor` does not evaluate predicates, we've matched too many nodes.
 				
 				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-7-example.swift") {
-					@Image(source: "cursor-output.png", alt: "")
+					@Image(source: "cursor-output.png", alt: "Two ranges {21, 8} and {40, 8}")
 				}
 			}
 		}
 	}
 		
-	@Section(title: "Enumerating Matches with ResolvingQueryCursor") {
+	@Section(title: "Enumerating Matches with a Resolved Sequence") {
 		@ContentAndMedia {
-			A `ResolvingQueryCursor` works just like a regular `Cursor`, but can evaluate predicates to further filter matches. To do this, it does need access to the text content at evaluation time.
+            A `Cursor` must be transformed into a `ResolvingQueryMatchSequence` to evaluate predicates and further filter matches. This evaluation requires access to the text content.
 		}
 		
 		@Steps {
@@ -107,26 +107,20 @@
 				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-7-example.swift")
 			}
 			@Step {
-				Create a `ResolvingQueryCursor`.
+				Create a `ResolvingQueryMatchSequence` from the cursor.
+                
+                To actually resolve the results, the sequence requires some context. We're building one from the source string data. But, there are other ways to do, and those are required if you need to evaluate subqueries. 
 				
 				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-8-example.swift")
 			}
 			
 			@Step {
-				Prepare it, passing in a function that can return text content.
-				
-				Here, we're using a a simple String extension helper. You may need more a more involved implementation.
-				
-				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-9-example.swift")
-			}
-			
-			@Step {
-				Swap the `cursor` for our new `resolvingCursor`.
+				Swap the `cursor` for our new `resolvingSequence`.
 				
 				We now get one match, just like we'd expect.
 				
-				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-10-example.swift") {
-					@Image(source: "resolving-cursor-output.png", alt: "")
+				@Code(name: "TreeSitterExample.swift", file: "using-queries-2-9-example.swift") {
+					@Image(source: "resolved-output.png", alt: "One range {21, 8}")
 				}
 			}
 		}

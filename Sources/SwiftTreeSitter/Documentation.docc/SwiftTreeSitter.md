@@ -4,7 +4,9 @@ Swift API for the tree-sitter incremental parsing system.
 
 ## Overview
 
-SwiftTreeSitter attempts to map the [tree-sitter](https://tree-sitter.github.io/) C API very closely. It differs in two significant ways. First, it tries to use Swift/Foundation types when possible. And, it offers a much more featureful version of the ``QueryCursor`` object, ``ResolvingQueryCursor``. In all other respects, its best to refer to the C API for details and documentation.
+SwiftTreeSitter attempts to map the [tree-sitter](https://tree-sitter.github.io/) C API very closely. It differs in two significant ways. First, it tries to use Swift/Foundation types when possible. And, it offers a query resolution system based around ``ResolvingQueryMatchSequence``.
+
+In all other respects, it's best to refer to the C API for details and documentation.
 
 ## Topics
 
@@ -26,7 +28,7 @@ SwiftTreeSitter attempts to map the [tree-sitter](https://tree-sitter.github.io/
 
 - ``Query``
 - ``QueryCursor``
-- ``ResolvingQueryCursor``
+- ``ResolvingQueryMatchSequence``
 - ``QueryCapture``
 - ``QueryMatch``
 - ``QueryError``

@@ -24,11 +24,9 @@ let query = try language.query(contentsOf: url!)
 
 let cursor = query.execute(node: tree.rootNode!)
 
-let resolvingCursor = ResolvingQueryCursor(cursor: cursor)
+let resolvingSequence = cursor.resolve(with: Predicate.Context(string: source))
 
-resolvingCursor.prepare(with: source.cursorTextProvider)
-
-let typeCaptures = cursor
+let typeCaptures = resolvingSequence
 	.map { $0.captures(named: "type") }
 	.flatMap({ $0 })
 

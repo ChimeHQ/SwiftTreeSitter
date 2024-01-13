@@ -23,7 +23,7 @@ final class LanguageLayerTests: XCTestCase {
 
 		let highlightQuery = try! Query(language: language, data: queryText.data(using: .utf8)!)
 
-		return LanguageConfiguration(language: language,
+		return LanguageConfiguration(language,
 									 name: "Swift",
 									 queries: [.highlights: highlightQuery])
 	}()
@@ -38,7 +38,7 @@ final class LanguageLayerTests: XCTestCase {
 
 		queries[.injections] = injectionQuery
 
-		return LanguageConfiguration(language: swiftConfig.language,
+		return LanguageConfiguration(swiftConfig.language,
 									 name: swiftConfig.name,
 									 queries: queries)
 	}()
