@@ -83,6 +83,7 @@ public final class ResolvingQueryCursor {
 	}
 }
 
+@available(*, deprecated, message: "Please use ResolvingQueryMatchSequence")
 extension ResolvingQueryCursor: Sequence, IteratorProtocol {
     /// Get the next set of TextElement results
     ///

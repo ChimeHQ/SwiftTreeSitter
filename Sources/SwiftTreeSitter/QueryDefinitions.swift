@@ -122,12 +122,16 @@ public extension QueryCapture {
 }
 
 extension Sequence where Element == QueryMatch {
+	private var captures: [QueryCapture] {
+		map({ $0.captures })
+			.flatMap({ $0 })
+	}
+
 	/// Interpret matches using the "highlights.scm" definition
 	///
 	/// Results are sorted such that less-specific matches come before more-specific. This helps to resolve ambiguous patterns.
 	public func highlights() -> [NamedRange] {
-		return map({ $0.captures })
-			.flatMap({ $0 })
+		captures
 			.sorted()
 			.compactMap { $0.highlight }
 	}
@@ -139,14 +143,14 @@ extension Sequence where Element == QueryMatch {
 
 	/// Interpret the cursor using the "locals.scm" definition
 	public func locals() -> [NamedRange] {
-		return map({ $0.captures })
-			.flatMap({ $0 })
+		captures
 			.compactMap({ $0.locals })
 	}
 }
 
-public extension ResolvingQueryCursor {
-	func injections() -> [NamedRange] {
+@available(*, deprecated, message: "Please use ResolvingQueryMatchSequence")
+extension ResolvingQueryCursor {
+	public func injections() -> [NamedRange] {
 		return compactMap({ $0.injection(with: context.textProvider) })
 	}
 }
