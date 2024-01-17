@@ -70,7 +70,7 @@ extension NamedRange: Comparable {
 	}
 }
 
-public extension QueryMatch {
+extension QueryMatch {
 	/// Interpret the match using the "injections.scm" definition
 	///
 	/// - `injection.content` defines the range of the injection
@@ -78,7 +78,7 @@ public extension QueryMatch {
 	/// - if that is not present, uses `injection.language` metadata
 	///
 	/// If `textProvider` is nil and a node contents is needed, the injection is dropped.
-	func injection(with textProvider: Predicate.TextProvider) -> NamedRange? {
+	public func injection(with textProvider: Predicate.TextProvider) -> NamedRange? {
 		guard let contentCapture = captures(named: "injection.content").first else {
 			return nil
 		}
@@ -103,11 +103,11 @@ public extension QueryMatch {
 	}
 }
 
-public extension QueryCapture {
+extension QueryCapture {
 	/// Interpret the capture using the "highlights.scm" definition
 	///
 	/// Capture names are used without modification.
-	var highlight: NamedRange? {
+	public var highlight: NamedRange? {
 		let components = nameComponents
 		guard components.isEmpty == false else { return nil }
 
@@ -115,8 +115,8 @@ public extension QueryCapture {
 	}
 }
 
-public extension QueryCapture {
-	var locals: NamedRange? {
+extension QueryCapture {
+	public var locals: NamedRange? {
 		return highlight
 	}
 }
@@ -136,7 +136,13 @@ extension Sequence where Element == QueryMatch {
 			.compactMap { $0.highlight }
 	}
 
-	/// Interpret the cursor using the "injections.scm" definition
+	/// Interpret the match using the "injections.scm" definition.
+	///
+	/// - `injection.content` defines the range of the injection
+	/// - a node with `injection.language` specifies the value of the language in the text
+	/// - if that is not present, uses `injection.language` metadata
+	///
+	/// If `textProvider` returns nil and node contents is needed, the injection is dropped.
 	public func injections(with textProvider: Predicate.TextProvider) -> [NamedRange] {
 		return compactMap({ $0.injection(with: textProvider) })
 	}
