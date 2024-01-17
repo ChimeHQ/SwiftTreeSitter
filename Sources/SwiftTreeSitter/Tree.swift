@@ -12,25 +12,6 @@ public final class Tree: Sendable {
 		ts_tree_delete(internalTree)
 	}
 
-	public var includedRanges: [TSRange] {
-		var count: UInt32 = 0
-
-		guard let tsRanges = ts_tree_included_ranges(internalTree, &count) else {
-			return []
-		}
-
-		let bufferPointer = UnsafeBufferPointer(start: tsRanges, count: Int(count))
-
-		// there is a bug in the current tree sitter version
-		// that can produce ranges with invalid points (but seemingly correct) byte
-		// offsets. We have to be more careful with those.
-		let ranges = bufferPointer.map({ TSRange(potentiallyInvalidRange: $0) })
-
-		free(tsRanges)
-
-		return ranges
-	}
-
 	public func copy() -> Tree? {
 		guard let copiedTree = ts_tree_copy(self.internalTree) else {
 			return nil
@@ -64,6 +45,25 @@ extension Tree {
 		let node = ts_tree_root_node(internalTree)
 
 		return Node(internalNode: node, internalTree: self)
+	}
+
+	public var includedRanges: [TSRange] {
+		var count: UInt32 = 0
+
+		guard let tsRanges = ts_tree_included_ranges(internalTree, &count) else {
+			return []
+		}
+
+		let bufferPointer = UnsafeBufferPointer(start: tsRanges, count: Int(count))
+
+		// there is a bug in the current tree sitter version
+		// that can produce ranges with invalid points (but seemingly correct) byte
+		// offsets. We have to be more careful with those.
+		let ranges = bufferPointer.map({ TSRange(potentiallyInvalidRange: $0) })
+
+		free(tsRanges)
+
+		return ranges
 	}
 }
 
@@ -150,6 +150,10 @@ extension MutableTree {
     public var rootNode: Node? {
 		tree.rootNode
     }
+
+	public var includedRanges: [TSRange] {
+		tree.includedRanges
+	}
 }
 
 extension MutableTree {
