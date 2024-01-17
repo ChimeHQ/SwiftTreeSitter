@@ -17,14 +17,6 @@ extension Queryable {
 				.highlights()
 		}
 	}
-
-	public func injections(in region: Region, provider: SwiftTreeSitter.Predicate.TextProvider) throws -> [NamedRange] {
-		try withoutActuallyEscaping(provider) { escapingClosure in
-			try executeQuery(.injections, in: region)
-				.resolve(with: .init(textProvider: escapingClosure))
-				.injections()
-		}
-	}
 }
 
 extension Queryable where Region == IndexSet {

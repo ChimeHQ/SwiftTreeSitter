@@ -34,33 +34,40 @@ public final class LanguageLayer {
 
 	public struct Configuration {
 		public let languageProvider: LanguageProvider
+		public let maximumLanguageDepth: Int
 
 		public init(
+			maximumLanguageDepth: Int = 4,
 			languageProvider: @escaping LanguageProvider = { _ in nil }
 		) {
 			self.languageProvider = languageProvider
+			self.maximumLanguageDepth = maximumLanguageDepth
 		}
+	}
+
+	private enum NestedEntry {
+		case layer(LanguageLayer)
+		case missing(String, [TSRange])
 	}
 
 	public let languageConfig: LanguageConfiguration
 	private let configuration: Configuration
 	private let parser = Parser()
 	private(set) var state = ParseState()
-	private var sublayers = [LanguageLayer]()
-	private(set) var rangeSet: IndexSet? = IndexSet()
-	private var missingInjections = [String: [NamedRange]]()
+	private var sublayers = [String : LanguageLayer]()
+	private var missingInjections = [String : [TSRange]]()
+	private let rangeRestricted: Bool
 
 	init(languageConfig: LanguageConfiguration, configuration: Configuration, ranges: [TSRange]) throws {
 		self.languageConfig = languageConfig
 		self.configuration = configuration
+		self.rangeRestricted = ranges.isEmpty == false
 
 		try parser.setLanguage(languageConfig.language)
 
-		if ranges.isEmpty == false {
+		if rangeRestricted {
 			parser.includedRanges = ranges
 		}
-
-		invalidateRanges()
 	}
 
 	public convenience init(languageConfig: LanguageConfiguration, configuration: Configuration) throws {
@@ -70,27 +77,23 @@ public final class LanguageLayer {
 	public var languageName: String {
 		languageConfig.name
 	}
+
+	public var supportsNestedLanguages: Bool {
+		languageConfig.queries[.injections] != nil && configuration.maximumLanguageDepth > 0
+	}
+
+	public var includedRangeSet: IndexSet? {
+		state.includedSet
+	}
 }
 
 extension LanguageLayer {
-	private func invalidateRanges() {
-		guard rangeSet != nil else { return }
-
-		rangeSet = parser.incluedRangeSet
-	}
-
-	var spanningRange: NSRange? {
-		return state.tree?.rootNode?.range
-	}
-
 	func contains(_ range: NSRange) -> Bool {
-		guard let indexRange = Range(range) else { return false }
-
-		if rangeSet?.contains(integersIn: indexRange) == true {
-			return true
+		guard let set = includedRangeSet else {
+			return false
 		}
 
-		return spanningRange?.intersection(range)?.length != nil
+		return set.intersects(integersIn: Range(range)!)
 	}
 
 	func languageLayer(for range: NSRange) -> LanguageLayer? {
@@ -98,38 +101,61 @@ extension LanguageLayer {
 			return nil
 		}
 
-		return sublayers.first(where: { $0.contains(range) }) ?? self
+		return sublayers.values.first(where: { $0.contains(range) }) ?? self
 	}
 }
 
 extension LanguageLayer {
-	func applyEdit(_ edit: InputEdit) {
+	private func applyEdit(_ edit: InputEdit) {
 		state.applyEdit(edit)
 
-		invalidateRanges()
-
-		sublayers.forEach({ $0.applyEdit(edit) })
+		for sublayer in sublayers.values {
+			sublayer.applyEdit(edit)
+		}
 	}
 
-	func parse(with content: Content) -> IndexSet {
+	private func shallowParse(with content: Content) -> IndexSet {
 		let newState = withoutActuallyEscaping(content.readHandler) { escapingClosure in
 			parser.parse(state: state, readHandler: escapingClosure)
 		}
 
 		let oldState = state
 
-		state = newState
+		self.state = newState
 
-		let set = oldState.changedSet(for: newState)
+		// manual included range bookkeeping, but only if we have previously been restricted
+		if rangeRestricted, let tree = newState.tree {
+			self.parser.includedRanges = tree.includedRanges
+		}
 
-		try? invalidateSublayers(with: set, content: content)
+		return oldState.changedSet(for: newState)
+	}
+
+	private func parse(with content: Content, affecting affectedSet: IndexSet) -> IndexSet {
+		// afer shallowParse completes, rangeSet is valid again
+		var set = shallowParse(with: content)
+
+		set.formUnion(affectedSet)
+
+		do {
+			let subset = try parseSublayers(with: set, content: content)
+
+			set.formUnion(subset)
+		} catch {
+			print("parsing sublayers for \(languageName) failed: ", error)
+		}
 
 		return set
 	}
 
 	@discardableResult
 	public func replaceContent(with string: String, transformer: Point.LocationTransformer = { _ in nil }) -> IndexSet {
-		let fullRange = spanningRange ?? NSRange(0..<0)
+		let set = includedRangeSet
+
+		let start = set?.first ?? 0
+		let end = set?.last ?? start
+
+		let fullRange = NSRange(start..<end)
 		let delta = string.utf16.count - fullRange.length
 		let edit = InputEdit(
 			range: fullRange,
@@ -144,67 +170,37 @@ extension LanguageLayer {
 	}
 
 	public func didChangeContent(using edit: InputEdit, content: LanguageLayer.Content) -> IndexSet {
+		// includedRangeSet becomes invalid here
 		applyEdit(edit)
 
-		return parse(with: content)
+		let editedRange = (edit.startByte..<edit.newEndByte).range
+		let affectedSet = IndexSet(integersIn: Range(editedRange)!)
+
+		return parse(with: content, affecting: affectedSet)
 	}
 
 	public func languageConfigurationChanged(for name: String, content: Content) throws -> IndexSet {
-		let normalizedName = name.lowercased()
-
-		if languageName == normalizedName {
-			self.state = ParseState()
-
-			return parse(with: content)
-		}
-
 		var invalidated = IndexSet()
 
-		for sublayer in sublayers {
-			let subset = try sublayer.languageConfigurationChanged(for: normalizedName, content: content)
+		for sublayer in sublayers.values {
+			let subset = try sublayer.languageConfigurationChanged(for: name, content: content)
 
 			invalidated.formUnion(subset)
 		}
 
-		if let missing = missingInjections[normalizedName] {
-			let sublang = configuration.languageProvider(normalizedName)!
-			let ranges = missing.map { $0.tsRange }
-			let sublayer = try LanguageLayer(languageConfig: sublang, configuration: configuration, ranges: ranges)
-
-			sublayers.append(sublayer)
-
-			let subset = sublayer.parse(with: content)
-
-			invalidated.formUnion(subset)
-
-			missingInjections[normalizedName] = nil
-		}
+		invalidated.formUnion(try fillMissingSublayer(for: name, content: content))
 
 		return invalidated
 	}
 }
 
 extension LanguageLayer {
-	func enumerateLanguageLayers(in set: IndexSet, block: (LanguageLayer) throws -> Void) rethrows {
-		let effectiveSet = rangeSet?.intersection(set) ?? set
-
-		if effectiveSet.isEmpty {
-			return
-		}
-
-		try block(self)
-
-		for layer in sublayers {
-			try layer.enumerateLanguageLayers(in: effectiveSet, block: block)
-		}
-	}
-
 	public func snapshot(in set: IndexSet? = nil) -> LanguageLayerTreeSnapshot? {
 		guard let rootSnapshot = LanguageLayerSnapshot(languageLayer: self) else {
 			return nil
 		}
 
-		let subSnapshots = sublayers.compactMap { $0.snapshot(in: set) }
+		let subSnapshots = sublayers.values.compactMap { $0.snapshot(in: set) }
 
 		if subSnapshots.count != sublayers.count {
 			return nil
@@ -231,16 +227,20 @@ extension LanguageLayer: Queryable {
 		return LanguageLayerQueryCursor(cursor: cursor, range: range, name: name)
 	}
 
-	public func executeQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
-		let effectiveSet = rangeSet?.intersection(set) ?? set
+	private func executeShallowQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
+		let effectiveSet = includedRangeSet?.intersection(set) ?? set
 
 		let layeredCursors = try effectiveSet.rangeView
 			.compactMap { NSRange($0) }
 			.map { try executeShallowQuery(queryDef, in: $0) }
 
-		var treeQueryCursor = LanguageTreeQueryCursor(subcursors: layeredCursors)
+		return LanguageTreeQueryCursor(subcursors: layeredCursors)
+	}
 
-		for layer in sublayers {
+	public func executeQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
+		var treeQueryCursor = try executeShallowQuery(queryDef, in: set)
+
+		for layer in sublayers.values {
 			let subcursor = try layer.executeQuery(queryDef, in: set)
 
 			treeQueryCursor.merge(with: subcursor)
@@ -251,43 +251,95 @@ extension LanguageLayer: Queryable {
 }
 
 extension LanguageLayer {
-	private func buildSublayers(from injections: [NamedRange]) -> [LanguageLayer] {
-		let groups = Dictionary(grouping: injections, by: { $0.name })
-
-		return groups.compactMap { (name, namedRanges) -> LanguageLayer? in
-			do {
-				guard let subLang = configuration.languageProvider(name) else {
-					print("no injected language returned for \(name)")
-					return nil
-				}
-
-				let ranges = namedRanges.map { $0.tsRange }
-
-				return try LanguageLayer(languageConfig: subLang, configuration: configuration, ranges: ranges)
-			} catch {
-				print("failed to set injected language for \(name): \(error)")
-				return nil
-			}
+	private func fillMissingSublayer(for name: String, content: Content) throws -> IndexSet {
+		guard let tsRanges = missingInjections[name] else {
+			return IndexSet()
 		}
+
+		return try addNewSublayer(named: name, tsRanges: tsRanges, content: content)
 	}
 
-	func invalidateSublayers(with invalidatedSet: IndexSet, content: Content) throws {
-		sublayers.removeAll { layer in
-			guard let set = layer.rangeSet else { return true }
+	private func addNewSublayer(named name: String, tsRanges: [TSRange], content: Content) throws -> IndexSet {
+		precondition(sublayers[name] == nil)
 
-			return set.intersection(invalidatedSet).isEmpty == false
+		guard let subLang = configuration.languageProvider(name) else {
+			self.missingInjections[name] = tsRanges
+
+			return IndexSet()
 		}
 
-		let injections = try injections(in: invalidatedSet, provider: content.textProvider)
+		let subConfig = Configuration(
+			maximumLanguageDepth: max(0, configuration.maximumLanguageDepth - 1),
+			languageProvider: configuration.languageProvider
+		)
 
-		self.sublayers = buildSublayers(from: injections)
+		let layer = try LanguageLayer(languageConfig: subLang, configuration: subConfig, ranges: tsRanges)
 
-		let createdNames = Set(sublayers.map { $0.languageName })
-		let groups = Dictionary(grouping: injections.filter { createdNames.contains($0.name) == false }, by: { $0.name })
-		self.missingInjections = groups
+		self.sublayers[name] = layer
+		self.missingInjections[name] = nil
+		
+		var affectedSet = IndexSet()
 
-		for sublayer in sublayers {
-			let _ = sublayer.parse(with: content)
+		for tsRange in tsRanges {
+			affectedSet.insert(integersIn: Range(tsRange.bytes.range)!)
 		}
+
+		return layer.parse(with: content, affecting: affectedSet)
+	}
+
+	private func encorporateRanges(_ tsRanges: [TSRange], content: Content) throws -> IndexSet {
+		guard let includedRanges = state.tree?.includedRanges else {
+			preconditionFailure("Cannot encorporateRanges into a layer that doesn't have any already defined")
+		}
+
+		var allRanges = includedRanges
+		var invalidation = IndexSet()
+
+		for newTSRange in tsRanges {
+			allRanges.removeAll(where: { newTSRange.bytes.lowerBound == $0.bytes.lowerBound })
+
+			allRanges.append(newTSRange)
+
+			invalidation.insert(integersIn: Range(newTSRange.bytes.range)!)
+		}
+
+		self.parser.includedRanges = allRanges
+
+		let set = shallowParse(with: content)
+
+		invalidation.formUnion(set)
+
+		return invalidation
+	}
+
+	private func parseSublayers(with invalidatedSet: IndexSet, content: Content) throws -> IndexSet {
+		guard supportsNestedLanguages else {
+			return IndexSet()
+		}
+
+		// injections must be shallow
+		let injections = try executeShallowQuery(.injections, in: invalidatedSet).injections(with: content.textProvider)
+		let groupedInjections = Dictionary(grouping: injections, by: { $0.name })
+		var invalidations = IndexSet()
+
+		// they could be new, or could be updates to existing
+		for pair in groupedInjections {
+			let name = pair.0
+			let ranges = pair.value.map { $0.tsRange }
+
+			guard let sublayer = sublayers[name] else {
+				let set = try addNewSublayer(named: name, tsRanges: ranges, content: content)
+
+				invalidations.formUnion(set)
+
+				continue
+			}
+
+			let set = try sublayer.encorporateRanges(ranges, content: content)
+
+			invalidations.formUnion(set)
+		}
+
+		return invalidations
 	}
 }

@@ -4,9 +4,11 @@ import SwiftTreeSitter
 
 struct ParseState {
 	let tree: MutableTree?
+	let includedSet: IndexSet?
 
 	init(tree: MutableTree? = nil) {
 		self.tree = tree
+		self.includedSet = tree?.includedSet
 	}
 
 	func node(in range: Range<UInt32>) -> Node? {

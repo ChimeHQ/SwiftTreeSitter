@@ -59,8 +59,10 @@ extension Parser {
 
 		return ParseState(tree: newTree)
 	}
+}
 
-	var incluedRangeSet: IndexSet {
+extension MutableTree {
+	var includedSet: IndexSet {
 		var set = IndexSet()
 
 		for tsRange in includedRanges {
