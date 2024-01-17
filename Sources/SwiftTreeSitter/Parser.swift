@@ -46,8 +46,9 @@ extension Parser {
 
 	/// The ranges this parser will operate on.
 	///
-	/// This defaults to the entire document. This is useful
-	/// for working with embedded languages.
+	/// This defaults to the entire document. This is useful for working with embedded languages.
+	///
+	/// > Warning: These values must be manually updated. The `includedRanges` property of `Tree` can be useful for this, as it is updtaed when edits are applied.
 	public var includedRanges: [TSRange] {
 		get {
 			var count: UInt32 = 0
