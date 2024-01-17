@@ -70,6 +70,12 @@ extension NamedRange: Comparable {
 	}
 }
 
+extension NamedRange: CustomDebugStringConvertible {
+	public var debugDescription: String {
+		"<\"\(name)\": \(tsRange)>"
+	}
+}
+
 extension QueryMatch {
 	/// Interpret the match using the "injections.scm" definition
 	///

@@ -131,18 +131,20 @@ extension LanguageLayer {
 		return oldState.changedSet(for: newState)
 	}
 
-	private func parse(with content: Content, affecting affectedSet: IndexSet) -> IndexSet {
+	private func parse(with content: Content, affecting affectedSet: IndexSet, resolveSublayers resolve: Bool) -> IndexSet {
 		// afer shallowParse completes, rangeSet is valid again
 		var set = shallowParse(with: content)
 
 		set.formUnion(affectedSet)
 
-		do {
-			let subset = try parseSublayers(with: set, content: content)
+		if resolve {
+			do {
+				let subset = try resolveSublayers(with: content, in: set)
 
-			set.formUnion(subset)
-		} catch {
-			print("parsing sublayers for \(languageName) failed: ", error)
+				set.formUnion(subset)
+			} catch {
+				print("parsing sublayers for \(languageName) failed: ", error)
+			}
 		}
 
 		return set
@@ -166,17 +168,17 @@ extension LanguageLayer {
 
 		let content = LanguageLayer.Content(string: string)
 
-		return didChangeContent(using: edit, content: content)
+		return didChangeContent(content, using: edit, resolveSublayers: true)
 	}
 
-	public func didChangeContent(using edit: InputEdit, content: LanguageLayer.Content) -> IndexSet {
+	public func didChangeContent(_ content: LanguageLayer.Content, using edit: InputEdit, resolveSublayers: Bool = true) -> IndexSet {
 		// includedRangeSet becomes invalid here
 		applyEdit(edit)
 
 		let editedRange = (edit.startByte..<edit.newEndByte).range
 		let affectedSet = IndexSet(integersIn: Range(editedRange)!)
 
-		return parse(with: content, affecting: affectedSet)
+		return parse(with: content, affecting: affectedSet, resolveSublayers: resolveSublayers)
 	}
 
 	public func languageConfigurationChanged(for name: String, content: Content) throws -> IndexSet {
@@ -277,14 +279,14 @@ extension LanguageLayer {
 
 		self.sublayers[name] = layer
 		self.missingInjections[name] = nil
-		
+
 		var affectedSet = IndexSet()
 
 		for tsRange in tsRanges {
 			affectedSet.insert(integersIn: Range(tsRange.bytes.range)!)
 		}
 
-		return layer.parse(with: content, affecting: affectedSet)
+		return layer.parse(with: content, affecting: affectedSet, resolveSublayers: true)
 	}
 
 	private func encorporateRanges(_ tsRanges: [TSRange], content: Content) throws -> IndexSet {
@@ -312,13 +314,16 @@ extension LanguageLayer {
 		return invalidation
 	}
 
-	private func parseSublayers(with invalidatedSet: IndexSet, content: Content) throws -> IndexSet {
+	/// Recursively resolve any language injections within the set.
+	///
+	/// This process is manual to offer the greatest control to clients.
+	public func resolveSublayers(with content: LanguageLayer.Content, in set: IndexSet) throws -> IndexSet {
 		guard supportsNestedLanguages else {
 			return IndexSet()
 		}
 
 		// injections must be shallow
-		let injections = try executeShallowQuery(.injections, in: invalidatedSet).injections(with: content.textProvider)
+		let injections = try executeShallowQuery(.injections, in: set).injections(with: content.textProvider)
 		let groupedInjections = Dictionary(grouping: injections, by: { $0.name })
 		var invalidations = IndexSet()
 
