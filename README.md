@@ -39,13 +39,13 @@ targets: [
     .target(
         name: "MySwiftTreeSitterTarget",
         dependencies: ["SwiftTreeSitter"]
-	),
+    ),
     .target(
         name: "MySwiftTreeSitterLayerTarget",
         dependencies: [
             .product(name: "SwiftTreeSitterLayer", package: "SwiftTreeSitter"),
-		]
-	),
+        ]
+    ),
 ]
 ```
 
