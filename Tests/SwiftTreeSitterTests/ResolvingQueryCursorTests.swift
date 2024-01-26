@@ -3,6 +3,7 @@ import XCTest
 import SwiftTreeSitter
 import TestTreeSitterSwift
 
+@available(*, deprecated)
 final class ResolvingQueryCursorTests: XCTestCase {
 #if !os(WASI)
 	private static let swiftLang = Language(language: tree_sitter_swift())
