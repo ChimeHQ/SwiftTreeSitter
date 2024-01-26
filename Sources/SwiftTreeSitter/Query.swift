@@ -43,7 +43,7 @@ public enum QueryPredicateError: Error {
 ///
 /// Tree-sitter's official documentation: [Pattern Matching with Queries](https://tree-sitter.github.io/tree-sitter/using-parsers#pattern-matching-with-queries)
 public final class Query: Sendable {
-    let internalQuery: OpaquePointer
+    let internalQueryPointer: SendableOpaquePointer
     let predicateList: [[Predicate]]
 
     /// Construct a query object from scm data
@@ -72,7 +72,7 @@ public final class Query: Sendable {
             throw QueryError(offset: errorOffset, internalError: queryError)
         }
 
-        self.internalQuery = queryPtr
+        self.internalQueryPointer = SendableOpaquePointer(queryPtr)
         self.predicateList = try PredicateParser().predicates(in: queryPtr)
     }
 
@@ -84,6 +84,10 @@ public final class Query: Sendable {
     deinit {
         ts_query_delete(internalQuery)
     }
+
+	var internalQuery: OpaquePointer {
+		internalQueryPointer.pointer
+	}
 
     public var patternCount: Int {
         return Int(ts_query_pattern_count(internalQuery))

@@ -2,14 +2,18 @@ import tree_sitter
 
 /// An immutable tree-sitter tree structure.
 public final class Tree: Sendable {
-	let internalTree: OpaquePointer
+	private let internalTreePointer: SendableOpaquePointer
 
 	init(internalTree: OpaquePointer) {
-		self.internalTree = internalTree
+		self.internalTreePointer = SendableOpaquePointer(internalTree)
 	}
 
 	deinit {
 		ts_tree_delete(internalTree)
+	}
+
+	var internalTree: OpaquePointer {
+		internalTreePointer.pointer
 	}
 
 	public func copy() -> Tree? {
@@ -127,17 +131,17 @@ extension Tree {
 public final class MutableTree {
 	let tree: Tree
 
-    init(internalTree: OpaquePointer) {
-        self.tree = Tree(internalTree: internalTree)
-    }
+	init(internalTree: OpaquePointer) {
+		self.tree = Tree(internalTree: internalTree)
+	}
 
 	init(tree: Tree) {
 		self.tree = tree
 	}
 
-    public func copy() -> Tree? {
+	public func copy() -> Tree? {
 		tree.copy()
-    }
+	}
 
 	public func mutableCopy() -> MutableTree? {
 		guard let tree = copy() else { return nil }
@@ -147,9 +151,9 @@ public final class MutableTree {
 }
 
 extension MutableTree {
-    public var rootNode: Node? {
+	public var rootNode: Node? {
 		tree.rootNode
-    }
+	}
 
 	public var includedRanges: [TSRange] {
 		tree.includedRanges
@@ -157,15 +161,15 @@ extension MutableTree {
 }
 
 extension MutableTree {
-    public func edit(_ inputEdit: InputEdit) {
-        withUnsafePointer(to: inputEdit.internalInputEdit) { (ptr) -> Void in
+	public func edit(_ inputEdit: InputEdit) {
+		withUnsafePointer(to: inputEdit.internalInputEdit) { (ptr) -> Void in
 			ts_tree_edit(tree.internalTree, ptr)
-        }
-    }
+		}
+	}
 
-    public func changedRanges(from other: Tree) -> [TSRange] {
+	public func changedRanges(from other: Tree) -> [TSRange] {
 		tree.changedRanges(from: other)
-    }
+	}
 
 	public func changedRanges(from other: MutableTree) -> [TSRange] {
 		tree.changedRanges(from: other.tree)
@@ -173,7 +177,7 @@ extension MutableTree {
 }
 
 extension MutableTree {
-    public func enumerateNodes(in byteRange: Range<UInt32>, block: (Node) throws -> Void) rethrows {
+	public func enumerateNodes(in byteRange: Range<UInt32>, block: (Node) throws -> Void) rethrows {
 		try tree.enumerateNodes(in: byteRange, block: block)
-    }
+	}
 }
