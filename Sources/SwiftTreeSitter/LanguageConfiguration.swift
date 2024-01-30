@@ -82,19 +82,19 @@ extension LanguageConfiguration {
 }
 
 extension LanguageConfiguration {
-	static let effectiveBundle: Bundle = {
+	static let bundleContainerURL: URL? = {
 		let mainBundle = Bundle.main
 
 		guard mainBundle.isXCTestRunner else {
-			return mainBundle
+			return mainBundle.resourceURL
 		}
 
-		return Bundle.testBundle ?? mainBundle
+		// we have to go up one directory, because Xcode puts SPM dependency bundles
+		return Bundle.testBundle?.bundleURL.deletingLastPathComponent()
 	}()
 
 	static func bundleQueriesDirectoryURL(for bundleName: String) -> URL? {
-		effectiveBundle
-			.resourceURL?
+		bundleContainerURL?
 			.appendingPathComponent("\(bundleName).bundle", isDirectory: true)
 			.appendingPathComponent("Contents/Resources/queries", isDirectory: true)
 	}
