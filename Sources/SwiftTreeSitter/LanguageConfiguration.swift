@@ -95,7 +95,7 @@ extension LanguageConfiguration {
 
 	static func bundleQueriesDirectoryURL(for bundleName: String) -> URL? {
         let bundlePath = bundleContainerURL?.appendingPathComponent("\(bundleName).bundle", isDirectory: true)
-#if os(iOS)
+#if os(iOS) || os(tvOS) || os(visionOS) || os(watchOS)
         return bundlePath?.appendingPathComponent("queries", isDirectory: true)
 #else
         return bundlePath?.appendingPathComponent("Contents/Resources/queries", isDirectory: true)
