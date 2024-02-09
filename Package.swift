@@ -8,6 +8,13 @@ let settings: [SwiftSetting] = [
 
 let package = Package(
 	name: "SwiftTreeSitter",
+    platforms: [
+        .macOS(.v10_13),
+        .iOS(.v12),
+        .tvOS(.v12),
+        .macCatalyst(.v13),
+        .watchOS(.v4)
+    ],
 	products: [
 		.library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
 		.library(name: "SwiftTreeSitterLayer", targets: ["SwiftTreeSitterLayer"]),
