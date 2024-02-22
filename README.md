@@ -172,6 +172,7 @@ Here's a list of parsers that support SPM. Since you're here, you might find tha
 | [OCaml](https://github.com/tree-sitter/tree-sitter-ocaml) | | ✅ | ✅ |
 | [Perl](https://github.com/ganezdragon/tree-sitter-perl) | | ✅ | ✅ |
 | [PHP](https://github.com/tree-sitter/tree-sitter-php) | ✅ | ✅ | ✅ |
+| [Pkl](https://github.com/apple/tree-sitter-pkl) | | ✅ | ✅ |
 | [Python](https://github.com/tree-sitter/tree-sitter-python) | | ✅ | ✅ |
 | [Ruby](https://github.com/tree-sitter/tree-sitter-ruby) | ✅ | ✅ | ✅ |
 | [Rust](https://github.com/tree-sitter/tree-sitter-rust) | | ✅ | ✅ |
