@@ -85,6 +85,7 @@ extension Predicate {
 		public let textProvider: TextProvider
 		public let groupMembershipProvider: GroupMembershipProvider
 
+		@MainActor
 		public static let none = Context(textProvider: { _, _ in return nil })
 
 		public init(

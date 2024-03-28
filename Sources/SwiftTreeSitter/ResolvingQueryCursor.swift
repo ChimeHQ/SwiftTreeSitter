@@ -42,12 +42,20 @@ public final class ResolvingQueryCursor {
     private var index: Array.Index
     private(set) var context: Predicate.Context
 
-	public init(cursor: QueryCursor, context: Predicate.Context = .none) {
+	public init(cursor: QueryCursor, context: Predicate.Context) {
         self.cursor = cursor
         self.matches = []
         self.index = matches.startIndex
 		self.context = context.cachingContext
     }
+
+	@MainActor
+	public init(cursor: QueryCursor) {
+		self.cursor = cursor
+		self.matches = []
+		self.index = matches.startIndex
+		self.context = Predicate.Context.none
+	}
 
     /// Eagerly load all `QueryMatch` objects.
     ///
