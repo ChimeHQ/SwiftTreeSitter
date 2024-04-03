@@ -49,6 +49,21 @@ targets: [
 ]
 ```
 
+## Query Conflicts
+
+SwiftTreeSitter does its best to resolve poor/incorrect query constructs, which surprisingly common.
+
+When using injections, child query ranges are automatically expanded using parent matches. This handles cases where a parent has queries that overlap with children in conflicting ways. Without expansion, it is possible to construct queries that fall within children ranges but produce on parent matches.
+
+All matches are sorted by:
+
+- depth
+- location in content
+- specificity of match label (more components => more specific)
+- occurrence in the query source
+
+Even with these, it is possible to produce queries that will result in "incorrect" behavior that are either ambiguous or undefined in the query definition.
+
 ## Highlighting
 
 A very common use of tree-sitter is to do syntax highlighting. It is possible to use this library directly, especially if your source text does not change. Here's a little example that sets everything up with a SPM-bundled language.

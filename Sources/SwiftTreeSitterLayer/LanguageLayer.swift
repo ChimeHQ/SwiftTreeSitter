@@ -51,6 +51,7 @@ public final class LanguageLayer {
 	}
 
 	public let languageConfig: LanguageConfiguration
+	public let depth: Int
 	private let configuration: Configuration
 	private let parser = Parser()
 	private(set) var state = ParseState()
@@ -58,10 +59,11 @@ public final class LanguageLayer {
 	private var missingInjections = [String : [TSRange]]()
 	private let rangeRestricted: Bool
 
-	init(languageConfig: LanguageConfiguration, configuration: Configuration, ranges: [TSRange]) throws {
+	init(languageConfig: LanguageConfiguration, configuration: Configuration, ranges: [TSRange], depth: Int) throws {
 		self.languageConfig = languageConfig
 		self.configuration = configuration
 		self.rangeRestricted = ranges.isEmpty == false
+		self.depth = depth
 
 		try parser.setLanguage(languageConfig.language)
 
@@ -70,8 +72,8 @@ public final class LanguageLayer {
 		}
 	}
 
-	public convenience init(languageConfig: LanguageConfiguration, configuration: Configuration) throws {
-		try self.init(languageConfig: languageConfig, configuration: configuration, ranges: [])
+	public convenience init(languageConfig: LanguageConfiguration, configuration: Configuration, depth: Int = 0) throws {
+		try self.init(languageConfig: languageConfig, configuration: configuration, ranges: [], depth: depth)
 	}
 
 	public var languageName: String {
@@ -213,42 +215,27 @@ extension LanguageLayer {
 }
 
 extension LanguageLayer: Queryable {
-	private func executeShallowQuery(_ queryDef: Query.Definition, in range: NSRange) throws -> LanguageLayerQueryCursor {
+	private func executeShallowQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageLayerQueryCursor {
 		let name = languageConfig.name
 
 		guard let query = languageConfig.queries[queryDef] else {
 			throw LanguageLayerError.queryUnavailable(name, queryDef)
 		}
 
-		guard let tree = state.tree else {
+		// a copy here is a small inefficiency...
+		guard let tree = state.tree?.copy() else {
 			throw LanguageLayerError.noRootNode
 		}
 
-		let cursor = query.execute(in: tree)
-
-		return LanguageLayerQueryCursor(cursor: cursor, range: range, name: name)
+		return LanguageLayerQueryCursor(query: query, tree: tree, set: set, depth: depth)
 	}
-
-	private func executeShallowQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
-		let effectiveSet = includedRangeSet?.intersection(set) ?? set
-
-		let layeredCursors = try effectiveSet.rangeView
-			.compactMap { NSRange($0) }
-			.map { try executeShallowQuery(queryDef, in: $0) }
-
-		return LanguageTreeQueryCursor(subcursors: layeredCursors)
-	}
-
+	
 	public func executeQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
-		var treeQueryCursor = try executeShallowQuery(queryDef, in: set)
-
-		for layer in sublayers.values {
-			let subcursor = try layer.executeQuery(queryDef, in: set)
-
-			treeQueryCursor.merge(with: subcursor)
+		guard let treeSnapshot = snapshot(in: set) else {
+			throw LanguageLayerError.noRootNode
 		}
 
-		return treeQueryCursor
+		return try treeSnapshot.executeQuery(queryDef, in: set)
 	}
 }
 
@@ -275,7 +262,7 @@ extension LanguageLayer {
 			languageProvider: configuration.languageProvider
 		)
 
-		let layer = try LanguageLayer(languageConfig: subLang, configuration: subConfig, ranges: tsRanges)
+		let layer = try LanguageLayer(languageConfig: subLang, configuration: subConfig, ranges: tsRanges, depth: depth + 1)
 
 		self.sublayers[name] = layer
 		self.missingInjections[name] = nil

@@ -118,6 +118,57 @@ let b = "var b = 1"
 
 		XCTAssertEqual(highlights, expected)
 	}
+
+	func testExpandingQueryRangesByParentMatches() throws {
+		let language = Language(language: tree_sitter_swift())
+
+		// this query conflicts with the injection
+		let queryText = """
+["var" "let"] @keyword
+(line_str_text) @string
+"""
+
+		let highlightQuery = try! Query(language: language, data: queryText.data(using: .utf8)!)
+
+		let injectionQueryText = """
+((line_str_text) @injection.content (#set! injection.language "swift"))
+"""
+		let injectionQuery = try! Query(language: language, data: injectionQueryText.data(using: .utf8)!)
+
+		let queries: [Query.Definition: Query] = [
+			.highlights: highlightQuery,
+			.injections: injectionQuery,
+		]
+
+		let swiftConfig = LanguageConfiguration(
+			language,
+			name: "Swift",
+			queries: queries
+		)
+
+		let config = LanguageLayer.Configuration(languageProvider: { name in
+			precondition(name == "swift")
+
+			return swiftConfig
+		})
+
+		let tree = try LanguageLayer(languageConfig: swiftConfig, configuration: config)
+
+		let text = """
+let a = "var a = 1"
+"""
+		tree.replaceContent(with: text)
+
+		// target a space within the string. This will match in the root but not in the injection
+		let highlights = try tree.highlights(in: NSRange(12..<13), provider: { _, _ in nil })
+
+		let expected = [
+			NamedRange(name: "string", range: NSRange(9..<18), pointRange: Point(0, 18)..<Point(0, 36)),
+			NamedRange(name: "keyword", range: NSRange(9..<12), pointRange: Point(0, 18)..<Point(0, 24)),
+		]
+
+		XCTAssertEqual(highlights, expected)
+	}
 }
 
 #endif
