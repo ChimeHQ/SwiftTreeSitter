@@ -51,7 +51,7 @@ targets: [
 
 ## Query Conflicts
 
-SwiftTreeSitter does its best to resolve poor/incorrect query constructs, which surprisingly common.
+SwiftTreeSitter does its best to resolve poor/incorrect query constructs, which are surprisingly common.
 
 When using injections, child query ranges are automatically expanded using parent matches. This handles cases where a parent has queries that overlap with children in conflicting ways. Without expansion, it is possible to construct queries that fall within children ranges but produce on parent matches.
 
