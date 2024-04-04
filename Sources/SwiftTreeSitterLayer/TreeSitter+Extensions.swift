@@ -54,7 +54,7 @@ extension InputEdit {
 }
 
 extension Parser {
-	func parse(state: ParseState, readHandler: @escaping Parser.ReadBlock) -> ParseState {
+	func parse(state: ParseState, readHandler: Parser.ReadBlock) -> ParseState {
 		let newTree = parse(tree: state.tree, readBlock: readHandler)
 
 		return ParseState(tree: newTree)

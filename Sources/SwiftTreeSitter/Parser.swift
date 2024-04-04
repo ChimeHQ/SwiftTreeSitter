@@ -107,21 +107,23 @@ extension Parser {
         return optionalTreePtr.flatMap({ MutableTree(internalTree: $0) })
     }
 
-	public func parse(tree: Tree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> MutableTree? {
-        let input = Input(encoding: encoding, readBlock: readBlock)
+	public func parse(tree: Tree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: ReadBlock) -> MutableTree? {
+		return withoutActuallyEscaping(readBlock) { escapingClosure in
+			let input = Input(encoding: encoding, readBlock: escapingClosure)
 
-        guard let internalInput = input.internalInput else {
-            return nil
-        }
+			guard let internalInput = input.internalInput else {
+				return nil
+			}
 
-        guard let newTree = ts_parser_parse(internalParser, tree?.internalTree, internalInput) else {
-            return nil
-        }
+			guard let newTree = ts_parser_parse(internalParser, tree?.internalTree, internalInput) else {
+				return nil
+			}
 
-        return MutableTree(internalTree: newTree)
+			return MutableTree(internalTree: newTree)
+		}
     }
 
-	public func parse(tree: MutableTree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: @escaping ReadBlock) -> MutableTree? {
+	public func parse(tree: MutableTree?, encoding: TSInputEncoding = TSInputEncodingUTF16, readBlock: ReadBlock) -> MutableTree? {
 		parse(tree: tree?.tree, encoding: encoding, readBlock: readBlock)
 	}
 

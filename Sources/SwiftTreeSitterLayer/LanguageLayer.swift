@@ -117,9 +117,7 @@ extension LanguageLayer {
 	}
 
 	private func shallowParse(with content: Content) -> IndexSet {
-		let newState = withoutActuallyEscaping(content.readHandler) { escapingClosure in
-			parser.parse(state: state, readHandler: escapingClosure)
-		}
+		let newState = parser.parse(state: state, readHandler: content.readHandler)
 
 		let oldState = state
 
