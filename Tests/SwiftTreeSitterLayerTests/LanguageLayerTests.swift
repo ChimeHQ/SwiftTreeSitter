@@ -169,6 +169,95 @@ let a = "var a = 1"
 
 		XCTAssertEqual(highlights, expected)
 	}
+
+	func testInjectionsParsedOutOfOrder() throws {
+		let config = LanguageLayer.Configuration(languageProvider: { name in
+			precondition(name == "swift")
+
+			return Self.swiftConfig
+		})
+
+		let layerTree = try LanguageLayer(languageConfig: Self.selfInjectingSwiftConfig, configuration: config)
+
+		let text = """
+let a = "var a = 1"
+let b = "var b = 1"
+let c = "var c = 1"
+"""
+
+		let content = LanguageLayer.Content(string: text)
+
+		// process just the first line
+		let content1 = LanguageLayer.Content(string: text, limit: 19)
+		let input1 = InputEdit(
+			startByte: 0,
+			oldEndByte: 0,
+			newEndByte: 19*2,
+			startPoint: Point(0, 0),
+			oldEndPoint: Point(0, 0),
+			newEndPoint: Point(0, 19*2)
+		)
+
+		let invalidation1 = layerTree.didChangeContent(content1, using: input1, resolveSublayers: false)
+		let target1 = IndexSet(integersIn: 0..<19)
+
+		XCTAssertEqual(invalidation1, target1)
+
+		// first line of highlights
+		let resolve1 = try layerTree.resolveSublayers(with: content1, in: target1)
+		XCTAssertEqual(resolve1, IndexSet(integersIn: 9..<18))
+
+		// query for highlights
+		let highlights1 = try layerTree.highlights(in: target1, provider: content1.textProvider)
+
+		let expected1 = [
+			NamedRange(name: "keyword", range: NSRange(0..<3), pointRange: Point(0, 0)..<Point(0, 6)),
+			NamedRange(name: "keyword", range: NSRange(9..<12), pointRange: Point(0, 18)..<Point(0, 24)),
+		]
+
+		XCTAssertEqual(highlights1, expected1)
+
+		// now process the entire content
+		let input2 = InputEdit(
+			startByte: input1.newEndByte,
+			oldEndByte: input1.newEndByte,
+			newEndByte: 60*2,
+			startPoint: input1.newEndPoint,
+			oldEndPoint: input1.newEndPoint,
+			newEndPoint: Point(3, 60*2)
+		)
+
+		let invalidation2 = layerTree.didChangeContent(content, using: input2, resolveSublayers: false)
+		XCTAssertEqual(invalidation2, IndexSet(integersIn: 19..<60))
+
+		// resolve + highlight *just the third line* skipping the middle, which will result in an invalidation starting at the last node of the first injection and going all the way to the last node of the 3rd
+		let target2 = IndexSet(integersIn: 40..<60)
+		let resolve2 = try layerTree.resolveSublayers(with: content, in: target2)
+		XCTAssertEqual(resolve2, IndexSet(17..<58))
+
+		let highlights2 = try layerTree.highlights(in: target2, provider: content.textProvider)
+
+		let expected2 = [
+			NamedRange(name: "keyword", range: NSRange(40..<43), pointRange: Point(2, 0)..<Point(2, 6)),
+			NamedRange(name: "keyword", range: NSRange(49..<52), pointRange: Point(2, 18)..<Point(2, 24)),
+		]
+
+		XCTAssertEqual(highlights2, expected2)
+
+		// and now, finally, resolve and query the middle injection
+		let target3 = IndexSet(integersIn: 20..<40)
+		let resolve3 = try layerTree.resolveSublayers(with: content, in: target3)
+		XCTAssertEqual(resolve3, IndexSet(29..<38))
+
+		let highlights3 = try layerTree.highlights(in: target3, provider: content.textProvider)
+
+		let expected3 = [
+			NamedRange(name: "keyword", range: NSRange(20..<23), pointRange: Point(1, 0)..<Point(1, 6)),
+			NamedRange(name: "keyword", range: NSRange(29..<32), pointRange: Point(1, 18)..<Point(1, 24)),
+		]
+
+		XCTAssertEqual(highlights3, expected3)
+	}
 }
 
 #endif

@@ -23,7 +23,11 @@ public final class LanguageLayer {
 		}
 
 		public init(string: String) {
-			let read = Parser.readFunction(for: string, limit: string.utf16.count)
+			self.init(string: string, limit: string.utf16.count)
+		}
+
+		public init(string: String, limit: Int) {
+			let read = Parser.readFunction(for: string, limit: limit)
 
 			self.init(
 				readHandler: read,
@@ -225,7 +229,13 @@ extension LanguageLayer: Queryable {
 			throw LanguageLayerError.noRootNode
 		}
 
-		return LanguageLayerQueryCursor(query: query, tree: tree, set: set, depth: depth)
+		return LanguageLayerQueryCursor(
+			query: query,
+			tree: tree,
+			set: set,
+			depth: depth,
+			languageName: languageName
+		)
 	}
 	
 	public func executeQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageTreeQueryCursor {
@@ -268,7 +278,9 @@ extension LanguageLayer {
 		var affectedSet = IndexSet()
 
 		for tsRange in tsRanges {
-			affectedSet.insert(integersIn: Range(tsRange.bytes.range)!)
+			let rangeSet = IndexSet(integersIn: tsRange.bytes.range)
+
+			affectedSet.formUnion(rangeSet)
 		}
 
 		return layer.parse(with: content, affecting: affectedSet, resolveSublayers: true)
@@ -290,7 +302,8 @@ extension LanguageLayer {
 			invalidation.insert(integersIn: Range(newTSRange.bytes.range)!)
 		}
 
-		self.parser.includedRanges = allRanges
+		// included ranges must be sorted and the above algorithm does not guarantee that
+		self.parser.includedRanges = allRanges.sorted()
 
 		let set = shallowParse(with: content)
 

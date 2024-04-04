@@ -40,18 +40,18 @@ public struct LanguageLayerSnapshot: Sendable {
 			return nil
 		}
 
-		return (tree, query, depth)
+		return (tree, query, depth, data.name)
 	}
 }
 
 extension LanguageLayerSnapshot: Queryable {
 	/// Run a query against the snapshot.
 	public func executeQuery(_ queryDef: Query.Definition, in set: IndexSet) throws -> LanguageLayerQueryCursor {
-		guard let query = data.queries[queryDef] else {
+		guard let target = queryTarget(for: queryDef) else {
 			throw LanguageLayerError.queryUnavailable(data.name, queryDef)
 		}
 
-		return LanguageLayerQueryCursor(query: query, tree: tree, set: set, depth: depth)
+		return LanguageLayerQueryCursor(target: target, set: set)
 	}
 }
 

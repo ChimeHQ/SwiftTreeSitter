@@ -10,15 +10,27 @@ public struct LanguageLayerQueryCursor {
 	private var activeCursor: QueryCursor?
 	private var index: Int
 	public let depth: Int
+	public let languageName: String
 
-	init(query: Query, tree: Tree, set: IndexSet, depth: Int) {
+	init(query: Query, tree: Tree, set: IndexSet, depth: Int, languageName: String) {
 		self.tree = tree
 		self.query = query
 		self.ranges = set.rangeView.compactMap({ NSRange($0) })
 		self.index = ranges.index(before: ranges.startIndex)
 		self.depth = depth
+		self.languageName = languageName
 
 		advanceRange()
+	}
+
+	init(target: LanguageTreeQueryCursor.Target, set: IndexSet) {
+		self.init(
+			query: target.1,
+			tree: target.0,
+			set: set,
+			depth: target.2,
+			languageName: target.3
+		)
 	}
 }
 
@@ -54,7 +66,7 @@ extension LanguageLayerQueryCursor: Sequence, IteratorProtocol {
 }
 
 public struct LanguageTreeQueryCursor {
-	typealias Target = (Tree, Query, Int)
+	typealias Target = (Tree, Query, Int, String)
 
 	private var activeCursor: LanguageLayerQueryCursor?
 	private let targets: [Target]
@@ -80,9 +92,7 @@ extension LanguageTreeQueryCursor: Sequence, IteratorProtocol {
 			return
 		}
 
-		let target = targets[index]
-
-		self.activeCursor = LanguageLayerQueryCursor(query: target.1, tree: target.0, set: set, depth: target.2)
+		self.activeCursor = LanguageLayerQueryCursor(target: targets[index], set: set)
 	}
 
 	private mutating func expandSet(_ range: NSRange?) {
