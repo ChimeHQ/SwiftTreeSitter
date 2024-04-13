@@ -20,7 +20,7 @@ let package = Package(
 		.library(name: "SwiftTreeSitterLayer", targets: ["SwiftTreeSitterLayer"]),
 	],
     dependencies: [
-        .package(url: "https://github.com/tree-sitter/tree-sitter", .upToNextMajor(from: "0.20.9")),
+        .package(url: "https://github.com/tree-sitter/tree-sitter", .upToNextMinor(from: "0.20.9")),
     ],
 	targets: [
 		.target(
