@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 enum ParserError: Error {
     case languageIncompatible
@@ -54,7 +54,7 @@ extension Parser {
 			var count: UInt32 = 0
 			let tsRangePointer = ts_parser_included_ranges(internalParser, &count)
 
-			let tsRangeBuffer = UnsafeBufferPointer<tree_sitter.TSRange>(start: tsRangePointer, count: Int(count))
+			let tsRangeBuffer = UnsafeBufferPointer<TreeSitter.TSRange>(start: tsRangePointer, count: Int(count))
 
 			return tsRangeBuffer.map({ TSRange(internalRange: $0) })
 		}
@@ -64,7 +64,7 @@ extension Parser {
 			ranges.withUnsafeBytes { bufferPtr in
 				let count = newValue.count
 
-				guard let ptr = bufferPtr.baseAddress?.bindMemory(to: tree_sitter.TSRange.self, capacity: count) else {
+				guard let ptr = bufferPtr.baseAddress?.bindMemory(to: TreeSitter.TSRange.self, capacity: count) else {
 					preconditionFailure("unable to convert pointer")
 				}
 

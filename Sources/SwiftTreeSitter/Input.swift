@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import tree_sitter
+import TreeSitter
 
 final class Input {
     typealias Buffer = UnsafeMutableBufferPointer<Int8>

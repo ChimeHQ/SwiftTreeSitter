@@ -1,4 +1,4 @@
-import tree_sitter
+import TreeSitter
 
 /// An immutable tree-sitter tree structure.
 public final class Tree: Sendable {

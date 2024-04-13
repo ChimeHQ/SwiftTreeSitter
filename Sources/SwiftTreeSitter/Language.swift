@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 public struct Language: Sendable {
 	private let tsLanguagePointer: SendableUnsafePointer<TSLanguage>

@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 extension String.Encoding {
     var internalEncoding: TSInputEncoding? {

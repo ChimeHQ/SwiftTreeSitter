@@ -1,6 +1,6 @@
 import Foundation
 
-import tree_sitter
+import TreeSitter
 
 /// A structure that holds a language name and its assoicated queries.
 public struct LanguageData: Sendable {
