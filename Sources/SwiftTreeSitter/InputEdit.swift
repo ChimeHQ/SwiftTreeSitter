@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 /// Structure that describes a change to the text content.
 ///

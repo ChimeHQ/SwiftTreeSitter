@@ -19,14 +19,10 @@ let package = Package(
 		.library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
 		.library(name: "SwiftTreeSitterLayer", targets: ["SwiftTreeSitterLayer"]),
 	],
+    dependencies: [
+        .package(url: "https://github.com/tree-sitter/tree-sitter", .upToNextMajor(from: "0.20.9")),
+    ],
 	targets: [
-		.target(
-			name: "tree-sitter",
-			path: "tree-sitter/lib",
-			sources: ["src/lib.c"],
-			publicHeadersPath: "include",
-			cSettings: [.headerSearchPath("src/")]
-		),
 		.target(
 			name: "TestTreeSitterSwift",
 			path: "tree-sitter-swift",
@@ -36,7 +32,9 @@ let package = Package(
 		),
 		.target(
 			name: "SwiftTreeSitter",
-			dependencies: ["tree-sitter"],
+			dependencies: [
+                .product(name: "TreeSitter", package: "tree-sitter"),
+            ],
 			swiftSettings: settings
 		),
 		.testTarget(

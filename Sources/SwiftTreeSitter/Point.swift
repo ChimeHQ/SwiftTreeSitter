@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import tree_sitter
+import TreeSitter
 
 public struct Point: Codable, Sendable {
     public let row: UInt32

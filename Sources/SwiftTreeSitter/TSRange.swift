@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 public struct TSRange: Codable, Hashable, Sendable {
     public let points: Range<Point>
@@ -10,12 +10,12 @@ public struct TSRange: Codable, Hashable, Sendable {
         self.bytes = bytes
     }
 
-    init(internalRange range: tree_sitter.TSRange) {
+    init(internalRange range: TreeSitter.TSRange) {
         self.bytes = range.start_byte..<range.end_byte
         self.points = Point(internalPoint: range.start_point)..<Point(internalPoint: range.end_point)
     }
 
-    init(potentiallyInvalidRange range: tree_sitter.TSRange) {
+    init(potentiallyInvalidRange range: TreeSitter.TSRange) {
         self.bytes = range.start_byte..<range.end_byte
 
         let start = Point(internalPoint: range.start_point)
@@ -25,7 +25,7 @@ public struct TSRange: Codable, Hashable, Sendable {
         self.points = start..<safeEnd
     }
 
-	var internalRange: tree_sitter.TSRange {
+	var internalRange: TreeSitter.TSRange {
 		return .init(start_point: points.lowerBound.internalPoint,
 					 end_point: points.upperBound.internalPoint,
 					 start_byte: bytes.lowerBound,

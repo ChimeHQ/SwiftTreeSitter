@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import tree_sitter
+import TreeSitter
 
 public struct Node {
     let internalNode: TSNode

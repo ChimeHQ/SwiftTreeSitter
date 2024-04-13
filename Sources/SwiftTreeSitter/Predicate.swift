@@ -1,5 +1,5 @@
 import Foundation
-import tree_sitter
+import TreeSitter
 
 public enum QueryPredicateStep: Hashable, Sendable {
     case done
