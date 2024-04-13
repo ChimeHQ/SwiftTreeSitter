@@ -1,4 +1,4 @@
-// swift-tools-version: 5.8
+// swift-tools-version: 5.9
 
 import PackageDescription
 
@@ -8,6 +8,14 @@ let settings: [SwiftSetting] = [
 
 let package = Package(
 	name: "SwiftTreeSitter",
+    platforms: [
+        .macOS(.v10_13),
+        .macCatalyst(.v13),
+        .iOS(.v12),
+        .tvOS(.v12),
+        .watchOS(.v5),
+        .visionOS(.v1),
+    ],
 	products: [
 		.library(name: "SwiftTreeSitter", targets: ["SwiftTreeSitter"]),
 		.library(name: "SwiftTreeSitterLayer", targets: ["SwiftTreeSitterLayer"]),
