@@ -50,14 +50,17 @@ private func readFunction(payload: UnsafeMutableRawPointer?, byteIndex: UInt32, 
     // get our self reference
     let wrapper: Input = Unmanaged.fromOpaque(payload!).takeUnretainedValue()
 
-    // call our Swift-friendly reader block
-    guard let data = wrapper.readBlock(Int(byteIndex), Point(internalPoint: position)) else {
-        bytesRead?.pointee = 0
-        return nil
+    // call our Swift-friendly reader block, or early out if there's no data to copy.
+    guard let data = wrapper.readBlock(Int(byteIndex), Point(internalPoint: position)),
+          data.count > 0
+    else
+    {
+      bytesRead?.pointee = 0
+      return nil
     }
 
     // copy the data into an internally-managed buffer with a lifetime of wrapper
-	let buffer = Input.Buffer.allocate(capacity: data.count)
+	  let buffer = Input.Buffer.allocate(capacity: data.count)
     let copiedLength = data.copyBytes(to: buffer)
     precondition(copiedLength == data.count)
 
