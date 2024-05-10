@@ -49,6 +49,26 @@ targets: [
 ]
 ```
 
+## Range Translation
+
+The tree-sitter runtime operates on raw string data. This means it works with bytes, and is string-encoding-sensitive. Swift's `String` type is an abstraction on top of raw data and cannot be used directly. To overcome this, you also have to be aware of the types of indexes you are using and how string data is translated back and forth.
+
+To help, SwiftTreeSitter supports the base tree-sitter encoding facilities. You can control this via `Parser.parse(tree:encoding:readBlock:)`. But, by default this will assume UTF-16-encoded data. This is done to offer direct compatibility with Foundation strings and `NSRange`, which both use UTF-16.
+
+Also, to help with all the back and forth, SwiftTreeSitter includes some accessors that are NSRange-based, as well as extension on `NSRange`. These **must** be used when working with the native tree-sitter types unless you take care to handle encoding yourself.
+
+To keep things clear, consistent naming and types are used. `Node.byteRange` returns a `Range<UInt32>`, which is an encoding-dependent value. `Node.range` is an `NSRange` which is defined to use UTF-16.
+    
+```swift
+let node = tree.rootNode!
+
+// this is encoding-dependent and cannot be used with your storage
+node.byteRange
+
+// this is a UTF-16-assumed translation of the byte ranges
+node.range
+```
+
 ## Query Conflicts
 
 SwiftTreeSitter does its best to resolve poor/incorrect query constructs, which are surprisingly common.
