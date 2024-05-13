@@ -67,6 +67,10 @@ node.byteRange
 
 // this is a UTF-16-assumed translation of the byte ranges
 node.range
+
+// converting UTF-16-based changed ranges on re-parse
+let ranges: [NSRange] = newtree.changedRanges(from: oldTree)
+    .map{ $0.bytes.range }
 ```
 
 ## Query Conflicts
