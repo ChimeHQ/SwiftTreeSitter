@@ -94,7 +94,7 @@ A very common use of tree-sitter is to do syntax highlighting. It is possible to
 
 First, check out how it works with SwiftTreeSitterLayer. It's complex, but does a lot for you.
 
-```swift
+````swift
 // LanguageConfiguration takes care of finding and loading queries in SPM-created bundles.
 let markdownConfig = try LanguageConfiguration(tree_sitter_markdown(), name: "Markdown")
 let markdownInlineConfig = try LanguageConfiguration(
@@ -148,7 +148,7 @@ let highlights = try rootLayer.highlights(in: fullRange, provider: textProvider)
 for namedRange in highlights {
     print("\(namedRange.name): \(namedRange.range)")
 }
-```
+````
 
 You can also use SwiftTreeSitter directly:
 
