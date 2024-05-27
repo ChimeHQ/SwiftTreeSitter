@@ -37,12 +37,6 @@ extension Node: Equatable {
     }
 }
 
-extension Node: Hashable {
-    public func hash(into hasher: inout Hasher) {
-        hasher.combine(internalNode.id.hashValue)
-    }
-}
-
 extension Node {
     public var sExpressionString: String? {
         guard let str = ts_node_string(internalNode) else {
@@ -62,6 +56,10 @@ extension Node {
         }
 
         return String(cString: str)
+    }
+
+    public var id: UInt {
+        return UInt(bitPattern: internalNode.id)
     }
 
     public var symbol: Int {
