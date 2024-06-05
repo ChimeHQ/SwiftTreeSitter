@@ -58,6 +58,10 @@ extension Node {
         return String(cString: str)
     }
 
+    public var id: UInt {
+        return UInt(bitPattern: internalNode.id)
+    }
+
     public var symbol: Int {
         return Int(ts_node_symbol(internalNode))
     }
