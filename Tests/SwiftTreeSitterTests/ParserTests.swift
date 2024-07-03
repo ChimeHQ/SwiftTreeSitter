@@ -140,3 +140,17 @@ func main😃😃() {
 	}
 #endif
 }
+
+extension ParserTests {
+	// Attempt to expose the bug introduced by https://github.com/ChimeHQ/SwiftTreeSitter/pull/24
+	func testReadEmptyData() throws {
+		let language = Language(language: tree_sitter_swift())
+
+		let parser = Parser()
+		try parser.setLanguage(language)
+
+		let _ = parser.parse(tree: Tree?.none, readBlock: { _, _ in
+			return nil
+		})
+	}
+}
