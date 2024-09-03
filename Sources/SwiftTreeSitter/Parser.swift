@@ -44,6 +44,13 @@ extension Parser {
         }
     }
 
+    /// Resets the parser to begin at the beginning of the document.
+    ///
+    /// If the parser was cancelled or timed out, use this to reset it.
+    public func reset() {
+        ts_parser_reset(internalParser)
+    }
+
 	/// The ranges this parser will operate on.
 	///
 	/// This defaults to the entire document. This is useful for working with embedded languages.
