@@ -258,6 +258,32 @@ let c = "var c = 1"
 
 		XCTAssertEqual(highlights3, expected3)
 	}
+
+	func testThrowsOnNoHighlightQuery() throws {
+		let language = Language(language: tree_sitter_swift())
+		let swiftConfig = LanguageConfiguration(
+			language,
+			name: "Swift",
+			queries: [:]
+		)
+
+		let config = LanguageLayer.Configuration(languageProvider: { name in
+			precondition(name == "swift")
+
+			return swiftConfig
+		})
+
+		let tree = try LanguageLayer(languageConfig: swiftConfig, configuration: config)
+
+		let text = """
+let a = "var a = 1"
+"""
+		tree.replaceContent(with: text)
+
+		XCTAssertThrowsError(try tree.highlights(in: NSRange(0..<10), provider: { _, _ in nil })) { error in
+			XCTAssertEqual(error as? LanguageLayerError, LanguageLayerError.queryUnavailable("Swift", .highlights))
+		}
+	}
 }
 
 #endif

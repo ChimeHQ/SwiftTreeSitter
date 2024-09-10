@@ -2,7 +2,7 @@ import Foundation
 
 import SwiftTreeSitter
 
-public enum LanguageLayerError: Error {
+public enum LanguageLayerError: Error, Hashable {
 	case noRootNode
 	case queryUnavailable(String, Query.Definition)
 }
