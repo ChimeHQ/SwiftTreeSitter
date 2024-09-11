@@ -36,7 +36,7 @@ extension Parser {
         try setLanguage(language.tsLanguage)
     }
 
-    public func setLanguage(_ language: UnsafePointer<TSLanguage>) throws {
+    public func setLanguage(_ language: OpaquePointer) throws {
         let success = ts_parser_set_language(internalParser, language)
 
         if success == false {

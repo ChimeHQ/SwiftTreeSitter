@@ -2,13 +2,13 @@ import Foundation
 import TreeSitter
 
 public struct Language: Sendable {
-	private let tsLanguagePointer: SendableUnsafePointer<TSLanguage>
+	private let tsLanguagePointer: SendableOpaquePointer
 
 	/// Creates an instance.
 	///
 	/// - Parameters:
 	///   - language: The TSLanguage instance to wrap.
-	public init(language: UnsafePointer<TSLanguage>) {
+	public init(language: OpaquePointer) {
 		self.init(language)
 	}
 
@@ -16,11 +16,11 @@ public struct Language: Sendable {
 	///
 	/// - Parameters:
 	///   - language: The TSLanguage instance to wrap.
-	public init(_ language: UnsafePointer<TSLanguage>) {
-		self.tsLanguagePointer = SendableUnsafePointer(language)
+	public init(_ language: OpaquePointer) {
+		self.tsLanguagePointer = SendableOpaquePointer(language)
 	}
 
-	public var tsLanguage: UnsafePointer<TSLanguage> {
+	public var tsLanguage: OpaquePointer {
 		tsLanguagePointer.pointer
 	}
 }
@@ -66,7 +66,8 @@ extension Language {
 	}
 }
 
-extension Language: Hashable {}
+extension Language: Hashable {
+}
 
 extension Language {
 	/// Construct a query object from data in a file.

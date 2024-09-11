@@ -39,7 +39,7 @@ public struct LanguageConfiguration: Sendable {
 
 #if !os(WASI)
 extension LanguageConfiguration {
-    public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, queries: [Query.Definition: Query]) {
+	public init(_ tsLanguage: OpaquePointer, name: String, queries: [Query.Definition: Query]) {
         self.init(Language(tsLanguage), name: name, queries: queries)
     }
 
@@ -55,7 +55,7 @@ extension LanguageConfiguration {
     /// Create a configuration with a name assumed to match a bundle.
     ///
     /// The bundle must be nested within resources and follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
-	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String) throws {
+	public init(_ tsLanguage: OpaquePointer, name: String) throws {
 		try self.init(Language(tsLanguage), name: name)
 	}
 
@@ -66,7 +66,7 @@ extension LanguageConfiguration {
 		self.init(language, name: name, queries: queries)
 	}
 
-	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, bundleName: String) throws {
+	public init(_ tsLanguage: OpaquePointer, name: String, bundleName: String) throws {
 		try self.init(Language(tsLanguage), name: name, bundleName: bundleName)
 	}
 
@@ -76,7 +76,7 @@ extension LanguageConfiguration {
 		self.init(language, name: name, queries: queries)
 	}
 
-	public init(_ tsLanguage: UnsafePointer<TSLanguage>, name: String, queriesURL: URL) throws {
+	public init(_ tsLanguage: OpaquePointer, name: String, queriesURL: URL) throws {
 		try self.init(Language(tsLanguage), name: name, queriesURL: queriesURL)
 	}
 }

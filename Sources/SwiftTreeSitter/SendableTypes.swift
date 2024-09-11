@@ -6,13 +6,5 @@ struct SendableOpaquePointer: @unchecked Sendable {
 	}
 }
 
-struct SendableUnsafePointer<T>: @unchecked Sendable {
-	let pointer: UnsafePointer<T>
-
-	init(_ pointer: UnsafePointer<T>) {
-		self.pointer = pointer
-	}
-}
-
-extension SendableUnsafePointer: Equatable {}
-extension SendableUnsafePointer: Hashable {}
+extension SendableOpaquePointer: Equatable {}
+extension SendableOpaquePointer: Hashable {}
