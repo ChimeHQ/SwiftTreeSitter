@@ -13,6 +13,11 @@ public struct LanguageData: Sendable {
 	}
 }
 
+enum LanguageConfigurationError: Error {
+	case queryDirectoryNotFound
+	case queryDirectoryNotReadable(URL)
+}
+
 /// A structure that holds a language parser, name, and its assoicated queries.
 public struct LanguageConfiguration: Sendable {
 	public let language: Language
@@ -60,8 +65,17 @@ extension LanguageConfiguration {
 	}
 
 	public init(_ language: Language, name: String, bundleName: String) throws {
-		let queriesURL = Self.bundleQueriesDirectoryURL(for: bundleName)
-		let queries = try queriesURL.flatMap { try Query.queries(for: language, in: $0) } ?? [:]
+		guard let queriesURL = Self.bundleQueriesDirectoryURL(for: bundleName) else {
+			throw LanguageConfigurationError.queryDirectoryNotFound
+		}
+
+		let path = queriesURL.standardizedFileURL.path
+
+		if FileManager.default.isReadableFile(atPath: path) == false {
+			throw LanguageConfigurationError.queryDirectoryNotReadable(queriesURL)
+		}
+
+		let queries = try Query.queries(for: language, in: queriesURL)
 
 		self.init(language, name: name, queries: queries)
 	}
