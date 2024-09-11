@@ -23,10 +23,6 @@ public struct LanguageLayerQueryCursor {
 
 		advanceRange()
 	}
-
-//	init(query: Query, tree: Tree, set: IndexSet, depth: Int, languageName: String) {
-//		
-//	}
 }
 
 extension LanguageLayerQueryCursor: Sequence, IteratorProtocol {
