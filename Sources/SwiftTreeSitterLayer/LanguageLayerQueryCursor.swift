@@ -4,34 +4,29 @@ import SwiftTreeSitter
 import enum SwiftTreeSitter.Predicate
 
 public struct LanguageLayerQueryCursor {
+	public struct Target {
+		let tree: Tree
+		let query: Query
+		let depth: Int
+		let name: String
+	}
+
 	private let ranges: [NSRange]
-	private let query: Query
-	private let tree: Tree
+	public let target: Target
 	private var activeCursor: QueryCursor?
 	private var index: Int
-	public let depth: Int
-	public let languageName: String
 
-	init(query: Query, tree: Tree, set: IndexSet, depth: Int, languageName: String) {
-		self.tree = tree
-		self.query = query
+	init(target: LanguageLayerQueryCursor.Target, set: IndexSet) {
+		self.target = target
 		self.ranges = set.rangeView.compactMap({ NSRange($0) })
 		self.index = ranges.index(before: ranges.startIndex)
-		self.depth = depth
-		self.languageName = languageName
 
 		advanceRange()
 	}
 
-	init(target: LanguageTreeQueryCursor.Target, set: IndexSet) {
-		self.init(
-			query: target.1,
-			tree: target.0,
-			set: set,
-			depth: target.2,
-			languageName: target.3
-		)
-	}
+//	init(query: Query, tree: Tree, set: IndexSet, depth: Int, languageName: String) {
+//		
+//	}
 }
 
 extension LanguageLayerQueryCursor: Sequence, IteratorProtocol {
@@ -46,7 +41,7 @@ extension LanguageLayerQueryCursor: Sequence, IteratorProtocol {
 
 		let range = ranges[index]
 
-		self.activeCursor = query.execute(in: tree, depth: depth)
+		self.activeCursor = target.query.execute(in: target.tree, depth: target.depth)
 
 		self.activeCursor?.setRange(range)
 	}
@@ -66,14 +61,12 @@ extension LanguageLayerQueryCursor: Sequence, IteratorProtocol {
 }
 
 public struct LanguageTreeQueryCursor {
-	typealias Target = (Tree, Query, Int, String)
-
 	private var activeCursor: LanguageLayerQueryCursor?
-	private let targets: [Target]
+	private let targets: [LanguageLayerQueryCursor.Target]
 	private var index: Int
 	private var set: IndexSet
 
-	init(set: IndexSet, targets: [Target]) {
+	init(set: IndexSet, targets: [LanguageLayerQueryCursor.Target]) {
 		self.set = set
 		self.targets = targets
 		self.index = targets.index(before: targets.startIndex)

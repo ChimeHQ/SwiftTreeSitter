@@ -35,12 +35,12 @@ public struct LanguageLayerSnapshot: Sendable {
 		return set
 	}
 
-	func queryTarget(for queryDef: Query.Definition) throws -> LanguageTreeQueryCursor.Target {
+	func queryTarget(for queryDef: Query.Definition) throws -> LanguageLayerQueryCursor.Target {
 		guard let query = data.queries[queryDef] else {
 			throw LanguageLayerError.queryUnavailable(data.name, queryDef)
 		}
 
-		return (tree, query, depth, data.name)
+		return .init(tree: tree, query: query, depth: depth, name: data.name)
 	}
 }
 
@@ -75,8 +75,8 @@ public struct LanguageLayerTreeSnapshot: Sendable {
 		}
 	}
 
-	private func queryTargets(in set: IndexSet, for queryDef: Query.Definition) throws -> [LanguageTreeQueryCursor.Target] {
-		var targets = [LanguageTreeQueryCursor.Target]()
+	private func queryTargets(in set: IndexSet, for queryDef: Query.Definition) throws -> [LanguageLayerQueryCursor.Target] {
+		var targets = [LanguageLayerQueryCursor.Target]()
 
 		try enumerateSnapshots(in: set) { snapshot in
 			let target = try snapshot.queryTarget(for: queryDef)
