@@ -2,7 +2,7 @@ import Foundation
 
 import TreeSitter
 
-/// A structure that holds a language name and its assoicated queries.
+/// A structure that holds a language name and its associated queries.
 public struct LanguageData: Sendable {
 	public let name: String
 	public let queries: [Query.Definition: Query]
@@ -18,16 +18,18 @@ enum LanguageConfigurationError: Error {
 	case queryDirectoryNotReadable(URL)
 }
 
-/// A structure that holds a language parser, name, and its assoicated queries.
+/// A structure that holds a language parser, name, and its associated queries.
 public struct LanguageConfiguration: Sendable {
 	public let language: Language
 	public let data: LanguageData
 
+	/// Create a configuration with the language parser reference and details about its queries.
 	public init(_ language: Language, data: LanguageData) {
 		self.language = language
 		self.data = data
 	}
 
+	/// Create a configuration with the language parser reference, a name, and the query definitions.
 	public init(_ language: Language, name: String, queries: [Query.Definition: Query]) {
 		self.language = language
 		self.data = LanguageData(name: name, queries: queries)
@@ -44,13 +46,14 @@ public struct LanguageConfiguration: Sendable {
 
 #if !os(WASI)
 extension LanguageConfiguration {
+	/// Create a configuration with a pointer to the language parser structure, a name, and the query definitions.
 	public init(_ tsLanguage: OpaquePointer, name: String, queries: [Query.Definition: Query]) {
         self.init(Language(tsLanguage), name: name, queries: queries)
     }
 
     /// Create a configuration with a name assumed to match a bundle.
     ///
-    /// The bundle must be nested within resources and follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
+	/// When using SPM to build and package tree-sitter parsers, at build time a bundle will be created for the package. Typically, this bundle will also include the query definition `.scm` files, via its `resources` property. This initializer can be used **if** the parser name and bundle follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
 	public init(_ language: Language, name: String) throws {
 		let bundleName = "TreeSitter\(name)_TreeSitter\(name)"
 
@@ -58,12 +61,15 @@ extension LanguageConfiguration {
 	}
 
     /// Create a configuration with a name assumed to match a bundle.
-    ///
-    /// The bundle must be nested within resources and follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
+	///
+	/// When using SPM to build and package tree-sitter parsers, at build time a bundle will be created for the package. Typically, this bundle will also include the query definition `.scm` files, via its `resources` property. This initializer can be used **if** the parser name and bundle follow the pattern `TreeSitter\(name)_TreeSitter\(name)`.
 	public init(_ tsLanguage: OpaquePointer, name: String) throws {
 		try self.init(Language(tsLanguage), name: name)
 	}
 
+	/// Create a configuration with a name and an independent bundle name.
+	///
+	/// When using SPM to build and package tree-sitter parsers, at build time a bundle will be created for the package. Typically, this bundle will also include the query definition `.scm` files, via its `resources` property. This initializer is good option if the package output bundle's naming convention doesn't follow a common pattern. This frequently happens when on parser package includes more than one parser implementation.
 	public init(_ language: Language, name: String, bundleName: String) throws {
 		guard let queriesURL = Self.bundleQueriesDirectoryURL(for: bundleName) else {
 			throw LanguageConfigurationError.queryDirectoryNotFound
@@ -80,16 +86,23 @@ extension LanguageConfiguration {
 		self.init(language, name: name, queries: queries)
 	}
 
+	/// Create a configuration with a name, and an independent bundle name.
 	public init(_ tsLanguage: OpaquePointer, name: String, bundleName: String) throws {
 		try self.init(Language(tsLanguage), name: name, bundleName: bundleName)
 	}
 
+	/// Create a configuration a name and a url to a directory of query definition files.
+	///
+	/// This is a more-general way to initialize configuration objects. It is useful if the query definitions you'd like to use are not part of a parser package, or if their on-disk layout doesn't match the heuristics used for the more automated initializers.
 	public init(_ language: Language, name: String, queriesURL: URL) throws {
 		let queries = try Query.queries(for: language, in: queriesURL)
 
 		self.init(language, name: name, queries: queries)
 	}
 
+	/// Create a configuration with a pointer to the language parser structure, a name, and a url to a directory of query definition files.
+	///
+	/// This is a more-general way to initialize configuration objects. It is useful if the query definitions you'd like to use are not part of a parser package, or if their on-disk layout doesn't match the heuristics used for the more automated initializers.
 	public init(_ tsLanguage: OpaquePointer, name: String, queriesURL: URL) throws {
 		try self.init(Language(tsLanguage), name: name, queriesURL: queriesURL)
 	}
