@@ -16,17 +16,18 @@ on:
 jobs:
   test:
     name: Test
-    runs-on: macOS-14
+	timeout-minutes: 30
+    runs-on: macOS-15
     env:
-      DEVELOPER_DIR: /Applications/Xcode_15.3.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_16.1.app
     strategy:
       matrix:
         destination:
           - "platform=macOS"
           - "platform=macOS,variant=Mac Catalyst"
-          - "platform=iOS Simulator,name=iPhone 12"
+          - "platform=iOS Simulator,name=iPhone 16"
           - "platform=tvOS Simulator,name=Apple TV"
-          - "platform=watchOS Simulator,name=Apple Watch Series 6 (40mm)"
+          - "platform=watchOS Simulator,name=Apple Watch Series 10 (42mm)"
           - "platform=visionOS Simulator,name=Apple Vision Pro"
           
     steps:
@@ -36,3 +37,16 @@ jobs:
           submodules: recursive
       - name: Test platform ${{ matrix.destination }}
         run: set -o pipefail && xcodebuild -scheme SwiftTreeSitter -destination "${{ matrix.destination }}" test | xcbeautify
+
+  linux_test:
+    name: Test Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install swiftly
+        run: curl -L https://swiftlang.github.io/swiftly/swiftly-install.sh | bash -s -- -y
+      - name: Install the latest Swift toolchain
+        run: swiftly install latest
+      - name: Test
+        run: swift test
