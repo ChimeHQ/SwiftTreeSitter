@@ -79,6 +79,7 @@ public enum Predicate: Hashable, Sendable {
 
 extension Predicate {
 	public typealias TextProvider = (NSRange, Range<Point>) -> String?
+	public typealias TextSnapshotProvider = @Sendable (NSRange, Range<Point>) -> String?
 	public typealias GroupMembershipProvider = (String, NSRange, Range<Point>) -> Bool
 
 	public struct Context {

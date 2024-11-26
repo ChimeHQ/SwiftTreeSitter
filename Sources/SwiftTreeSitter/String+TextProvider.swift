@@ -14,7 +14,11 @@ extension String {
 	}
 
 	public var predicateTextProvider: Predicate.TextProvider {
-		return { (nsRange, _) in
+		predicateTextSnapshotProvider
+	}
+	
+	public var predicateTextSnapshotProvider: Predicate.TextSnapshotProvider {
+		{ (nsRange, _) in
 			guard let range = Range<String.Index>(nsRange, in: self) else {
 				return nil
 			}

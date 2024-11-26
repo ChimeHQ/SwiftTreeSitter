@@ -35,6 +35,36 @@ public final class LanguageLayer {
 			)
 		}
 	}
+	
+	public struct ContentSnapshot: Sendable {
+		public let readHandler: Parser.DataSnapshotProvider
+		public let textProvider: SwiftTreeSitter.Predicate.TextSnapshotProvider
+		
+		public init(
+			readHandler: @escaping @Sendable (Int, Point) -> Data?,
+			textProvider: @escaping @Sendable (NSRange, Range<Point>) -> String?
+		) {
+			self.readHandler = readHandler
+			self.textProvider = textProvider
+		}
+		
+		public init(string: String, limit: Int) {
+			let read = Parser.readFunction(for: string, limit: limit)
+
+			self.init(
+				readHandler: read,
+				textProvider: string.predicateTextSnapshotProvider
+			)
+		}
+		
+		public init(string: String) {
+			self.init(string: string, limit: string.utf16.count)
+		}
+
+		public var content: LanguageLayer.Content {
+			.init(readHandler: readHandler, textProvider: textProvider)
+		}
+	}
 
 	public struct Configuration {
 		public let languageProvider: LanguageProvider

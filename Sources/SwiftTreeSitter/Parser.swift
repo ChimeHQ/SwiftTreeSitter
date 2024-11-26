@@ -97,6 +97,7 @@ extension Parser {
 
 extension Parser {
     public typealias ReadBlock = (Int, Point) -> Data?
+	public typealias DataSnapshotProvider = @Sendable (Int, Point) -> Data?
 
     public func parse(_ string: String) -> MutableTree? {
         guard let data = string.data(using: encoding) else { return nil }
@@ -144,15 +145,18 @@ extension Parser {
 		parse(tree: tree?.tree, string: string, limit: limit, chunkSize: chunkSize)
 	}
 
-    public static func readFunction(for string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Parser.ReadBlock {
-        let usableLimit = limit ?? string.utf16.count
-        let encoding = String.nativeUTF16Encoding
-
-        return { (start, _) -> Data? in
-            return string.data(at: start,
-                               limit: usableLimit,
-                               using: encoding,
-                               chunkSize: chunkSize)
-        }
-    }
+	/// Form a function that captures an immutable view into the data of a `String`.
+	public static func readFunction(for string: String, limit: Int? = nil, chunkSize: Int = 2048) -> Parser.DataSnapshotProvider {
+		let usableLimit = limit ?? string.utf16.count
+		let encoding = String.nativeUTF16Encoding
+		
+		return { (start, _) -> Data? in
+			return string.data(
+				at: start,
+				limit: usableLimit,
+				using: encoding,
+				chunkSize: chunkSize
+			)
+		}
+	}
 }
