@@ -92,6 +92,56 @@ func main() {}
 		XCTAssertEqual(highlights, expected)
 	}
 
+
+	func testReparsingWithinInjection() throws {
+		let config = LanguageLayer.Configuration(languageProvider: { name in
+			precondition(name == "swift")
+
+			return Self.swiftConfig
+		})
+
+		let tree = try LanguageLayer(languageConfig: Self.selfInjectingSwiftConfig, configuration: config)
+
+		let text = """
+let a = "var a = 1"
+
+func main() {}
+"""
+		tree.replaceContent(with: text)
+
+		print(try tree.highlights(in: NSRange(0..<text.utf16.count), provider: { _, _ in nil }))
+
+		// make a sufficient change so we can be sure we've actually invalidated the right stuff
+let newText = """
+let a = "func b() {}"
+
+func main() {}
+"""
+
+		let edit = InputEdit(
+			startByte: 9*2,
+			oldEndByte: 18*2,
+			newEndByte: 20*2,
+			startPoint: Point(0, 9*2),
+			oldEndPoint: Point(0, 18*2),
+			newEndPoint: Point(0, 20*2)
+		)
+
+		let invalidation = tree.didChangeContent(.init(string: newText), using: edit, resolveSublayers: false)
+
+		XCTAssertEqual(invalidation, IndexSet(integersIn: 9..<20))
+
+		let highlights = try tree.highlights(in: NSRange(0..<newText.utf16.count), provider: { _, _ in nil })
+
+		let expected = [
+			NamedRange(name: "keyword", range: NSRange(0..<3), pointRange: Point(0, 0)..<Point(0, 6)),
+			NamedRange(name: "keyword.function", range: NSRange(23..<27), pointRange: Point(2, 0)..<Point(2, 8)),
+			NamedRange(name: "keyword.function", range: NSRange(9..<13), pointRange: Point(0, 9*2)..<Point(0, 13*2)),
+		]
+
+		XCTAssertEqual(highlights, expected)
+	}
+
 	func testMultipleInjectionsinSameLayer() throws {
 		let config = LanguageLayer.Configuration(languageProvider: { name in
 			precondition(name == "swift")

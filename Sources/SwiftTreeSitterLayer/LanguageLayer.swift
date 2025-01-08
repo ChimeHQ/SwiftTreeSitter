@@ -145,29 +145,37 @@ extension LanguageLayer {
 	private func applyEdit(_ edit: InputEdit) {
 		state.applyEdit(edit)
 
+		// and now update the included ranges
+		if rangeRestricted, let tree = state.tree {
+			parser.includedRanges = tree.includedRanges
+		}
+
 		for sublayer in sublayers.values {
 			sublayer.applyEdit(edit)
 		}
 	}
 
-	private func shallowParse(with content: Content) -> IndexSet {
+	private func parse(with content: Content) -> IndexSet {
 		let newState = parser.parse(state: state, readHandler: content.readHandler)
 
 		let oldState = state
 
 		self.state = newState
 
-		// manual included range bookkeeping, but only if we have previously been restricted
-		if rangeRestricted, let tree = newState.tree {
-			self.parser.includedRanges = tree.includedRanges
+		var invalidations = oldState.changedSet(for: newState)
+
+		for layer in sublayers.values {
+			let subset = layer.parse(with: content)
+
+			invalidations.formUnion(subset)
 		}
 
-		return oldState.changedSet(for: newState)
+		return invalidations
 	}
 
 	private func parse(with content: Content, affecting affectedSet: IndexSet, resolveSublayers resolve: Bool) -> IndexSet {
-		// afer shallowParse completes, rangeSet is valid again
-		var set = shallowParse(with: content)
+		// afer this completes, affectedSet is valid again
+		var set = parse(with: content)
 
 		set.formUnion(affectedSet)
 
@@ -205,6 +213,13 @@ extension LanguageLayer {
 		return didChangeContent(content, using: edit, resolveSublayers: true)
 	}
 
+	/// Inform the layer tree that content has changed.
+	///
+	/// By default, this function will eagerly resolve sublayers. However, there could be a significant benefit to deferring that work until a query. Layer resolution is always performed at that point anyways, because it is needed to compute query results.
+	///
+	/// - Parameter content: The means of determining the state of the current content.
+	/// - Parameter edit: Describes how the content has changed
+	/// - Parameter resolveSublayers: If false, this will defer sublayer resolution.
 	public func didChangeContent(_ content: LanguageLayer.Content, using edit: InputEdit, resolveSublayers: Bool = true) -> IndexSet {
 		// includedRangeSet becomes invalid here
 		applyEdit(edit)
@@ -331,7 +346,7 @@ extension LanguageLayer {
 		// included ranges must be sorted and the above algorithm does not guarantee that
 		self.parser.includedRanges = allRanges.sorted()
 
-		let set = shallowParse(with: content)
+		let set = parse(with: content)
 
 		invalidation.formUnion(set)
 
