@@ -2,10 +2,11 @@ import Foundation
 
 extension String {
     static var nativeUTF16Encoding: String.Encoding {
-        let dataA = "abc".data(using: .utf16LittleEndian)
-        let dataB = "abc".data(using: .utf16)?.suffix(from: 2)
-
-        return dataA == dataB ? .utf16LittleEndian : .utf16BigEndian
+#if _endian(little)
+        return .utf16LittleEndian
+#else
+        return .utf16BigEndian
+#endif
     }
 
     func data(at byteOffset: Int, limit: Int, using encoding: String.Encoding, chunkSize: Int) -> Data? {
